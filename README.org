@@ -1,0 +1,94 @@
+#+TITLE: gegede - General Geometry Description
+
+Note: this is still in a conceptual/development stage.
+
+* What is this?
+
+The GGD is a general system to generate a description of a [[http://en.wikipedia.org/wiki/Constructive_solid_geometry][constructive solid geometry]] specifically as used by [[http://cern.ch/geant4][Geant4]] or [[http://root.cern.ch][ROOT]] applications are as represented in [[http://cern.ch/gdml][GDML]] files.
+
+* How do I use it?
+
+The design of GGD is layered.
+
+#+BEGIN_SRC dot :cmd dot :cmdline -Tpng :file highlevel.png :exports results
+  digraph "highlevel" {
+    rankdir=LR;
+    params -> builders;
+    builders -> objects;
+    objects -> file;
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:highlevel.png]]
+
+- params :: high level, human-centric configuration mechanism
+- builders :: procedural geometry constructor code 
+- objects :: generic, in-memory representation of the final geometry
+- file :: final output in a suitable data exchange format
+
+At the highest level is a simple configuration language for end-user customization of parameters consumed by the next layer, the builders.  The builders are instances of classes which are responsible for constructing some portion of an overall geometry and may manage some number of other (sub)builders to handle specific construction details.  The geometry is constructed by building an in-memory representation of general geometry objects.
+
+* How does it work
+
+Details of each layer
+
+** Parameter Configuration
+
+Generators may expose high-level configuration parameters.  The system allows the user to supply these parameters in a simple text-based format.  The syntax of the configuration file provides for a number of named sections with each section consisting of a set of key/value pairs.
+
+*** FIXME exact specification of the configuration file schema should wait until the design of builders is more fleshed out
+
+The configuration file is parsed into an in-memory data structure prior to being delivered to builders.  This allows for it to be programmatically modified by the geometry generator application. 
+
+The configuration may specify which builders to load to carry out a portion of the construction.  This allows for a user extensible application.
+
+** Builders
+
+A builder is an instance of a class which is responsible for constructing some portion of the geometry either directly of by delegating the construction to other (sub)builders.  A user who develops novel geometry description spends their time largely coding builders.  
+
+The result of evaluating a builder is an unplaced logical volume which includes any placed daughters as well as any material or surface properties.  If a builder is written to take sub-builders it is responsible for placing the logical volume of each sub-builder as appropriate.  This hierarchy ends at small scales with builders that only produce volumes and at the highest scale where a builder produces the "world volume".
+
+A builder's life cycle goes through three distinct phases
+
+- creation :: a builder object is constructed with any configuration parameters
+- building :: the builder produces its top-level logical volume and all the it holds
+- placing :: a caller outside of the builder object (usually another builder) places the logical volume
+
+After final placement, all builders may be discarded.
+
+*** FIXME: where does material definition come in to play, take into account defaults
+
+** Geometry objects
+
+The builders populate basic constructive solid geometry (CSG) objects.  These objects are similar to those used natively by the Geant4 and ROOT and as supported by the dominant data exchange format, GDML.  The objects are instances of simple Python classes with no functionality ("dumb" data classes).  They cover the CSG concepts including:
+
+ - =elements= :: list of elementary atoms
+
+ - =materials= :: list of aggregations of elements or other materials
+
+ - =shapes= :: list of shapes used for creating volumes
+
+ - =volumes= :: list of logical volumes each bringing together a shape and a material
+
+ - =placements= :: list of physical volumes each bringing together
+                   daughter and mother (unless its a world placement)
+                   volumes and a transformation between them
+
+ - =optical= :: list of optical properties associated with a named material
+
+ - =surfaces= :: list of optical surfaces
+
+ - =sensitive= :: list of sensitive detectors each associating a
+                  (Geant4 sensitive detector) class with a logical
+                  volume and a set of touchables.
+
+*** FIXME: expand to cover other concepts such as replicas and parameterized volumes.
+
+
+** Exchange files
+
+The geometry objects are finally used to produce exchange data files such as those in GDML format.  Because the objects are general, multiple exchange data formats can be accommodated.
+
+*** FIXME: expand on the mechanism to hook in new format generators
+

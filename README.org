@@ -4,13 +4,15 @@ Note: this is still in a conceptual/development stage.
 
 * What is this?
 
-The GGD is a general system to generate a description of a [[http://en.wikipedia.org/wiki/Constructive_solid_geometry][constructive solid geometry]] specifically as used by [[http://cern.ch/geant4][Geant4]] or [[http://root.cern.ch][ROOT]] applications are as represented in [[http://cern.ch/gdml][GDML]] files.
+The GGD is a general system to generate a description of a [[http://en.wikipedia.org/wiki/Constructive_solid_geometry][constructive solid geometry]] specifically as used by [[http://geant4.web.cern.ch/geant4/G4UsersDocuments/UsersGuides/ForApplicationDeveloper/html/Detector/geometry.html][Geant4]] or [[http://root.cern.ch/root/html534/guides/users-guide/Geometry.html][ROOT]] applications are as represented in [[http://cern.ch/gdml][GDML]] files.
 
 * How do I use it?
 
 The design of GGD is layered.
 
 #+BEGIN_SRC dot :cmd dot :cmdline -Tpng :file highlevel.png :exports results
+  # note: make the the following diagram
+  # github org parser exposes this but shouldn't
   digraph "highlevel" {
     rankdir=LR;
     params -> builders;
@@ -29,9 +31,9 @@ The design of GGD is layered.
 
 At the highest level is a simple configuration language for end-user customization of parameters consumed by the next layer, the builders.  The builders are instances of classes which are responsible for constructing some portion of an overall geometry and may manage some number of other (sub)builders to handle specific construction details.  The geometry is constructed by building an in-memory representation of general geometry objects.
 
-* How does it work
+* More details
 
-Details of each layer
+This section has more details about each layer of GGD.
 
 ** Parameter Configuration
 
@@ -85,6 +87,17 @@ The builders populate basic constructive solid geometry (CSG) objects.  These ob
 
 *** FIXME: expand to cover other concepts such as replicas and parameterized volumes.
 
+*** The schema
+
+The =gegede.schema= module defines the schema that the low level geometry objects data structures follow.  This is expressed as a Python data structure =gegede.schema.Schema= which is a dictionary of keys named after the above categories.  Each value enumerates the structure of the objects of each category that can be created.  Builder code instantiates objects from this schema.  For example, to make a box shape
+
+#+BEGIN_SRC python
+  from gegede.schema import shapes
+  # ...
+  box1 = shapes.box("box1", '1cm','2cm','3cm')
+#+END_SRC
+
+Note: all quantities that have units must be specified with them.  GGD uses [[https://github.com/hgrecco/pint][pint]] for unit processing.
 
 ** Exchange files
 

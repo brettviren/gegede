@@ -1,0 +1,35 @@
+Constructing geometry objects with =gegede=.
+
+* The object schema
+
+The objects that =gegede= can produce follow a /schema/ which describes the data members of every object that can be produced.  The default schema is written as a Python data structure and is available as the dictionary =gegede.schema.Schema=.  (in the source at [[./python/gegede/schema/__init__.py]]).  This schema should only be modified to add support for new types.  Such modification may need to be carried through to the construction code which is described next.  
+
+* Construction of a geometry
+
+A geometry is constructed into a fully contained, non-global instance of =gegede.construct.Geometry=.  This allows multiple geometries to be constructed and exist at once.  A geometry is first created like:
+
+#+BEGIN_SRC python
+  from gegede.construct import Geometry
+  geom = Geometry()
+#+END_SRC
+
+All geometry construction is done through the =Geometry= object (here =geom=).  At this low-level, it proceeds much the same manner as one would construct a geometry with Geant4 or ROOT.  For example, to make a "box" shape (aka "solid") object:
+
+#+BEGIN_SRC python
+  box1 = geom.shapes.Box("box1", '1.0m', '2 m', '3 meter')
+  box2 = geom.shapes.Box("box2", '1m', '2m', dz='3m')
+  box3 = geom.shapes.Box("box3", dy='2m', dz='3m')
+
+  assert box1 == geom.store.shapes["box1"]
+#+END_SRC
+
+Items to note about this example:
+
+- Shapes must be created with name as their first argument that is unique to the geometry.  This requirement is carried over from Geant4.
+- This name can be used to look up the shape from the managed store.
+- Arguments following the name may be positional or keyword in the usual Python fashion.  
+- Unspecified arguments will take values as are provided by the schema, knowing these defaults lets it be said that the three boxes are equivalently defined.
+- All numerical quantities that have dimension *must* have units, while unitless quantities can be expressed as literal numbers or their string representations.  Either way, these values are parsed by [[https://github.com/hgrecco/pint][pint]] and must match the dimension for the value as given by its prototype in the schema.  Otherwise, one is free to specify values in whatever supported unit happens to be convenient.
+
+
+

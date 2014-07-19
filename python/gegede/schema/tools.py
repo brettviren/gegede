@@ -1,42 +1,9 @@
 #!/usr/bin/env python
 '''
-The schema for the categories of geometry description.
-
-Shapes ("solids") follow the conventions shows in Geant4 and ROOT:
-
-http://geant4.web.cern.ch/geant4/G4UsersDocuments/UsersGuides/ForApplicationDeveloper/html/Detector/geomSolids.html
-http://root.cern.ch/root/html534/guides/users-guide/Geometry.html#shapes
-
- - the naming conventions of Geant4 are taken for the shapes (although we call them "shapes" not solids")
-
- - where applicable, the dimensions of solids are expressed as "half lengths" an such values are indicated with a "d" in their name (eg, "dx", "dy", "dz", "dphi").
-
- - all dimensions must be expressed in a quantity with the appropriate unit
-
+Some functions to help process the schema
 '''
-
-from collections import namedtuple, OrderedDict
-from . import units, Quantity
-
-zerolength = Quantity('0cm')
-unitlength = Quantity('0cm')
-zeroangle = Quantity('0deg')
-piangle = Quantity('180deg')
-twopiangle = Quantity('360deg')
-
-Schema = dict(
-    Shapes = [
-        ("Box", (("dx",unitlength), ("dy",unitlength), ("dz",unitlength))),
-        ("Tubs", (("rmin", zerolength), ("rmax",unitlength), ("dz", unitlength),
-                  ("sphi",zeroangle), ("dphi", twopiangle))),
-        ("Sphere", (("rmin", zerolength), ("rmax",unitlength),
-                    ("sphi",zeroangle), ("dphi", twopiangle),
-                    ("stheta",zeroangle), ("dtheta", piangle))),
-        # fixme: fill in the rest!
-    ]
-)
-
-
+from collections import OrderedDict, namedtuple
+from .. import units, Quantity
 
 def make_converter(obj):
     '''Return a function that will convert its argument using obj as a
@@ -88,7 +55,7 @@ def validate_input(proto, *args, **kwargs):
     return members.values()
     
 
-def make_ntt_typed(collector, ntname, *proto):
+def make_maker(collector, ntname, *proto):
 
     '''
     Make a namedtuple class that does type-checking of its args against a prototype.
@@ -110,18 +77,4 @@ def make_ntt_typed(collector, ntname, *proto):
     instantiator.__name__ = ntname
     instantiator.__doc__ = "%s: %s" % (ntname, ', '.join(member_names))
     return instantiator
-
-shape_store = OrderedDict()
-
-def make_shapes(shapes_schema):
-    shape_classes = list()
-    shape_names = [ss[0] for ss in shapes_schema]
-    ShapeCollection = namedtuple("Shapes", shape_names)
-    shapes = list()
-    for ss in shapes_schema:
-        shape = make_ntt_typed(shape_store, ss[0], *ss[1])
-        shapes.append(shape)
-    return ShapeCollection(*shapes)
-shapes = make_shapes(Schema['Shapes'])
-
 

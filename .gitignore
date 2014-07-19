@@ -3,3 +3,7 @@
 pint
 venv
 README.html
+build
+dist
+gegede.egg-info
+*.html

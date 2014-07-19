@@ -6,7 +6,7 @@ The GGD is a general system to generate a description of a [[http://en.wikipedia
 
 * How do I use it?
 
-The design of GGD is layered to and allows use at each later.
+GGD is designed along layers which are exposed to the user to allow different levels of interface.
 
 #+BEGIN_SRC dot :cmd dot :cmdline -Tpng :file highlevel.png :exports results :post (org-redisplay-inline-images)
   # note: make the the following diagram
@@ -40,3 +40,24 @@ At the highest level is a simple configuration language for end-user customizati
 
 T.B.D.
 
+* Development
+
+To set up for building and testing "in source":
+
+#+BEGIN_EXAMPLE
+  virtualenv venv
+  source venv/bin/activate
+  python setup.py develop
+#+END_EXAMPLE
+
+The tests can be either run manually one at a time via:
+
+#+BEGIN_EXAMPLE
+  python tests/test_schema.py
+#+END_EXAMPLE
+
+Or collectively with nose:
+
+#+BEGIN_EXAMPLE
+  nosetests
+#+END_EXAMPLE

@@ -12,6 +12,7 @@ class GeometryStore(object):
     '''
     def __init__(self):
         self.shapes = OrderedDict()
+        self.matter = OrderedDict()
         
 
 class Geometry(object):
@@ -35,9 +36,12 @@ class Geometry(object):
         '''
         # for now hard-code knowledge of the schema, fixme: can we make this implicit?
 
-        shape_schema = schema['shapes']
-        shape_types = sorted(shape_schema.keys())
-        shape_makers = [make_maker(self.store.shapes, n, *shape_schema[n]) for n in shape_types]
-        self.shapes = namedtuple("Shapes", shape_types)(*shape_makers)
+        scheme = schema['shapes']
+        types = sorted(scheme.keys())
+        makers = [make_maker(self.store.shapes, n, *scheme[n]) for n in types]
+        self.shapes = namedtuple("Shapes", types)(*makers)
         
-
+        scheme = schema['matter']
+        types = sorted(scheme.keys())
+        makers = [make_maker(self.store.matter, n, *scheme[n]) for n in types]
+        self.matter = namedtuple("Matter", types)(*makers)

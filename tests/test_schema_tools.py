@@ -2,16 +2,16 @@
 '''
 Test the gegede.schema.tools module.
 '''
-import common
+
 from gegede.schema.tools import make_converter, validate_input
 
 def test_converter():
     c = make_converter("1cm")
-    o = c("1m")                 # should be okay
+    c("1m")                     # should be okay
 
     c = make_converter(1)
     try:
-        o = c("1m")             # should fail
+        c("1m")                 # should fail
     except ValueError:
         pass
     else:
@@ -19,7 +19,7 @@ def test_converter():
 
     c = make_converter('1cm')
     try:
-        o = c(1)             # should fail
+        c(1)                    # should fail
     except ValueError:
         pass
     else:
@@ -27,12 +27,12 @@ def test_converter():
 
 def test_validate_input():
     proto = (("intnum",0),("fpnum",0.0),("dist","0cm"))
-    v = validate_input(proto, 1, 2.0, "3meter")
+    validate_input(proto, 1, 2.0, "3meter")
 
-    v = validate_input(proto, 1, dist='4inch')
+    validate_input(proto, 1, dist='4inch')
 
     try:
-        v = validate_input(proto, 1, 2.0, 3) # should fail
+        validate_input(proto, 1, 2.0, 3) # should fail
     except ValueError:
         pass
     else:

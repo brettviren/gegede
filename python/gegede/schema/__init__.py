@@ -35,17 +35,20 @@ Schema = dict(
         ),
 
     matter = dict(
-        Element = (("symbol",""), ("z",0), ("a","0.0g/mole")),
-        Isotope = (("z",0), ("ia",0), ("a","0.0g/mole")),
-        Composition = (("symbol",""), ("isotopes", list)),
+        Element = (("symbol",str), ("z",int), ("a","0.0g/mole")),
+        Isotope = (("z",int), ("ia",int), ("a","0.0g/mole")),
+        Composition = (("symbol",str), ("isotopes", list)),
 
-        # a material with no specific components
-        Amalgam = (("z", 0), ("a","0.0g/mole"), ("density", 0.0)),
+        # a material with no specific constituents
+        Amalgam = (("z", int), ("a","0.0g/mole"), ("density", "0.0g/cc")),
 
-        # three ways to mix up Elements, list of 2-tuple ("name",portion)
+        # A molecule is a Material with a number of elements
         Molecule = (("density", "0.0g/cc"), ("elements", list)),
-        Compound = (("density", "0.0g/cc"), ("elements", list)),
-        Mixture = (("density", "0.0g/cc"), ("elements", list)),
+
+        # A mixture is a Material that has a number of elements or
+        # other materials added by mass fraction.
+        Mixture = (("density", "0.0g/cc"), ("components", list)),
+
         # fixme, these need to also take state, temperature and pressure
         ),
 

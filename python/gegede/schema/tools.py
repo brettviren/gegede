@@ -3,20 +3,50 @@
 Some functions to help process the schema
 '''
 from collections import OrderedDict, namedtuple
-from .. import units, Quantity
+from .. import Quantity
 
-def make_converter(obj):
-    '''Return a function that will convert its argument using obj as a
-    prototype.  It will raise ValueError if conversion is not
-    possible.
+def toquantity(proto):
+    if type(proto) == Quantity:
+        return proto
+    if isinstance(proto, type("")):
+        try:
+            q = Quantity(proto)
+            return q
+        except ValueError,err:
+            pass
+    return
+
+
+def make_converter(proto):
+    '''Return a function that will convert its argument using <proto> as a
+    prototype.  The <proto> is either a type or a string that can be
+    converted to a Quantity.
     '''
-    obj = Quantity(obj)
+    if proto == str:            # require a string
+        def tostr(other):
+            other = str(other)
+            if other == "":
+                raise ValueError, 'Empty value'
+            return other
+        return tostr
+
+    if proto in (list, int, float): 
+        def totype(other):
+            return proto(other)
+        return totype
+
+    qobj = toquantity(proto)
+    if qobj is None:        # prototype some type
+        raise 'Can not parse prototype: %s [%s]' % (type(proto),proto)
+
+    # it's a Quantity
     def converter(other):
         other = Quantity(other)
-        if obj.dimensionality == other.dimensionality:
+        if qobj.dimensionality == other.dimensionality:
             return other
-        raise ValueError, 'Unit mismatch: %s incompatible with prototype %s' % (other, obj)
+        raise ValueError, 'Unit mismatch: %s incompatible with prototype %s' % (other, qobj)
     return converter
+
 
 def validate_input(proto, *args, **kwargs):
     '''Validate the input <args> and <kwargs> against the prototypes in <proto>.
@@ -45,6 +75,7 @@ def validate_input(proto, *args, **kwargs):
     for k,v in zip(members.keys(), args):
         members[k] = converters[k](v)
         already.append(k)
+
     for k,v in kwargs.items():
         if k not in converters.keys():
             raise ValueError, 'Object "%s" not in prototype' % (k,)

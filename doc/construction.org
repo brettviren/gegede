@@ -2,7 +2,7 @@ Constructing geometry objects with =gegede=.
 
 * The object schema
 
-The objects that =gegede= can produce follow a /schema/ which describes the data members of every object that can be produced.  The default schema is written as a Python data structure and is available as the dictionary =gegede.schema.Schema=.  (in the source at [[./python/gegede/schema/__init__.py]]).  This schema should only be modified to add support for new types.  Such modification may need to be carried through to the construction code which is described next.  
+The objects that =gegede= can produce follow a /schema/ which describes the data members of every object that can be produced.  The default schema is written as a Python data structure and is available as the dictionary =gegede.schema.Schema=, (in the source at [[./python/gegede/schema/__init__.py]]).  This schema should only be modified to add support for new types.  Such modification may need to be carried through to the construction code described below.
 
 * Construction of a geometry
 

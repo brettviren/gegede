@@ -9,7 +9,7 @@ def test_converter():
     c = make_converter("1cm")
     c("1m")                     # should be okay
 
-    c = make_converter(1)
+    c = make_converter(int)
     try:
         c("1m")                 # should fail
     except ValueError:
@@ -26,7 +26,7 @@ def test_converter():
         raise RuntimeError, "Failed to catch mismatch with unitful prototype"
 
 def test_validate_input():
-    proto = (("intnum",0),("fpnum",0.0),("dist","0cm"))
+    proto = (("intnum",int),("fpnum",float),("dist","0cm"))
     validate_input(proto, 1, 2.0, "3meter")
 
     validate_input(proto, 1, dist='4inch')

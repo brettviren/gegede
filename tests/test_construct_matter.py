@@ -18,6 +18,8 @@ def test_elements():
     assert o.symbol == 'O'
     assert o.z == 8
     assert o.a == Quantity(16.0, 'gram / mole')
+    assert len(g.store.matter) == 1
+    assert len(g.store.shapes) == 0
     print o
 
     n = g.matter.Element("Nitrogen", "N", 7, "14.01*g/mole")
@@ -36,7 +38,7 @@ def test_elements():
     assert U238.ia == 238
     print U238
     enriched_uranium = g.matter.Composition("enriched U", symbol="U", 
-                                            isotopes=(("u235",0.8), ("U238",0.2)))
+                                            isotopes=(("U235",0.8), ("U238",0.2)))
     assert len(enriched_uranium.isotopes) == 2
     print enriched_uranium
 
@@ -61,3 +63,13 @@ def test_elements():
     print nuc_rod_mat
     assert 1 == len(nuc_rod_mat.components)
 
+
+def test_pass_objects():
+    g = construct.Geometry()
+    
+    n = g.matter.Element("Nitrogen", "N", 7, "14.01*g/mole")
+    h = g.matter.Element("Hydrogen","H",1,"1.01g/mole")
+    water = g.matter.Molecule("Water", density="1.0kg/l", elements=((n,1),(h,2)))
+    print water
+
+    assert 3 == len(g.store.matter)

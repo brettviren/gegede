@@ -3,50 +3,35 @@
 Some functions to help process the schema
 '''
 from collections import OrderedDict, namedtuple
-from .. import Quantity
-
-def toquantity(proto):
-    if type(proto) == Quantity:
-        return proto
-    if isinstance(proto, type("")):
-        try:
-            q = Quantity(proto)
-            return q
-        except ValueError,err:
-            pass
-    return
-
+from types import isquantity, toquantity
 
 def make_converter(proto):
     '''Return a function that will convert its argument using <proto> as a
-    prototype.  The <proto> is either a type or a string that can be
-    converted to a Quantity.
+    prototype.  The <proto> is either a type or an instance of a Quantity
+    or a string that can be parsed as a Quantity.
     '''
-    if proto == str:            # require a string
+    if proto in (int, float):   # simple numerical type
+        def topod(other):
+            return proto(other)
+        return topod
+
+    if proto == str:            # treat string special to instrument some error checking
         def tostr(other):
             other = str(other)
             if other == "":
-                raise ValueError, 'Empty value'
+                raise ValueError, 'Empty string is an illegal value for str'
+            if other is None:
+                raise ValueError, 'None is an illegal value for str'
             return other
         return tostr
 
-    if proto in (list, int, float): 
-        def totype(other):
-            return proto(other)
-        return totype
+    if isquantity(proto):
+        return toquantity(proto)
 
-    qobj = toquantity(proto)
-    if qobj is None:        # prototype some type
-        raise 'Can not parse prototype: %s [%s]' % (type(proto),proto)
-
-    # it's a Quantity
-    def converter(other):
-        other = Quantity(other)
-        if qobj.dimensionality == other.dimensionality:
-            return other
-        raise ValueError, 'Unit mismatch: %s incompatible with prototype %s' % (other, qobj)
-    return converter
-
+    # it better be of some type of self-converting prototype
+    def toobj(other):
+        return proto(other)
+    return toobj
 
 def validate_input(proto, *args, **kwargs):
     '''Validate the input <args> and <kwargs> against the prototypes in <proto>.
@@ -68,6 +53,8 @@ def validate_input(proto, *args, **kwargs):
     members = OrderedDict()
     converters = dict()
     for name,pval in proto:
+        if isquantity(pval):
+            pval = toquantity(pval)(pval)
         members[name] = pval
         converters[name] = make_converter(pval)
 

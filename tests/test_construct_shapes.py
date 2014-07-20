@@ -3,7 +3,6 @@
 Test the gegede.construct module by making some shapes
 '''
 
-import common
 from gegede import construct
 
 def test_units():
@@ -11,7 +10,7 @@ def test_units():
     g.shapes.Box("units0",'1cm','2cm','3cm')    
 
     try:
-        x = g.shapes.Box("units1",1,'2cm','3cm') # should fail
+        g.shapes.Box("units1",1,'2cm','3cm') # should fail
     except ValueError:
         pass
     else:
@@ -20,14 +19,14 @@ def test_units():
 def test_unique_shapes():
     g = construct.Geometry()
     try:
-        b0 = g.shapes.Box("box0",1,2,3) # should fail
+        g.shapes.Box("box0",1,2,3) # should fail
     except ValueError:
-        b0 = g.shapes.Box("box0",'1cm','2cm','3cm')
+        g.shapes.Box("box0",'1cm','2cm','3cm')
     else:
         raise RuntimeError, "Failed to catch unit mismatch"
 
     try:
-        b00 = g.shapes.Box("box0",'1mm','2mm','3mm')
+        g.shapes.Box("box0",'1mm','2mm','3mm')
     except ValueError:
         print 'Correctly failed to allow two boxes of same name'
         pass
@@ -52,7 +51,7 @@ def test_make_some_shapes():
     assert b1.dy==b2.dy and b2.dy==b3.dy, str([b1,b2,b3])
     assert b1.dz==b2.dz and b2.dz==b3.dz, str([b1,b2,b3])
     try:
-        b4 = g.shapes.Box("box4", 1, 2, dy=22, dz=33)
+        g.shapes.Box("box4", 1, 2, dy=22, dz=33)
     except ValueError:
         print 'Correctly failed with duplicate kwargs'
         pass

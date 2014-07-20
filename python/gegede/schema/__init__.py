@@ -22,6 +22,8 @@ http://root.cern.ch/root/html534/guides/users-guide/Geometry.html#shapes
 
 '''
 
+from types import Named, NamedTypedList
+
 Schema = dict(
 
     shapes = dict(
@@ -37,20 +39,28 @@ Schema = dict(
     matter = dict(
         Element = (("symbol",str), ("z",int), ("a","0.0g/mole")),
         Isotope = (("z",int), ("ia",int), ("a","0.0g/mole")),
-        Composition = (("symbol",str), ("isotopes", list)),
+        Composition = (("symbol",str), ("isotopes", NamedTypedList(float))),
 
         # a material with no specific constituents
         Amalgam = (("z", int), ("a","0.0g/mole"), ("density", "0.0g/cc")),
 
         # A molecule is a Material with a number of elements
-        Molecule = (("density", "0.0g/cc"), ("elements", list)),
+        Molecule = (("density", "0.0g/cc"), ("elements", NamedTypedList(int))),
 
         # A mixture is a Material that has a number of elements or
         # other materials added by mass fraction.
-        Mixture = (("density", "0.0g/cc"), ("components", list)),
+        Mixture = (("density", "0.0g/cc"), ("components", NamedTypedList(float))),
 
         # fixme, these need to also take state, temperature and pressure
         ),
 
+    structure = dict(
+        Position = (("x", "0m"), ("y","0m"), ("z","0m")),
+        Rotation = (("x", "0deg"), ("y","0deg"), ("z","0deg")),
+        Volume = (("material", Named), ("shape", Named), 
+                  ("placements", NamedTypedList(str,0)),
+                  ("params", NamedTypedList(str, 0))),
+        Placement = (("volume", Named), ("pos", Named), ("rot", Named)),
+    ),
 )
 

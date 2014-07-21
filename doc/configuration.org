@@ -1,0 +1,6 @@
+Configuration system for GGD
+
+- based on Python config parser
+- maybe with =deconf= style variables
+
+More to come.

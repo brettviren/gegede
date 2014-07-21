@@ -1,0 +1,5 @@
+GGD builders
+
+These organize geometry object construction code into a hierarchy of reusable chunks.
+
+More to come.

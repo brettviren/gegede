@@ -9,6 +9,7 @@ The General Geometry Description (GGD) is a software system to generate a descri
 GGD is designed along layers each of which allows the user-programmer access.
 
 #+BEGIN_SRC dot :cmd dot :cmdline -Tpng :file highlevel.png :exports results 
+  # note: github exposes this, ignore it
   digraph "highlevel" {
     rankdir=LR;
     params -> builders;

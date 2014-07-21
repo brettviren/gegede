@@ -10,7 +10,7 @@ After producing a =gegede.construct.Geometry= object one can export it to a numb
   geom = Geomtry()
   # ... fill geom ...
   xml = gdml.dumps(geom)
-  open('geom.gdml,'w').write(xml)
+  open('geom.gdml','w').write(xml)
 #+END_SRC
 
 Each exporter is in a module under =gegede.export= and must implement the following API:

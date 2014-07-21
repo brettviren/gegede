@@ -2,20 +2,18 @@
 
 * What is this?
 
-The GGD is a general system to generate a description of a [[http://en.wikipedia.org/wiki/Constructive_solid_geometry][constructive solid geometry]] specifically as used by [[http://geant4.web.cern.ch/geant4/G4UsersDocuments/UsersGuides/ForApplicationDeveloper/html/Detector/geometry.html][Geant4]] or [[http://root.cern.ch/root/html534/guides/users-guide/Geometry.html][ROOT]] applications are as represented in [[http://cern.ch/gdml][GDML]] files.
+The General Geometry Description (GGD) is a software system to generate a description of a [[http://en.wikipedia.org/wiki/Constructive_solid_geometry][constructive solid geometry]] specifically as used by [[http://geant4.web.cern.ch/geant4/G4UsersDocuments/UsersGuides/ForApplicationDeveloper/html/Detector/geometry.html][Geant4]] or [[http://root.cern.ch/root/html534/guides/users-guide/Geometry.html][ROOT]] applications are as represented in [[http://cern.ch/gdml][GDML]] files.  It is implemented as a pure Python module =gegede=.  It relies on [[https://github.com/hgrecco/pint][Pint]] for units and [[http://lxml.de/][lxml]] for emitting XML for GDML.  For running the tests you will need [[https://nose.readthedocs.org][nose]] or a similar unit test runner.
 
 * How do I use it?
 
-GGD is designed along layers which are exposed to the user to allow different levels of interface.
+GGD is designed along layers each of which allows the user-programmer access.
 
-#+BEGIN_SRC dot :cmd dot :cmdline -Tpng :file highlevel.png :exports results :post (org-redisplay-inline-images)
-  # note: make the the following diagram
-  # github org parser exposes this but shouldn't
+#+BEGIN_SRC dot :cmd dot :cmdline -Tpng :file highlevel.png :exports results 
   digraph "highlevel" {
     rankdir=LR;
     params -> builders;
     builders -> objects;
-    objects -> file;
+    objects -> export;
   }
 #+END_SRC
 
@@ -25,11 +23,13 @@ GGD is designed along layers which are exposed to the user to allow different le
 - params :: high level, human-centric configuration mechanism
 - builders :: structured, procedural geometry constructor code 
 - objects :: the in-memory representation of the final geometry
-- file :: conversion to formats suitable to exchange the data with other applications.
+- export :: conversion to formats suitable to exchange the data with other applications.
 
-At the highest level is a simple configuration language for end-user customization of parameters consumed by the next layer, the builders.  The builders are instances of classes which are responsible for constructing some portion of an overall geometry and may manage some number of other (sub)builders to handle specific construction details.  The geometry is constructed by building an in-memory representation of general geometry objects.
+At the highest level is a simple configuration language for end-user setting of parameters that are consumed by the next layer, the builders.  The builders are instances of classes which are responsible for constructing some portion of an overall geometry.  They may also manage some number of other (sub)builders to handle specific construction details.  The geometry is constructed by building an in-memory representation of general geometry objects.  Finally these objects may be exported into a number of forms including GDML, "plain old (Python) data" and JSON.  Each layer provides for extension to novel uses.
 
 * Tutorial
+
+Each layer contains a tutorial:
 
 - [[./doc/configuration.org][Configuration]]
 - [[./doc/builders.org][Builders]]
@@ -40,9 +40,17 @@ At the highest level is a simple configuration language for end-user customizati
 
 T.B.D.
 
+* Installation
+
+GGD can be installed in the usual "Python way":
+
+#+BEGIN_EXAMPLE
+  python setup.py install
+#+END_EXAMPLE
+
 * Development
 
-To set up for building and testing "in source":
+To set up for building and testing GGD "in source":
 
 #+BEGIN_EXAMPLE
   virtualenv venv
@@ -50,13 +58,7 @@ To set up for building and testing "in source":
   python setup.py develop
 #+END_EXAMPLE
 
-The tests can be either run manually one at a time via:
-
-#+BEGIN_EXAMPLE
-  python tests/test_schema.py
-#+END_EXAMPLE
-
-Or collectively with nose:
+The tests are meant to be run via [[https://nose.readthedocs.org][nose]]:
 
 #+BEGIN_EXAMPLE
   pip install nose

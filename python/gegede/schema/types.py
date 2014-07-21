@@ -32,7 +32,6 @@ def toquantity(proto):
         raise ValueError, 'Unit mismatch: %s incompatible with prototype %s' % (other, qobj)
     return converter
 
-
 def Named(thing):
     '''
     Return thing.name if it has the attribute, otherwise return thing
@@ -41,25 +40,35 @@ def Named(thing):
         return thing.name
     return thing
 
-def resolve_name(proto):
-    ret = list()
-    for n,v in proto:
-        ret.append((n,Named(v)))
-    return tuple(ret)
-
 
 def NamedTypedList(typ, minentries = 1):
-    '''
-    Return a function which processes a prototype.
+    '''Return a function which processes a prototype which is a list of
+    2-tuples: ("name", obj) where <obj> is an instance of type <typ>.
     '''
 
-    def converter(proto):
+    def named_typed_list_converter(proto):
         ret = list()
         if len(proto) < minentries:
             raise ValueError, "At least %d entries required" % minentries
-        for n,v in resolve_name(proto):
+        for n,v in proto:
             v = typ(v)
+            n = Named(n)
             ret.append((n,v))
         return tuple(ret)
-    return converter
+    return named_typed_list_converter
+
+def NameList(typ, minentries = 1):
+    '''Return a function which processes a prototype which is a list of
+    object names.
+    '''
+
+    def name_list_converter(proto):
+        ret = list()
+        if len(proto) < minentries:
+            raise ValueError, "At least %d entries required" % minentries
+        for n in proto:
+            n = Named(n)
+            ret.append(n)
+        return tuple(ret)
+    return name_list_converter
 

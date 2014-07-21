@@ -59,5 +59,6 @@ The tests can be either run manually one at a time via:
 Or collectively with nose:
 
 #+BEGIN_EXAMPLE
+  pip install nose
   nosetests
 #+END_EXAMPLE

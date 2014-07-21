@@ -53,10 +53,19 @@ def validate_input(proto, *args, **kwargs):
     members = OrderedDict()
     converters = dict()
     for name,pval in proto:
+        c = make_converter(pval)
+        converters[name] = c
+
+        # set default
         if isquantity(pval):
-            pval = toquantity(pval)(pval)
-        members[name] = pval
-        converters[name] = make_converter(pval)
+            members[name] = c(pval)
+        else:
+            members[name] = None
+
+        # if isquantity(pval):
+        #     pval = toquantity(pval)(pval)
+        # members[name] = pval
+        # converters[name] = make_converter(pval)
 
     already = list()
     for k,v in zip(members.keys(), args):
@@ -82,6 +91,9 @@ def make_maker(collector, ntname, *proto):
     '''
     member_names = [p[0] for p in proto]
     def instantiator(objname, *args, **kwargs):
+        if not objname:
+            objname = "%s%06d" % (ntname, len(collector))
+
         if objname in collector:
             raise ValueError, 'Instance "%s" of type %s already in %s' % \
                 (objname, ntname, collector)

@@ -61,6 +61,11 @@ def test_make_some_shapes():
     print 'Shape store:\n\t', '\n\t'.join([str(v) for v in g.store.shapes.values()])
 
 
+def test_default_args():
+    g = construct.Geometry()
+    b1 = g.shapes.Box('box1')
+    print 'Box1:',b1
+
 if '__main__' == __name__:
     test_units()
     test_unique_shapes()

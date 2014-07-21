@@ -22,7 +22,7 @@ http://root.cern.ch/root/html534/guides/users-guide/Geometry.html#shapes
 
 '''
 
-from types import Named, NamedTypedList
+from types import Named, NameList, NamedTypedList
 
 Schema = dict(
 
@@ -58,7 +58,7 @@ Schema = dict(
         Position = (("x", "0m"), ("y","0m"), ("z","0m")),
         Rotation = (("x", "0deg"), ("y","0deg"), ("z","0deg")),
         Volume = (("material", Named), ("shape", Named), 
-                  ("placements", NamedTypedList(str,0)),
+                  ("placements", NameList(str,0)),
                   ("params", NamedTypedList(str, 0))),
         Placement = (("volume", Named), ("pos", Named), ("rot", Named)),
     ),

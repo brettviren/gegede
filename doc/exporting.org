@@ -1,0 +1,32 @@
+Exporting =gegede= objects.
+
+* Calling exporters
+
+After producing a =gegede.construct.Geometry= object one can export it to a number of supported formats.  
+
+#+BEGIN_SRC python
+  from gegede.export import gdml
+  from gegede.construct import Geometry
+  geom = Geomtry()
+  # ... fill geom ...
+  xml = gdml.dumps(geom)
+  open('geom.gdml,'w').write(xml)
+#+END_SRC
+
+Each exporter is in a module under =gegede.export= and must implement the following API:
+
+- =EXPORTER.dumps(geom)= :: return a serializable object (string) representing the =geom= in the EXPORTER's format.
+
+It may implement this additional API:
+
+- =EXPORTER.convert(geom)= :: return a different object representation of =geom= in a form related to the exporter.
+
+* Writing exporters
+
+Exporters must supply the =dumps()= function taking an instance of =gegede.construct.Geometry= and returning a serialized object (eg a string) suitable to passing to =file.write()=.
+
+** Considerations
+
+The =gegede.construct.Geometry= data object's =store= member contains a per-section collection of all objects created under that section.  Most exporter's work by walking through this store and converting each object into whatever the target form is.  Object values that are held as =collections.namedtuple= or =pint.Quantity= will likely need special consideration when serializing.  For a simple example see the module =gegede.export.pod=.
+
+

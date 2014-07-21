@@ -16,13 +16,9 @@ class Geometry(object):
         The optional <schema> object is a raw schema and defaults to
         gegede.schema.Schema.
         '''
-        self.load_schema(schema or default_schema.Schema)
+        if not schema:
+            schema = default_schema.Schema
 
-    def load_schema(self, schema):
-        '''
-        Instrument self with members to create elements described in the schema.
-        '''
-        #parts = ['shapes', 'matter', 'structure']
         parts = sorted(schema.keys())
         self.store = namedtuple('GeometryStore', parts)(*[OrderedDict() for x in parts])
 
@@ -32,17 +28,4 @@ class Geometry(object):
             makers = [make_maker(store, n, *scheme[n]) for n in types]
             setattr(self, part, namedtuple(part.capitalize(), types)(*makers))
 
-        # scheme = schema['shapes']
-        # types = sorted(scheme.keys())
-        # makers = [make_maker(self.store.shapes, n, *scheme[n]) for n in types]
-        # self.shapes = namedtuple("Shapes", types)(*makers)
-        
-        # scheme = schema['matter']
-        # types = sorted(scheme.keys())
-        # makers = [make_maker(self.store.matter, n, *scheme[n]) for n in types]
-        # self.matter = namedtuple("Matter", types)(*makers)
-
-        # scheme = schema['structure']
-        # types = sorted(scheme.keys())
-        # makers = [make_maker(self.store.matter, n, *scheme[n]) for n in types]
-        # self.matter = namedtuple("Structure", types)(*makers)
+        self.schema = schema

@@ -50,6 +50,7 @@ def test_elements():
 
     water = g.matter.Molecule("Water", density="1.0kg/l", elements=(("Oxygen",1),("Hydrogen",2)))
     print water
+    assert hasattr(water,'symbol')
     assert 2 == len(water.elements)
 
     air = g.matter.Mixture("Air", density = "1.290*mg/cc", 

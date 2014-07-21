@@ -45,11 +45,11 @@ Schema = dict(
         Amalgam = (("z", int), ("a","0.0g/mole"), ("density", "0.0g/cc")),
 
         # A molecule is a Material with a number of elements
-        Molecule = (("density", "0.0g/cc"), ("elements", NamedTypedList(int))),
+        Molecule = (("symbol",str), ("density", "0.0g/cc"), ("elements", NamedTypedList(int))),
 
         # A mixture is a Material that has a number of elements or
         # other materials added by mass fraction.
-        Mixture = (("density", "0.0g/cc"), ("components", NamedTypedList(float))),
+        Mixture = (("symbol",str), ("density", "0.0g/cc"), ("components", NamedTypedList(float))),
 
         # fixme, these need to also take state, temperature and pressure
         ),

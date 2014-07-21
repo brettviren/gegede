@@ -10,8 +10,10 @@ setup(name = 'gegede',
       url = 'http://github.com/brettviren/gegede',
       package_dir = {'':'python'},
       packages = ['gegede', 'gegede.schema'],
+      # These are just what were developed against.  Older versions may be okay.
       install_requires=[
           "pint >= 0.5.1",
+          "lxml >= 3.3.5"
       ],
   )
 

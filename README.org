@@ -14,12 +14,13 @@ GGD is designed along layers each of which allows the user-programmer access.
     rankdir=LR;
     params -> builders;
     builders -> objects;
-    objects -> export;
+    objects -> exports;
   }
 #+END_SRC
 
 #+RESULTS:
 [[file:highlevel.png]]
+
 
 - params :: high level, human-centric configuration mechanism
 - builders :: structured, procedural geometry constructor code 

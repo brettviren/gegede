@@ -1,5 +1,106 @@
 GGD builders
 
-These organize geometry object construction code into a hierarchy of reusable chunks.
+GGD builders organize geometry object construction code into a hierarchy of reusable chunks.  This layer sits below the [[./configuration.org][configuration]] layer and above the [[./construction.org][construction]] layer.  The first section below goes through some high-level builder concepts and presents some design issues that developers should consider.  It is followed with how to write builders.
 
-More to come.
+* Builder Concepts
+
+A builder class is responsible for providing code to construct some chunk of an overall geometry.  It may do this by directly creating geometry objects through the =gegede.construct.Geometry= object and/or it may delegate to some number of (sub)builders.  
+
+Builders are ephemeral.  Once the construction is done they are discarded.  An application developer is not required to use them or may elect to use builders for only part of the construction.  
+
+There is a builder-to-builder API that is to be followed as part of the builder hierarchy.  Each builder must:
+
+- accept zero or more sub-builders as input
+- create zero or more internal sub-builders
+- directly construct zero or more logical volumes
+- provide access to these logical volumes by name (to the parent builder)
+- trigger construction by all sub-builders
+- place all logical volumes returned by sub-builders
+
+There is also a builder-to-builder contract.  Each builder must "know" the expected number and interpretation of the logical volumes that each of its sub-builder provide.  However, a builder should not make any assumptions about details any sub-structure in these volumes.  A builder must also remain fully ignorant of how its own volumes will be placed into some mother by another builder.
+
+The following figure illustrates an example system of GGD builders.  The black arrows connecting builders is the builder hierarchy which in this case here is flat.  Below each builder in the figure shows the geometry that builder directly creates.  Red arrows indicate internal geometry construction done directly by the builder while blue arrows indicate construction (specifically, placement) done by the builder using a logical volume (LV) taken from a sub-builder.
+
+For that, each builder produces and exposes a number of top-level logical volumes.  In this example, each builder is exposing only a single LV but a builder may expose multiple, logical volumes.  These LVs must all be top-level and not related to each other.  
+
+#+BEGIN_SRC dot :cmd dot :cmdline -Tpng buildhier2.dot :file buildhier2.png :exports results 
+#+END_SRC
+
+#+RESULTS:
+[[file:buildhier2.png]]
+
+The figure is simple and lacks some concepts that a more realistic system would have.  For example, it shows each builder placing the LV from a sub-builder into a "leaf" LV.  This need not be the case, the "Detector Builder" might have a second sub-builder called "GAr Builder" which builds a gaseous argon LV which the "Detector Builder" may place either above the LAr in the Cryostate LV or in the LAr in the LAr LV.
+
+This figure also illustrates the need for a "inter-builder contract".  While builders can directly create sub-builders they may also have sub-builders passed in.  These sub-builders may not be known to the original author.  For example, the [[./configuration.org][configuration mechanism]] allows for a user to specify what sub-builders are given to a builder.  Regardless of how a builder gets sub-builders it must understand how to interpret the LVs they produce.  It is up to each builder developer to determine this through an informal "inter-builder contract".  This largely boils down to documentation.
+
+An example of how this might come into play in the figure is if we extended the "Detector Builder" to return two logical volumes.  Say both a LAr detector and a Water Cherenkov detector were to be constructed at the same "site".  The "Site Builder" must then know how to interpret each LV object that the "Detector Builder" produces.  This interpretation might be "place the first LV here and the second LV there".  Or the "Site Builder" might look at the names of the LV and use a hard-coded lookup table that gives the site-location of each LV.  Or, with the most flexibility exposed to the user, the configuration mechanism would be used to let the user specify the location of each by name.  Pushed to the extreme this leads to having all construction information in the configuration which means the user becomes the programmer, so obviously some balance is needed.
+
+Likewise, the amount of geometry that any one builder constructs is left up to the builder authors.  One may make a system of a small number of small builders each making a rather monolithic chunk of the geometry.  Or, one may make a system with a large number of builders each making a relatively limited chunk of the geometry. Or, of course, some mix of the these two extremes.  The best balance is one that follows the natural complexity and symmetry of the geometry to be constructed.
+
+
+
+* Builder Coding
+
+A builder is an instance of a Python class that satisfies the API and behavior of =gegede.builder.Builder= defined in [[../python/gegede/builder.py][gegede/builder.py]].  It is expected that most builders will inherit from this class.  After creation, there are two entry points which should be implemented in the subclass:
+
+** Configuration
+
+A builder may receive configuration information by implementing the method:
+
+#+BEGIN_SRC python
+  def configure(self, **kwds):
+      # ...
+#+END_SRC
+
+Default values may be specified in the usual Python manner:
+
+#+BEGIN_SRC python
+  def configure(self, dx='1cm', dy='1cm', dz='1cm', material='Air', **kwds):
+      # ...
+#+END_SRC
+
+No geometry construction may be done in this method.
+
+** Construction
+
+The main point of a builder is to construct geometry and it does so by implementing the method:
+
+#+BEGIN_SRC python
+  def construct(self, geom):
+      # ...      
+      top_lv = geom.structure.Volume(...)
+      self.add_volume(top_lv)
+      # ...
+#+END_SRC
+
+The =geom= object is an instance of =gegede.construct.Geometry=.  Any top-level logical volumes (or their names) must be added to the =.volumes= list with =add_volume()=.  Daughter volumes must not be registered.
+
+In addition to constructing geometry directly, if the builder has any sub-builders then their logical volumes are also available in the context of this method:
+
+#+BEGIN_SRC python
+  def construct(self, geom):
+      # ...
+      for sb in self.builders:
+          for sub_lv in sb.volumes:
+              self.add_sub_builder_volume(sub_lv)
+#+END_SRC
+
+Here, =add_sub_builder_volume()= is some user-provided method.
+
+** Builder Hierarchy Management
+
+The two =Builder= methods above must be called in the correct order across the entire builder hierarchy.  For each method there is an identically named function in the =gegede.builder= module which will assure this ordering.  This example shows a how they are called.
+
+#+BEGIN_SRC python
+  from gegede.builder import configure, construct
+  from gegede.construct import Geometry
+
+  def generate_geometry(world_builder, config):
+      configure(world_builder, config)
+      geom = Geometry()
+      construct(world_builder, geom)
+      return geom
+#+END_SRC
+
+The =top= and =cfg= objects may be created in any manner but see the [[./configuration.org][configure tutorial]] for one way that is provided by GGD.
+

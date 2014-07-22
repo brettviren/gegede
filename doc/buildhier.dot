@@ -1,0 +1,88 @@
+digraph "buildhier" {
+
+
+	// builders
+	node[group=builders, shape=box3d,style=filled]
+	worldB[label="World Builder"];
+	siteB[label="Site Builder"];
+	detB[label="Detector Builder"];
+	apaB[label="APA Builders"];
+
+	// logical volumes
+	node[group=lvols, shape=ellipse, style=filled, color=white];
+        worldLV[label="World LV"];
+	siteLV[label="Site LV"];
+	tankLV[label="Cryostat LV"];
+	larLV[label="LAr LV"];
+	apaLV[label="APA LV"];
+	wiresLV[label="Wires LV"];
+        
+	// placements
+	node[group=pvols, shape=diamond, style=filled, color=lightgrey];
+	sitePV [label="Site PV"];
+	tankPV [label="Cryostat PV"];
+	larPV [label="Lar PV"];
+	apaPV1 [label="APA1 PV"];
+	apaPV2 [label="APA2 PV"];
+	wiresPV [label="Wires PV"];
+
+	// any other nodes are invisible
+	node[shape=none, width=0, height=0, label=""];
+	
+
+        subgraph cluster_1 {
+                label = "Builders";
+                color = black;
+		rank="same";
+		
+                worldB -> siteB -> detB -> apaB;
+		
+        }
+
+        subgraph cluster_2 {
+                label = "LVolumes";
+                style = filled;
+                color = lightgrey;
+                edge [color=none];
+		
+		worldLV -> lvp1 -> siteLV -> lvp2 -> tankLV -> lp3 -> larLV -> lvp4 -> apaLV -> lvp5->wiresLV;
+        }
+
+	subgraph cluster_3 {
+		label = "PVolumes";
+		edge [color=none];
+		pvp1 -> sitePV -> pvp2 -> tankPV -> pvp3 -> larPV -> pvp4;
+		pvp4 -> apaPV1;
+		pvp4 -> apaPV2;
+		{rank="same"; apaPV1->apaPV2}
+		apaPV1 -> wiresPV;
+		apaPV2 -> wiresPV;
+		}
+			
+
+	
+	edge [color=blue];
+	worldB -> worldLV;
+	siteB -> siteLV;
+	detB -> tankLV;
+	detB -> larLV;
+	detB -> apaLV;
+	apaB -> apaLV;
+	apaB -> wiresLV;	
+
+	edge [color=red];
+	worldB -> sitePV;
+	siteB -> tankPV;
+	detB -> larPV;
+	detB -> apaPV1;
+	detB -> apaPV2;
+	apaB -> wiresPV;
+	
+	edge [style=dotted];
+	worldLV -> sitePV -> siteLV -> tankPV -> tankLV -> larPV -> larLV;
+	larLV -> apaPV1;
+	larLV -> apaPV2;
+	apaPV1 -> apaLV;
+	apaLV -> wiresPV -> wiresLV;
+		
+}

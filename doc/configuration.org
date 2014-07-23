@@ -1,6 +1,28 @@
 Configuration system for GGD
 
-- based on Python config parser
-- maybe with =deconf= style variables
+* Overview
 
-More to come.
+The GGD system is layered and allows the user/programmer access to each layer.  The top-most layer is one that provides a human-oriented configuration mechanism.  Configuration takes the form of a simple text file.  It is parsed into a data structure and then interpreted by GGD.  The interpretation makes some assumptions about conventions that the author of the configuration file must follow.  This interpretation results in creation of the [[./builders.org][builders]] which make up the lower GGD layer.  This layer then performs geometry object [[./construction.org][construction]] and these objects are used for [[./exporting.org][exporting]] the information to some target form.
+
+* Configuration File Syntax
+
+The GGD configuration file syntax is parsed by Python's =configparser= module.  This syntax is also sometimes known as "INI".  It consists of a number of named sections which hold a number of key/value pairs.
+
+#+BEGIN_EXAMPLE
+[section name]
+key1 = value1
+#+END_EXAMPLE
+
+The content of the configuration file is parsed into a Python data structure by GGD and then interpreted following these conventions.  
+
+** Builder sections
+
+Sections starting with "=[builder NAME]=" are interpreted as being for a builder.  Any key/value pairs given will be passed to the builder named "=NAME=" if it is created.  Certain keys are reserved by GGD:
+
+- =class= :: The fully qualified class name (eg "=module.submodule.MyBuilderClass=").
+- =builders= :: A space or comma separated list of builder names to be given to the builder as sub-builders.  
+
+Beyond these reserved keys each builder is free to expect its own set of keys.
+
+
+

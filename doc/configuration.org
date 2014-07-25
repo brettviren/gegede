@@ -13,6 +13,23 @@ The GGD configuration file syntax is parsed by Python's =configparser= module.  
 key1 = value1
 #+END_EXAMPLE
 
+** Syntax Extensions
+
+The GGD configuration layer will evaluate each section of key/value pairs in a limited Python environment.  This allows any given value to reference a key from the same section in order to use its value.  It also allows expression of complex data structures, units, arithmetic.  In principle this allows a high degree of programming and a balance should be struck.  In order to keep the configuration simple, complex programming should be put into the builder.
+
+*** Specifying units
+
+All numerical quantities that have units must have them explicitly given in the configuration.  This is done with the =Q()= function ("Q" for "quantity").
+
+#+BEGIN_EXAMPLE
+[builder mydetector]
+width = Q("10m")
+height = 10*width
+depth = 10*height
+#+END_EXAMPLE
+
+
+
 The content of the configuration file is parsed into a Python data structure by GGD and then interpreted following these conventions.  
 
 ** Builder sections
@@ -20,9 +37,12 @@ The content of the configuration file is parsed into a Python data structure by 
 Sections starting with "=[builder NAME]=" are interpreted as being for a builder.  Any key/value pairs given will be passed to the builder named "=NAME=" if it is created.  Certain keys are reserved by GGD:
 
 - =class= :: The fully qualified class name (eg "=module.submodule.MyBuilderClass=").
-- =builders= :: A space or comma separated list of builder names to be given to the builder as sub-builders.  
+- =subbuilders= :: A space or comma separated list of builder names to be given to the builder as sub-builders.  
 
 Beyond these reserved keys each builder is free to expect its own set of keys.
 
+** Example
+
+A working example is in the source at [[../python/gegede/examples/lar.cfg][lar.cfg]].
 
 

@@ -6,42 +6,66 @@ The GGD system is layered and allows the user/programmer access to each layer.  
 
 * Configuration File Syntax
 
-The GGD configuration file syntax is parsed by Python's =configparser= module.  This syntax is also sometimes known as "INI".  It consists of a number of named sections which hold a number of key/value pairs.
+The GGD configuration file syntax is parsed by Python's =configparser= module.  This syntax is also sometimes known as "INI".  It consists of a number of named sections each holding a number of key/value pairs.
 
 #+BEGIN_EXAMPLE
-[section name]
+[name]
 key1 = value1
 #+END_EXAMPLE
 
 ** Syntax Extensions
 
-The GGD configuration layer will evaluate each section of key/value pairs in a limited Python environment.  This allows any given value to reference a key from the same section in order to use its value.  It also allows expression of complex data structures, units, arithmetic.  In principle this allows a high degree of programming and a balance should be struck.  In order to keep the configuration simple, complex programming should be put into the builder.
+The GGD configuration layer will process the file in a series of steps that add some features beyond the basic syntax.  Care should be exercised in exploiting these features.  If the configuration becomes complex consider if it would be better to move this complexity into the [[./builders.org][builder]] code.  
+
+*** Evaluation
+
+The values in the parsed configuration file are evaluated by the Python interpreter in order.  Within one section, prior keys may be referenced in subsequent values.  For example:
+
+#+BEGIN_EXAMPLE
+[mybuilder]
+x = 21
+y = x*2
+#+END_EXAMPLE
+
+results in =y= being 42.  Referencing a variable before it is defined is an error. 
 
 *** Specifying units
 
-All numerical quantities that have units must have them explicitly given in the configuration.  This is done with the =Q()= function ("Q" for "quantity").
+All numerical quantities that have units *must* have them explicitly given in the configuration.  If not, they will be caught as an error during geometry generation.  Units are specified with the =Q()= function ("Q" is for "quantity").  This is an abbreviation for the [[http://pint.readthedocs.org/en/0.5.1/tutorial.html][=pint.UnitRegistry.Quantity=]] method and as such can be "called" in the configuration file in any manner it could be called directly from Python.
 
 #+BEGIN_EXAMPLE
-[builder mydetector]
+[mybuilder]
 width = Q("10m")
-height = 10*width
-depth = 10*height
+height = Q(10, 'meter')
+depth = Q("10*m")
 #+END_EXAMPLE
 
+*** Data structures
 
+Because values are evaluated by the Python interpreter the configuration values may take the form of any valid Python data structure.  One particularly useful one is a list to give a vector of values.  For example:
 
-The content of the configuration file is parsed into a Python data structure by GGD and then interpreted following these conventions.  
+#+BEGIN_EXAMPLE
+[mybuilder]
+offset = [Q("1m"), Q("2m"), Q("3m")]
+#+END_EXAMPLE 
+
+* Interpretation
+
+After the configuration data is parsed and evaluated as above it is interpreted by GGD.  
 
 ** Builder sections
 
-Sections starting with "=[builder NAME]=" are interpreted as being for a builder.  Any key/value pairs given will be passed to the builder named "=NAME=" if it is created.  Certain keys are reserved by GGD:
+Each configuration section corresponds to a single instance of a builder object (see [[./builders.org][Builders]]) of the same name.  Any key/value pairs given will be passed to the builder for that name, if it is created.  Builder creation starts at a given builder section or the first section if none is given.
+
+Certain keys are reserved by GGD for interpretation:
 
 - =class= :: The fully qualified class name (eg "=module.submodule.MyBuilderClass=").
-- =subbuilders= :: A space or comma separated list of builder names to be given to the builder as sub-builders.  
+- =subbuilders= :: A list of builder instance names to be given to the builder as sub-builders.  
 
 Beyond these reserved keys each builder is free to expect its own set of keys.
 
-** Example
+
+* Examples
 
 A working example is in the source at [[../python/gegede/examples/lar.cfg][lar.cfg]].
 

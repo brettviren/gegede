@@ -12,10 +12,12 @@ class SimpleBuilder(gegede.builder.Builder):
     '''
 
     def configure(self, dx='1m', dy='1m', dz='1m', mat='Air', **kwds):
+        #print 'Configuring "%s"' % self.name
         self.box_mat = mat      # assume made somewhere else
         self.box_dim = (dx,dy,dz)
 
     def construct(self, geom):
+        #print 'Constructing "%s"' % self.name
         shape = geom.shapes.Box(self.name + '_box_shape', *self.box_dim)
         lv = geom.structure.Volume(self.name+'_volume', material=self.box_mat, shape=shape)
         self.add_volume(lv)

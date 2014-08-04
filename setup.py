@@ -15,5 +15,11 @@ setup(name = 'gegede',
           "pint >= 0.5.1",
           "lxml >= 3.3.5"
       ],
+      entry_points = {
+          'console_scripts': [
+              'gegede-cli = gegede.main:main',
+              ]
+      }
+              
   )
 

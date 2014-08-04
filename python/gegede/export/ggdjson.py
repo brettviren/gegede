@@ -7,4 +7,4 @@ import json
 import pod
 
 def dumps(geom):
-    return json.dumps(pod.dumps(geom), indent=2)
+    return json.dumps(pod.convert(geom), indent=2)

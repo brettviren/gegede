@@ -38,6 +38,8 @@ Each layer contains a tutorial:
 - [[./doc/construction.org][Construction]]
 - [[./doc/exporting.org][Exporting]]
 
+See also the [[https://github.com/brettviren/gegede-example][GeGeDe Example]] project.
+
 * Reference
 
 T.B.D.
@@ -50,19 +52,6 @@ GGD can be installed in the usual "Python way":
   python setup.py install
 #+END_EXAMPLE
 
-* Development
+More info in the [[./doc/install.org][installation]] document.
 
-To set up for building and testing GGD "in source":
 
-#+BEGIN_EXAMPLE
-  virtualenv venv
-  source venv/bin/activate
-  python setup.py develop
-#+END_EXAMPLE
-
-The tests are meant to be run via [[https://nose.readthedocs.org][nose]]:
-
-#+BEGIN_EXAMPLE
-  pip install nose
-  nosetests
-#+END_EXAMPLE

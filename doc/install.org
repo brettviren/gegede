@@ -1,0 +1,50 @@
+* Installation of GeGeDe
+
+GeGeDe is pure Python with a few dependencies.  It may be installed in "the usual way" of Python packages.  
+
+** Virtualenv
+
+The easiest way to install GeGeDe for yourself is via a "virtual environment".  If you do not have the  =virtualenv= command see [[http://virtualenv.readthedocs.org/en/latest/virtualenv.html#installation][these instructions]].  Here is one recipe to get set up.
+
+#+BEGIN_EXAMPLE
+  $ wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.tar.gz
+  $ tar -xf virtualenv-1.11.tar.gz
+  $ python virtualenv-1.11/virtualenv.py ggdvenv
+  $ source ggdvenv/bin/activate
+#+END_EXAMPLE
+
+At this point, any Python packages you install go into your virtual environment (called "=ggdvenv=" here).
+
+** Installing GeGeDe
+
+Get the GeGeDe source and install like:
+
+#+BEGIN_EXAMPLE
+  $ git clone https://github.com/brettviren/gegede.git
+  $ cd gegede/
+  $ python setup.py install
+#+END_EXAMPLE
+
+* Development
+
+To set up for building and testing GGD "in source":
+
+#+BEGIN_EXAMPLE
+  $ virtualenv venv
+  $ source venv/bin/activate
+  $ python setup.py develop
+#+END_EXAMPLE
+
+The tests are meant to be run via [[https://nose.readthedocs.org][nose]]:
+
+#+BEGIN_EXAMPLE
+  $ pip install nose
+  $ nosetests
+  ....................
+  ----------------------------------------------------------------------
+  Ran 20 tests in 1.657s
+
+  OK
+#+END_EXAMPLE
+
+All tests should pass.

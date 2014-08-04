@@ -6,6 +6,8 @@ Export a gegede.construct.Geometry into a plain old data structure.
 # It would be nice to clean this code up to not hard-code assumptions
 # about the data schema.
 
+import pprint
+
 def value2pod(val):
     if type(val) == tuple:
         return val
@@ -25,4 +27,4 @@ def convert(geom):
     return dat
 
 def dumps(geom):
-    return str(convert(geom))
+    return pprint.pformat(convert(geom), indent=4) + '\n'

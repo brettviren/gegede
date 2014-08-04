@@ -3,16 +3,17 @@
 High level main functions.
 '''
 import os
-import gegede.configuration
-import gegede.interp
-import gegede.builder
-
 
 
 def generate(filenames, world_name = None):
     '''
     Return a geometry object generated from the given configuration file(s).
     '''
+    import gegede.configuration
+    import gegede.interp
+    import gegede.builder
+    import gegede.construct
+
     assert filenames
     cfg = gegede.configuration.configure(filenames)
     assert cfg

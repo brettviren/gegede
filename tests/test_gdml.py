@@ -24,13 +24,8 @@ def test_gdml():
 
 def test_gegede_gdml():
     geom = nested_boxes()
-
-    s = gegede.export.gdml.dumps(geom)
-    open('test_gdml.gdml','w').write(s)
-    xsd_doc = etree.parse(gegede.export.gdml.schema_file)
-    xsd = etree.XMLSchema(xsd_doc)
-    xml = etree.parse('test_gdml.gdml')
-    xsd.validate(xml)
-    print xsd.error_log
+    s = gegede.export.gdml.dumps(geom) # validates internally
+    assert s
+    gegede.export.gdml.validate(s) # but do it again explicitly
 
     

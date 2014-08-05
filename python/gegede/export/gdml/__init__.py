@@ -221,6 +221,18 @@ def convert(geom):
     return gdml_node
 
 
-def dumps(geom):
-    return etree.tostring(convert(geom), pretty_print = True)
+def validate(text):
+    from StringIO import StringIO
+    xsd_doc = etree.parse(schema_file)
+    xsd = etree.XMLSchema(xsd_doc)
+    xml = etree.parse(StringIO(text))
+    okay = xsd.validate(xml)
+    if not okay:
+        print xsd.error_log
+        raise ValueError, 'Invalid GDML'
+    return True
 
+def dumps(geom):
+    xml = etree.tostring(convert(geom), pretty_print = True, xml_declaration = True)
+    validate(xml)
+    return xml

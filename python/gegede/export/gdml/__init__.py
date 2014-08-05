@@ -12,10 +12,15 @@ http://stackoverflow.com/questions/2850823/multiple-xml-namespaces-in-tag-with-l
 
 '''
 
-from lxml import etree
-from .. import Quantity
+import os
 
-from . import pod
+schema_dir = os.path.join(os.path.dirname(__file__), 'schema')
+schema_file = os.path.join(schema_dir, 'gdml.xsd')
+
+from lxml import etree
+from gegede import Quantity
+
+from gegede.export import pod
 
 def qtus(q,unit):
     'Quantity to unit string'

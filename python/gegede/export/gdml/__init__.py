@@ -89,6 +89,9 @@ def make_material_node(obj):
     if typename == 'Molecule':
         node = etree.Element('material', name=obj.name, formula=Symbol(obj))
         node.append(etree.Element('D', value=D(obj)))
+        for elename, elenum in obj.elements:
+            node.append(etree.Element('composite', ref=elename, n=str(elenum)))
+
 
     if typename == 'Mixture':
         node = etree.Element('material', name=obj.name, formula=Symbol(obj))
@@ -234,5 +237,5 @@ def validate(text):
 
 def dumps(geom):
     xml = etree.tostring(convert(geom), pretty_print = True, xml_declaration = True)
-    validate(xml)
+    # don't validate here
     return xml

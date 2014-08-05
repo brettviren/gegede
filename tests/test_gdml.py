@@ -24,8 +24,8 @@ def test_gdml():
 
 def test_gegede_gdml():
     geom = nested_boxes()
-    s = gegede.export.gdml.dumps(geom) # validates internally
+    s = gegede.export.gdml.dumps(geom)
     assert s
-    gegede.export.gdml.validate(s) # but do it again explicitly
+    gegede.export.gdml.validate(s)
 
     

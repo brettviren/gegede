@@ -11,16 +11,17 @@ def airwaterboxes():
 
     U235 = g.matter.Isotope("U235", z=92, ia=235, a="235.0439242 g/mole")
     U238 = g.matter.Isotope("U238", z=92, ia=238, a="238.0507847 g/mole")
-    enriched_uranium = g.matter.Composition("enriched U", symbol="U", 
+    enriched_uranium = g.matter.Composition("enriched_U", symbol="U", 
                                             isotopes=(("U235",0.8), ("U238",0.2)))
 
     box1 = g.shapes.Box("box1",'1cm','2cm','3cm')    
     box2 = g.shapes.Box("box2",'1m','2m','3m')    
     pos = g.structure.Position(None, '1cm',z='2cm')
     rot = g.structure.Rotation('', x='90deg')
-    lv1 = g.structure.Volume('a box', material=water, shape=box1)
+    lv1 = g.structure.Volume('a_box', material=water, shape=box1)
     lv1inlv2 = g.structure.Placement("lv1_in_lv2", volume=lv1, pos=pos, rot=rot)
-    lv2 = g.structure.Volume('the world', material = air, shape=box2,
+    lv2 = g.structure.Volume('the_world', material = air, shape=box2,
                              placements = [lv1inlv2], params= (("foo",42), ("bar","baz")))
+    g.world = lv2.name
     return g
 

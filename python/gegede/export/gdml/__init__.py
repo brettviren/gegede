@@ -43,6 +43,21 @@ def Atom(obj):
 def Symbol(obj):
     return obj.symbol or ""
 
+# def wash(geom):
+#     '''Return a new geom object with its contents "washed" of any things
+#     that will tickle GDML limitations.
+#     '''
+#     import gegede.construct
+#     newg = gegede.construct.Geometry(geom.schema)
+#     for store_name in geom.store._fields:
+#         store = getattr(geom.store,store_name)
+#         newstore = getattr(newg.store,store_name)
+#         for name, obj in store.items():
+#             newobj = type(obj)(obj.name.replace(' ','_'), *obj[1:])
+#             newstore[name.replace(' ','_')] = newobj
+#     return newg
+
+
 
 def make_material_node(obj):
     '''
@@ -152,12 +167,12 @@ def convert(geom):
     Return an lxml.etree formed from the geometry
     '''
     # exhausting....
-
     gdml_node = etree.Element('gdml')
 
-    # <define>
     xsi = "schema/gdml.xsd"
     # fixme: do I need this cruft: xsi:noNamespaceSchemaLocation="schema/gdml.xsd" ?
+
+    # <define>
     define_node = etree.Element('define')
     gdml_node.append(define_node)
     for name, obj in geom.store.structure.items():
@@ -195,6 +210,13 @@ def convert(geom):
         node = make_structure_node(obj, geom.store.structure)
         if node is not None:
             structure_node.append(node)        
+
+    # <setup>
+    setup_node = etree.Element('setup', name="Default", version="0")
+    gdml_node.append(setup_node)
+
+    world_node = etree.Element('world', ref=geom.world)
+    setup_node.append(world_node)
 
     return gdml_node
 

@@ -22,7 +22,7 @@ def test_gdml():
         print xsd.error_log
     assert valid, "Failed to validate GDML's own test.gdml"
 
-def _test_gegede_gdml():
+def test_gegede_gdml():
     geom = nested_boxes()
 
     s = gegede.export.gdml.dumps(geom)

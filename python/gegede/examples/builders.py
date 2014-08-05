@@ -41,7 +41,7 @@ def nested_boxes():
     cfg = dict()
 
     for size in sizes:          # fake up some configuration and builder building
-        sb = SimpleBuilder('builder of box size %s' % size)
+        sb = SimpleBuilder('box_of_size_%s' % size)
         cfg[sb.name] = dict(dx=size,dy=size,dz=size)
         blist.append(sb)
         if last_b:
@@ -51,4 +51,5 @@ def nested_boxes():
     gegede.builder.configure(blist[0], cfg)
     geom = gegede.construct.Geometry()
     gegede.builder.construct(blist[0], geom)
+    geom.world = blist[0].volumes[0]
     return geom

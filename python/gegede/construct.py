@@ -10,6 +10,10 @@ class Geometry(object):
     This object provides for creation of elements in a geometry and
     maintains a store of these elements for later retrieval by name.
     '''
+
+    # Set to the name of the world volume
+    world = None
+
     def __init__(self, schema = None):
         '''Create a geometry constructor.
 

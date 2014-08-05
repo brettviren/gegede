@@ -16,13 +16,16 @@ def test_gdml():
     file = os.path.join(testdir, 'test.gdml')
     geo = ROOT.TGeoManager()
     geo.Import(file)
+    assert geo
 
-
-def _test_read_gdml_in_root():
+def test_read_gdml_in_root():
 
     geom = nested_boxes()
     s = gegede.export.gdml.dumps(geom)
+    gegede.export.gdml.validate(s)
     geo = ROOT.TGeoManager()
     fd, fname = tempfile.mkstemp(suffix='.gdml')
     open(fname, 'w').write(s)
+    print fname
     geo.Import(fname)
+    assert geo

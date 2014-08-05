@@ -94,7 +94,7 @@
 
   <orb name="testorb" r="500.0"/>
 
-  <polyhedra name="testph" startphi="0.0" totalphi="TWOPI" numsides="3">
+  <polyhedra name="testph" startphi="0.0" deltaphi="TWOPI" numsides="3">
     <zplane z="10.0" rmin="1.0" rmax="5.0"/>
     <zplane z="100.0" rmin="10.0" rmax="30.0"/>
   </polyhedra> 

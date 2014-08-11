@@ -14,6 +14,12 @@ def Nnuc(obj):
 def Symbol(obj):
     return obj.symbol.upper()
 
+# Note, ROOT density is hard coded as g/cc
+#  http://root.cern.ch/root/html534/guides/users-guide/Geometry.html#units
+def Density(obj):
+    return str(obj.density.to('g/cc').magnitude)
+
+
 def make_object(type, *args):
     obj = type(*args)
     ROOT.SetOwnership(0)
@@ -25,7 +31,6 @@ def make_material(obj):
     '''
 
     typename = type(obj).__name__
-    node = None
 
     if typename == 'Element':
         return make_object(ROOT.TGeoElement, 
@@ -36,32 +41,30 @@ def make_material(obj):
                            obj.name.upper(), obj.z, Nnuc(obj), Amass(obj))
 
     if typename == 'Composition': # element mix of isotopes
-        obj = make_object(ROOT.TGeoMixture, obj.name, len(obj.isotopes))
+        new = make_object(ROOT.TGeoMixture, obj.name, len(obj.isotopes))
         for count, (isoname, isofrac) in enumerate(obj.isotopes):
             iso = get_element(isnoame)
-            obj.AddElement(iso, isofrac)
-        return obj
+            new.AddElement(iso, isofrac)
+        return new
 
     if typename == 'Amalgam':
-        node = etree.Element('material', name=obj.name, Z=float(obj.z))
-        # fixme: units???
-        node.append(etree.Element('D', value=D(obj)))
-        node.append(etree.Element('atom', value=Atom(obj)))
+        return make_object(ROOT.TGeoMaterial, obj.name, Amass(obj), float(obj.z), Density(obj))
 
-    if typename == 'Molecule':
-        node = etree.Element('material', name=obj.name, formula=Symbol(obj))
-        node.append(etree.Element('D', value=D(obj)))
+    if typename == 'Molecule':  # mix of elements
+        new = make_object(ROOT.TGeoMixture, obj.name, len(obj.elements), Density(obj))
         for elename, elenum in obj.elements:
-            node.append(etree.Element('composite', ref=elename, n=str(elenum)))
-
+            ele = get_element(elename):
+            new.AddElement(ele, elenum)
+        return new
 
     if typename == 'Mixture':
-        node = etree.Element('material', name=obj.name, formula=Symbol(obj))
-        node.append(etree.Element('D', value=D(obj)))
+        new = make_object(ROOT.TGeoMixture, obj.name, len(obj.components), Density(obj))
         for compname, compfrac in obj.components:
-            node.append(etree.Element('fraction', ref=compname, n=str(compfrac)))
+            comp = get_element(compname):
+            new.AddElement(comp, compfrac)
+        return obj
+    return
 
-    return node
 
 
 def convert(geom):
@@ -73,5 +76,14 @@ def convert(geom):
 
     # Materials
     for name, obj in geom.store.matter.items():
-    
+        make_material(obj)
+
+def validate(tgeo):
+    return True
+
+def dumps(tgeo):
+    return None
+
+
+
     

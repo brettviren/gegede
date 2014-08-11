@@ -1,3 +1,16 @@
+* Prerequisites
+
+** For ROOT export
+
+[[http://root.cern.ch/drupal/content/building-root-cmake][Install ROOT]]
+
+** For GDML export
+
+#+BEGIN_EXAMPLE
+$ sudo apt-get install libxml2 libxslt1-dev
+#+END_EXAMPLE
+
+
 * Installation of GeGeDe
 
 GeGeDe is pure Python with a few dependencies.  It may be installed in "the usual way" of Python packages.  
@@ -25,6 +38,7 @@ Get the GeGeDe source and install like:
   $ python setup.py install
 #+END_EXAMPLE
 
+
 * Development
 
 To set up for building and testing GGD "in source":
@@ -47,4 +61,4 @@ The tests are meant to be run via [[https://nose.readthedocs.org][nose]]:
   OK
 #+END_EXAMPLE
 
-All tests should pass.
+All tests should pass in a "develop" install.  Tests run in a normal install may fail.

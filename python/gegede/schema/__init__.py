@@ -39,6 +39,8 @@ Schema = dict(
     matter = dict(
         Element = (("symbol",str), ("z",int), ("a","0.0g/mole")),
         Isotope = (("z",int), ("ia",int), ("a","0.0g/mole")),
+
+        # A number of isotopes composed 
         Composition = (("symbol",str), ("isotopes", NamedTypedList(float))),
 
         # a material with no specific constituents
@@ -51,7 +53,7 @@ Schema = dict(
         # other materials added by mass fraction.
         Mixture = (("symbol",str), ("density", "0.0g/cc"), ("components", NamedTypedList(float))),
 
-        # fixme, these need to also take state, temperature and pressure
+        # fixme, these need to also take state, temperature and pressure, radlen
         ),
 
     structure = dict(

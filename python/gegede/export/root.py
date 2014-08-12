@@ -5,6 +5,8 @@ Export to ROOT TGeo
 
 import ROOT
 
+
+
 def Amass(obj):
     return obj.a.to('g/mole').magnitude
 
@@ -17,33 +19,57 @@ def Symbol(obj):
 # Note, ROOT density is hard coded as g/cc
 #  http://root.cern.ch/root/html534/guides/users-guide/Geometry.html#units
 def Density(obj):
-    return str(obj.density.to('g/cc').magnitude)
+    return obj.density.to('g/cc').magnitude
 
 
 def make_object(type, *args):
     obj = type(*args)
-    ROOT.SetOwnership(0)
+    ROOT.SetOwnership(obj, 0)
     return obj
 
-def make_material(obj):
+def get_element(tgeo, name):
+    et = tgeo.GetElementTable()
+    print et
+    ele = et.FindElement(name)
+
+    if not ele:
+        nele = et.GetNelements()
+        print 'I know about %d elements:' % nele
+        for count in range(nele):
+            known = et.GetElement(count)
+            print '\t%4d: "%s" "%s"' % (count, known.GetName(), known.GetTitle())
+        raise KeyError, 'No such element: "%s"' % name
+    return ele
+    
+def make_material(tgeo, obj):
     '''
     Make and return a TGeo equivalent to the gegede obj.
     '''
+    et = tgeo.GetElementTable()
 
     typename = type(obj).__name__
 
+    print 'Making: <%s> "%s"' % (typename, obj.name)
+
     if typename == 'Element':
-        return make_object(ROOT.TGeoElement, 
-                           Symbol(obj), obj.name.upper(), obj.z, Nnuc(obj), Amass(obj))
+        # brain dead interface
+        last = et.GetNelements() 
+        et.AddElement(obj.name, Symbol(obj), obj.z, Amass(obj))
+        ele = et.GetElement(last)
+        return ele
 
     if typename == 'Isotope':
-        return make_object(ROOT.TGeoIsotope, 
-                           obj.name.upper(), obj.z, Nnuc(obj), Amass(obj))
+        # brain dead, inconsistent interface
+        iso = make_object(ROOT.TGeoIsotope, 
+                          obj.name, obj.z, Nnuc(obj), Amass(obj))
+        et.AddIsotope(iso)
+        return iso
 
     if typename == 'Composition': # element mix of isotopes
-        new = make_object(ROOT.TGeoMixture, obj.name, len(obj.isotopes))
+        new = make_object(ROOT.TGeoElement , obj.name, Symbol(obj), len(obj.isotopes))
         for count, (isoname, isofrac) in enumerate(obj.isotopes):
-            iso = get_element(isnoame)
+            iso = et.FindIsotope(isoname)
+            assert iso, 'No isotope: %s' % isoname
             new.AddElement(iso, isofrac)
         return new
 
@@ -53,14 +79,14 @@ def make_material(obj):
     if typename == 'Molecule':  # mix of elements
         new = make_object(ROOT.TGeoMixture, obj.name, len(obj.elements), Density(obj))
         for elename, elenum in obj.elements:
-            ele = get_element(elename):
+            ele = get_element(tgeo, elename)
             new.AddElement(ele, elenum)
         return new
 
     if typename == 'Mixture':
         new = make_object(ROOT.TGeoMixture, obj.name, len(obj.components), Density(obj))
         for compname, compfrac in obj.components:
-            comp = get_element(compname):
+            comp = get_element(tgeo, compname)
             new.AddElement(comp, compfrac)
         return obj
     return
@@ -71,13 +97,14 @@ def convert(geom):
     '''
     Return a ROOT.TGeoManager filled with the geometry.
     '''
-    tgeo = ROOT.TGeoManager(geom.world, 'GeGeDe %s' % geom.world)
+    tgeo = make_object(ROOT.TGeoManager, geom.world, 'GeGeDe %s' % geom.world)
 
 
     # Materials
     for name, obj in geom.store.matter.items():
-        make_material(obj)
+        make_material(tgeo, obj)
 
+    return tgeo
 def validate(tgeo):
     return True
 

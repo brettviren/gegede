@@ -3,9 +3,24 @@
 Test the ROOT exporter
 '''
 
-import gegede.export.root
+from gegede.export.root import Bucket, make_material, convert
+import ROOT
+
 from gegede.examples.simple import airwaterboxes
+
+def test_bucket():
+    '''
+    Test the gegede.export.root.Bucket class
+    '''
+    tgeo = ROOT.TGeoManager('world','World')
+    bucket = Bucket()
+    o = bucket.make(ROOT.TGeoElement, 'ele1', 'E1', 1, 2.0)
+    u235 = bucket.make(ROOT.TGeoIsotope, 'U235', 92, 235, 235.0)
+    u238 = bucket.make(ROOT.TGeoIsotope, 'U238', 92, 238, 238.0)
+    
+
 
 def test_export_root():
     g = airwaterboxes()
-    tg = gegede.export.root.convert(g)
+    tg = convert(g)
+    print tg

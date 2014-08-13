@@ -110,6 +110,7 @@ def make_shape_node(shape):
     aunit = 'radian'
     typename = type(shape).__name__
 
+    # fixme: adapt this block to use gegede.util.wash_units
     outdat = dict()
     udat = dict()
     for k,v in zip(shape._fields, shape): # universal defaults

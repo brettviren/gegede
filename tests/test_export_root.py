@@ -12,8 +12,7 @@ def test_bucket():
     '''
     Test the gegede.export.root.Bucket class
     '''
-    tgeo = ROOT.TGeoManager('world','World')
-    bucket = Bucket()
+    bucket = Bucket("world")
     o = bucket.make(ROOT.TGeoElement, 'ele1', 'E1', 1, 2.0)
     u235 = bucket.make(ROOT.TGeoIsotope, 'U235', 92, 235, 235.0)
     u238 = bucket.make(ROOT.TGeoIsotope, 'U238', 92, 238, 238.0)
@@ -22,5 +21,5 @@ def test_bucket():
 
 def test_export_root():
     g = airwaterboxes()
-    tg = convert(g)
-    print tg
+    b = convert(g)
+    print b.tgeo.Print()

@@ -4,6 +4,14 @@
 
 [[http://root.cern.ch/drupal/content/building-root-cmake][Install ROOT]]
 
+ROOT is available on Ubuntu but needs =PYTHONPATH= set:
+
+#+BEGIN_EXAMPLE
+  $ sudo apt-et install libroot-bindings-python5.34
+  $ export PYTHONPATH=/usr/lib/x86_64-linux-gnu/root5.34
+  $ python -c 'import ROOT'  # <-- just a test...
+#+END_EXAMPLE
+
 ** For GDML export
 
 #+BEGIN_EXAMPLE

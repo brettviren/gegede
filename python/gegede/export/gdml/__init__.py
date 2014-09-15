@@ -171,7 +171,7 @@ def convert(geom):
     Return an lxml.etree formed from the geometry
     '''
     # exhausting....
-    gdml_node = etree.Element('gdml')
+    gdml_node = etree.Element("gdml")
 
     xsi = "schema/gdml.xsd"
     # fixme: do I need this cruft: xsi:noNamespaceSchemaLocation="schema/gdml.xsd" ?
@@ -238,5 +238,6 @@ def validate(text):
 
 def dumps(geom):
     xml = etree.tostring(convert(geom), pretty_print = True, xml_declaration = True)
+    xml = xml.replace("'",'"')
     # don't validate here
     return xml

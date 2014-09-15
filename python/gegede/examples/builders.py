@@ -30,7 +30,8 @@ class SimpleBuilder(gegede.builder.Builder):
             return
 
         sublv = subb.volumes[0]
-        geom.structure.Placement("%s_in_%s" % (sublv, lv.name), volume=sublv)
+        p = geom.structure.Placement("%s_in_%s" % (sublv, lv.name), volume=sublv)
+        # fixme: need to do something with this placement!
         return
 
 

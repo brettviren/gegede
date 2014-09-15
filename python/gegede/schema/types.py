@@ -47,6 +47,7 @@ def NamedTypedList(typ, minentries = 1):
     '''
 
     def named_typed_list_converter(proto):
+        print 'named_typed_list_converter(%s, "%s")' % (typ, str(proto))
         ret = list()
         if len(proto) < minentries:
             raise ValueError, "At least %d entries required" % minentries
@@ -54,8 +55,10 @@ def NamedTypedList(typ, minentries = 1):
             v = typ(v)
             n = Named(n)
             ret.append((n,v))
-        return tuple(ret)
+        return ret
+    named_typed_list_converter.default = list
     return named_typed_list_converter
+
 
 def NameList(typ, minentries = 1):
     '''Return a function which processes a prototype which is a list of
@@ -63,12 +66,14 @@ def NameList(typ, minentries = 1):
     '''
 
     def name_list_converter(proto):
+        print 'name_list_converter(%s, "%s")' % (typ, str(proto))
         ret = list()
         if len(proto) < minentries:
             raise ValueError, "At least %d entries required" % minentries
         for n in proto:
             n = Named(n)
             ret.append(n)
-        return tuple(ret)
+        return ret
+    name_list_converter.default = list
     return name_list_converter
 

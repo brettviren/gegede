@@ -30,7 +30,8 @@ def make_converter(proto):
 
     # it better be of some type of self-converting prototype
     def toobj(other):
-        return proto(other)
+        ret = proto(other)
+        return ret
     return toobj
 
 def validate_input(proto, *args, **kwargs):
@@ -50,15 +51,22 @@ def validate_input(proto, *args, **kwargs):
 
     A an ordered list of values are returned.
     '''
+    #print 'VALIDATE INPUT', str(proto)
+
     members = OrderedDict()
     converters = dict()
     for name,pval in proto:
         c = make_converter(pval)
         converters[name] = c
 
+        #print 'CONVERTER:',name,c,pval
+
         # set default
         if isquantity(pval):
             members[name] = c(pval)
+        elif hasattr(pval, 'default'):
+            #print 'SET DEFAULT:',name,pval.default
+            members[name] = pval.default()
         else:
             members[name] = None
 
@@ -70,6 +78,7 @@ def validate_input(proto, *args, **kwargs):
     already = list()
     for k,v in zip(members.keys(), args):
         members[k] = converters[k](v)
+        #print 'ARGS:',k,v,members[k]
         already.append(k)
 
     for k,v in kwargs.items():
@@ -78,6 +87,7 @@ def validate_input(proto, *args, **kwargs):
         if k in already:
             raise ValueError, 'Keyword argument already supplied as positional: %s' % k
         members[k] = converters[k](v)
+        #print 'KWDS:',k,v,members[k]
 
     return members.values()
     
@@ -103,6 +113,7 @@ def make_maker(collector, ntname, *proto):
         NTT = namedtuple(ntname, ['name'] + member_names)
         obj = NTT(objname, *members)
         collector[objname] = obj
+        #print 'INSTANTIATED:', obj
         return obj
     instantiator.__name__ = ntname
     instantiator.__doc__ = "%s: %s" % (ntname, ', '.join(member_names))

@@ -34,7 +34,7 @@ def test_shapes():
     if unimplemented:
         print 'Warning: shapes still needing implementation: %s' % ', '.join(unimplemented)
 
-
+    
 
 if '__main__' == __name__:
     test_categories()

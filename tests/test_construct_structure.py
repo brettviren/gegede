@@ -37,3 +37,19 @@ def test_make_some_stuff():
     assert lv2.params
     print lv2
     
+def test_post_place():
+    g = construct.Geometry()
+
+    box0 = g.shapes.Box("box0",'1mm','2mm','3mm')    
+    box1 = g.shapes.Box("box1",'1cm','2cm','3cm')    
+
+    lv1 = g.structure.Volume('a box', material='water', shape=box1)
+    lv0 = g.structure.Volume('daughter-box', material='air', shape=box0)
+
+    lv0inlv1 = g.structure.Placement('lv0_in_lv1', volume=lv0)
+    lv1.placements.append(lv0inlv1.name) # no boom!
+
+    print 'DONE'
+    print g.store.structure
+    
+    

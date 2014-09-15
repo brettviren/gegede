@@ -158,8 +158,10 @@ def make_structure_node(obj, store):
             pvol = etree.Element('physvol')
             node.append(pvol)
             pvol.append(etree.Element('volumeref', ref=place.volume))
-            pvol.append(etree.Element('positionref', ref=place.pos))
-            pvol.append(etree.Element('rotationref', ref=place.rot))
+            if place.pos:
+                pvol.append(etree.Element('positionref', ref=place.pos))
+            if place.rot:
+                pvol.append(etree.Element('rotationref', ref=place.rot))
         for parname, parval in obj.params or []:
             pnode = etree.Element('auxiliary', auxtype=parname, auxvalue=parval)
             node.append(pnode)

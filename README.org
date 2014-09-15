@@ -49,7 +49,7 @@ T.B.D.
 GGD can be installed in the usual "Python way":
 
 #+BEGIN_EXAMPLE
-  python setup.py install
+  $ python setup.py install
 #+END_EXAMPLE
 
 More info in the [[./doc/install.org][installation]] document.

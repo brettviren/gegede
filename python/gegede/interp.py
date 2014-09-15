@@ -19,7 +19,8 @@ def make_builder(dat, name = None):
     If no name is given return the first found.
     '''
     bname, bdat = get_builder_config(dat, name)
-    bobj = bdat['class'](bname)
+    klass = bdat.pop('class')
+    bobj = klass(bname)
     subbuilders = bdat.get('subbuilders',list())
     for sbname in subbuilders:
         sb = make_builder(dat, sbname)

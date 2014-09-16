@@ -19,7 +19,7 @@ schema_file = os.path.join(schema_dir, 'gdml.xsd')
 
 from lxml import etree
 from gegede import Quantity
-
+from gegede.iter import ascending
 from gegede.export import pod
 
 def qtus(q,unit):
@@ -110,63 +110,61 @@ def make_shape_node(shape):
     aunit = 'radian'
     typename = type(shape).__name__
 
-    # fixme: adapt this block to use gegede.util.wash_units
-    outdat = dict()
-    udat = dict()
-    for k,v in zip(shape._fields, shape): # universal defaults
-        if k == 'name':
-            outdat['name'] = v
-            continue
-        if type(v) == Quantity:
-            if 'meter' in v.to_base_units().units:
-                outdat.setdefault('lunit', lunit)
-                udat[k] = str(v.to(lunit).magnitude)
-                continue
-            if 'radian' in v.to_base_units().units:
-                outdat.setdefault('aunit', aunit)
-                udat[k] = str(v.to(aunit).magnitude)
-                continue
-    
+    def unitify(unit, quant, scale=1.0):
+        quant = quant * scale
+        return str(quant.to(unit).magnitude)
+    def dsize(quant):
+        return unitify(lunit, quant, 2.0)
+    def rsize(quant):
+        return unitify(lunit, quant, 1.0)
+    def ang(quant):
+        return unitify(aunit, quant, 1.0)
+
     if typename == 'Box':
-        outdat.update(x=udat['dx'], y=udat['dy'], z=udat['dz'])
-        return etree.Element('box', **outdat)
+        dat = dict(name=shape.name, lunit=lunit,
+                   x=dsize(shape.dx), y=dsize(shape.dy), z=dsize(shape.dz))
+        return etree.Element('box', **dat)
                              
     if typename == 'Tubs':
-        outdat.update(rmin=udat['rmin'], rmax=udat['rmax'], z=udat['dz'], 
-                      startphi=udat['sphi'], deltaphi=['dphi'])
-        return etree.Element('tube', **outdat)
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                   rmin=rsize(shape.rmin), rmax=rsize(shape.rmax), z=dsize(shape.dz),
+                   startphi=ang(shape.sphi), deltaphi=ang(shape.dphi))
+        return etree.Element('tube', **dat)
 
     if typename == 'Sphere':
-        outdat.update(rmin=udat['rmin'], rmax=udat['rmax'],
-                      startphi=udat['sphi'], deltaphi=['dphi'],
-                      starttheta=udat['stheta'], deltatheta=['dtheta'])
-        return etree.Element('sphere', **outdat)
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                   rmin=rsize(shape.rmin), rmax=rsize(shape.rmax),
+                   startphi=ang(shape.sphi), deltaphi=ang(shape.dphi),
+                   starttheta=ang(shape.stheta), deltatheta=ang(shape.dtheta))
+        return etree.Element('sphere', **dat)
 
     # etc....  Grow this as gegede.schema.Schema.shapes grows....
 
     return
 
-def make_structure_node(obj, store):
-    typename = type(obj).__name__
+def make_volume_node(vol, store):
 
-    if typename == 'Volume':
-        node = etree.Element('volume', name=obj.name)
-        node.append(etree.Element('materialref', ref=obj.material))
-        node.append(etree.Element('solidref', ref=obj.shape))
-        for placename in obj.placements or []:
-            place = store[placename]
-            pvol = etree.Element('physvol')
-            node.append(pvol)
-            pvol.append(etree.Element('volumeref', ref=place.volume))
-            if place.pos:
-                pvol.append(etree.Element('positionref', ref=place.pos))
-            if place.rot:
-                pvol.append(etree.Element('rotationref', ref=place.rot))
-        for parname, parval in obj.params or []:
-            pnode = etree.Element('auxiliary', auxtype=parname, auxvalue=parval)
-            node.append(pnode)
-        return node
-    return
+    node = etree.Element('volume', name=vol.name)
+    node.append(etree.Element('materialref', ref=vol.material))
+    node.append(etree.Element('solidref', ref=vol.shape))
+    for placename in vol.placements or []:
+        place = store[placename]
+        pvol = etree.Element('physvol')
+        node.append(pvol)
+        pvol.append(etree.Element('volumeref', ref=place.volume))
+        if place.pos:
+            pvol.append(etree.Element('positionref', ref=place.pos))
+        else:
+            pvol.append(etree.Element('positionref', ref='center'))
+        if place.rot:
+            pvol.append(etree.Element('rotationref', ref=place.rot))
+        else:
+            pvol.append(etree.Element('rotationref', ref='identity'))
+    for parname, parval in vol.params or []:
+        pnode = etree.Element('auxiliary', auxtype=parname, auxvalue=parval)
+        node.append(pnode)
+    return node
+
 
 def convert(geom):
     '''
@@ -181,16 +179,25 @@ def convert(geom):
     # <define>
     define_node = etree.Element('define')
     gdml_node.append(define_node)
+    center = identity = None
     for name, obj in geom.store.structure.items():
         typename = type(obj).__name__.lower()
         node = None
         if typename == 'position':
             node = etree.Element('position', **nt_qunit2xmldict(obj, 'cm'))
+            if obj.name == 'center':
+                center = obj
         if typename == 'rotation':
             node = etree.Element('rotation', **nt_qunit2xmldict(obj, 'deg'))
+            if obj.name == 'identity':
+                identity = obj
         if node is not None:
             define_node.append(node)
         continue
+    if center is None:
+        define_node.append(etree.Element('position', name='center'))
+    if identity is None:
+        define_node.append(etree.Element('rotation', name='identity'))
 
     # <materials>
     materials_node = etree.Element('materials')
@@ -212,10 +219,10 @@ def convert(geom):
     # <structure>
     structure_node = etree.Element('structure')
     gdml_node.append(structure_node)
-    for obj in geom.store.structure.values():
-        node = make_structure_node(obj, geom.store.structure)
+    for vol in ascending(geom.store.structure, geom.world):
+        node = make_volume_node(vol, geom.store.structure)
         if node is not None:
-            structure_node.append(node)        
+            structure_node.append(node)
 
     # <setup>
     setup_node = etree.Element('setup', name="Default", version="0")

@@ -47,7 +47,7 @@ def NamedTypedList(typ, minentries = 1):
     '''
 
     def named_typed_list_converter(proto):
-        print 'named_typed_list_converter(%s, "%s")' % (typ, str(proto))
+        #print 'named_typed_list_converter(%s, "%s")' % (typ, str(proto))
         ret = list()
         if len(proto) < minentries:
             raise ValueError, "At least %d entries required" % minentries
@@ -66,7 +66,7 @@ def NameList(typ, minentries = 1):
     '''
 
     def name_list_converter(proto):
-        print 'name_list_converter(%s, "%s")' % (typ, str(proto))
+        #print 'name_list_converter(%s, "%s")' % (typ, str(proto))
         ret = list()
         if len(proto) < minentries:
             raise ValueError, "At least %d entries required" % minentries

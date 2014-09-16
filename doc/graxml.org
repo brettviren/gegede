@@ -1,0 +1,29 @@
+The GraXML viewer can view GeGeDe GDML
+
+* Installation
+
+See the [[http://hrivnac.web.cern.ch/hrivnac/Activities/Packages/GraXML/][GraXML home page]] for [[http://hrivnac.web.cern.ch/hrivnac/Activities/Packages/GraXML/JavaDoc/net/hep/graphics/GraXML/doc-files/Guide.html#Local%20Instalation][installation instructions]] but basically, download the tar file, unpack it and run
+
+#+BEGIN_EXAMPLE
+  $ ./GraXML/bin/GraXML.sh
+#+END_EXAMPLE
+
+To auto-load your GDML file (assumed to be =mygeo.gdml=) make a little file:
+
+#+BEGIN_EXAMPLE c++
+  // mygeo.bsh
+  // for some reason the default for this is 0.1
+  net.hep.geant4.GDML.GeometricModel.Evaluator.setRescaleFactor(1.0);
+  // load the actual GDML file.  The object "w" is premade
+  w.show("mygeo.gdml");
+#+END_EXAMPLE
+
+This is a "Bean shell" script and mostly looks like C++.  You can then pass it in on the command line:
+
+#+BEGIN_EXAMPLE
+  $ ./GraXML/bin/GraXML.sh mygeo.bsh
+#+END_EXAMPLE
+
+More examples of what these script files can do are found at the GraXML pages.
+
+After the app loads, click on your geometry in the tree viewer on the right-hand-side of the GUI.

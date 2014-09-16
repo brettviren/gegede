@@ -1,0 +1,10 @@
+* ROOT's GDML importer and/or GDML itself
+
+In no particular order:
+
+ - order of volumes matter despite daughters being referenced by name (GraXML does not suffer this limitation)
+
+ - single quoted strings are XML standard but (until recently) led to parse errors
+
+ - although you can define a null position and rotation in the =define= section you must always supply both in a placement even if a null pos/rot is desired.
+

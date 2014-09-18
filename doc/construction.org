@@ -6,6 +6,10 @@ The objects that =gegede= can produce follow a /schema/ which describes the data
 
 * Construction of a geometry
 
+This section walks through how to construct a geometry.
+
+** The Geometry Object
+
 A geometry is constructed into a fully contained, non-global instance of =gegede.construct.Geometry=.  This allows multiple geometries to be constructed and exist at once.  A geometry is first created like:
 
 #+BEGIN_SRC python
@@ -13,7 +17,13 @@ A geometry is constructed into a fully contained, non-global instance of =gegede
   geom = Geometry()
 #+END_SRC
 
-All geometry construction is done through the =Geometry= object (here =geom=).  At this low-level, it proceeds much the same manner as one would construct a geometry with Geant4 or ROOT.  For example, to make a "box" shape (aka "solid") object:
+Note: in a [[./builders.org][builder]] context this geometry object is passed in through the argument to the builder object's =.construct(geom)= method.
+
+All geometry construction is then done through this =Geometry= object.  This object has a number of attributes through which one may create instances supported by the geometry [[./schema.org][schema]].  
+
+** Shapes
+
+The =shapes= geometry attribute lets one create volume shapes (aka "solids").  A shape is created by calling the associated method.  In all cases the first argument must either be a unique name or =None= (which will cause GeGeDe to generate a unique name).  Following this are some number of shape-specific keywords expected by the schema.  For example:
 
 #+BEGIN_SRC python
   box1 = geom.shapes.Box("box1", '1.0m', '2 m', '3 meter')
@@ -31,5 +41,56 @@ Items to note about this example:
 - Unspecified arguments will take values as are provided by the schema, knowing these defaults lets it be said that the three boxes are equivalently defined.
 - All numerical quantities that have dimension *must* have units, while unitless quantities can be expressed as literal numbers or their string representations.  Either way, these values are parsed by [[https://github.com/hgrecco/pint][pint]] and must match the dimension for the value as given by its prototype in the schema.  Otherwise, one is free to specify values in whatever supported unit happens to be convenient.
 
+** Material
 
+** Volumes
 
+A volume is essentially a composition of shape and material and zero or more placements of daughter volumes.  In addition, any number of parameters may be associated.  A volume with no daughters may be created like:
+
+#+BEGIN_SRC python
+  mat = ... # set material
+  box1 = ... # set the shape  
+  lv = geom.structure.Volume('my_volume', material = mat, shape=box1)
+#+END_SRC
+
+Strictly the =material= and =shape= must be set to their names and not their objects but an internal conversion will occur if an object is given.  If the material and shape are both =None=, the volume will be considered an Assembly.
+
+If the volume has daughters and if those daughters may be created before the parent they may be specified like:
+
+#+BEGIN_SRC python
+  mat = ... # set material
+  box1 = ... # set the shape  
+  children = make_daughters()
+  placements = place_daughters(children)
+  lv = geom.structure.Volume('my_volume', material = mat, shape=box1, placements = placements)
+#+END_SRC 
+
+It is often the case that it is not convenient to create the daughters before the mother (particularly in real life).  To accommodate that pattern one may set the placements to a list for later filling:
+
+#+BEGIN_SRC python
+  lv = geom.structure.Volume([...], placements = list())
+  # later...
+  child = make_child()
+  lv.placements.append(place_child(child))
+#+END_SRC
+
+FIXME: this should be cleaned up to make an empty list the default.
+
+*** Creating placements, positions and rotations.
+
+To create a placement itself one needs a (daughter) volume and to specify a position and rotation.  
+
+#+BEGIN_SRC python
+  lv = get_volume_from_somewhere()
+  pos = geom.structure.Position(x='1m', y='2m', z='3m')
+  rot = geom.structure.Rotation(z='45 deg')
+  place = geom.structure.Placement(volume=lv, pos=pos, rot=rot)
+
+  # then:
+  mother = geom.structure.Volume(momname, ..., placements = [place])
+  # or
+  mother = geom.structure.Volume(momname, ..., placements = [])
+  mother.placements.append(place)
+#+END_SRC
+
+If a position is not specified the default of a null-displacement will be used.  Likewise, no rotation given implies a null rotation.

@@ -21,7 +21,7 @@ def make_builder(dat, name = None):
     bname, bdat = get_builder_config(dat, name)
     klass = bdat.pop('class')
     bobj = klass(bname)
-    subbuilders = bdat.get('subbuilders',list())
+    subbuilders = bdat.pop('subbuilders',list())
     for sbname in subbuilders:
         sb = make_builder(dat, sbname)
         bobj.builders.append(sb)

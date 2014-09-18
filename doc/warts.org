@@ -8,3 +8,8 @@ In no particular order:
 
  - although you can define a null position and rotation in the =define= section you must always supply both in a placement even if a null pos/rot is desired.
 
+* GraXML
+
+In no particular order:
+
+ - no support for "assembly".  Doh!  this may be a deal breaker

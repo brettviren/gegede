@@ -138,15 +138,28 @@ def make_shape_node(shape):
                    starttheta=ang(shape.stheta), deltatheta=ang(shape.dtheta))
         return etree.Element('sphere', **dat)
 
+    if typename == 'Boolean':
+        ele = etree.Element(shape.type, name=shape.name)
+        # the rest are sub nodes.  why?  because, don't ask questions!
+        ele.append(etree.Element('first', ref=shape.first))
+        ele.append(etree.Element('second', ref=shape.second))
+        ele.append(etree.Element('positionref', ref = shape.pos or 'center'))
+        ele.append(etree.Element('rotationref', ref = shape.rot or 'identity'))
+        return ele
+
     # etc....  Grow this as gegede.schema.Schema.shapes grows....
 
     return
 
 def make_volume_node(vol, store):
 
-    node = etree.Element('volume', name=vol.name)
-    node.append(etree.Element('materialref', ref=vol.material))
-    node.append(etree.Element('solidref', ref=vol.shape))
+    node_type = 'volume'
+    if vol.material is None and vol.shape is None:
+        node = etree.Element('assembly', name=vol.name)
+    else:
+        node = etree.Element('volume', name=vol.name)
+        node.append(etree.Element('materialref', ref=vol.material))
+        node.append(etree.Element('solidref', ref=vol.shape))
     for placename in vol.placements or []:
         place = store[placename]
         pvol = etree.Element('physvol')

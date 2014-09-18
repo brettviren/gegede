@@ -71,10 +71,21 @@ class Builder(object):
 
         Subclass may override.
 
+        If a self.defaults value exists it updated with kwds and the
+        items are set as data members of self.  
+
         The builder may add sub-builder objects inside this method.
         See self.add_builder().  They will have their own configure()
         method called after this method exits.
+
         '''
+        if hasattr(self, 'defaults'):
+            if not set(kwds).issubset(self.defaults): # no unknown keywords
+                msg = 'Unknown parameter in: "%s"' % (', '.join(sorted(kwds.keys())), )
+                raise ValueError,msg
+            self.__dict__.update(**self.defaults)    # stash them as data members
+            self.__dict__.update(**kwds)             # and update any from user
+
         return
 
     

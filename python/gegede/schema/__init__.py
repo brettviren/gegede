@@ -33,6 +33,9 @@ Schema = dict(
         Sphere = (("rmin", "0m"), ("rmax","1m"),
                     ("sphi","0deg"), ("dphi", "360deg"),
                     ("stheta","0deg"), ("dtheta", "180deg")),
+        Boolean = (("type",str), ("first", Named), ("second", Named), 
+                   ("pos", Named), ("rot", Named))
+
         # fixme: fill in the rest!
         ),
 

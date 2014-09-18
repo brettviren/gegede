@@ -45,21 +45,24 @@ A builder is an instance of a Python class that satisfies the API and behavior o
 
 ** Configuration
 
-A builder may receive configuration information by implementing the method:
+A builder learns of configuration information through the =configure()= method.  No geometry construction may be done in this method.
+Left unimplemented, the default =configure()= method will check for a class variable =.defaults= to hold a dictionary of default configuration items.  Any passed in during the configuration phase, such as those defined in a configuration file section, may override these defaults.  
+
+If the builder wishes to explicitly construct sub-builders it should do so in this method, potentially after calling the parent class's =configure()=.
+
+The generic prototype for =configure()= is:
 
 #+BEGIN_SRC python
   def configure(self, **kwds):
       # ...
 #+END_SRC
 
-Default values may be specified in the usual Python manner:
+In addition to setting a =.default= dictionary, default values may be specified in the usual Python manner:
 
 #+BEGIN_SRC python
   def configure(self, dx='1cm', dy='1cm', dz='1cm', material='Air', **kwds):
       # ...
 #+END_SRC
-
-No geometry construction may be done in this method.
 
 ** Construction
 

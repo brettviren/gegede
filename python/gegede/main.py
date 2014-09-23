@@ -52,6 +52,18 @@ def export(geom, filename, ext = None):
         raise ValueError, 'Unknown export format: "%s" for file %s' % (ext, filename)
     meth(geom, filename)
 
+def validate_gdml(filename):
+    import gegede.export.gdml
+    return gegede.export.gdml.validate(open(filename).read())
+
+def validate(filename, ext):
+    ext = ext or os.path.splitext(filename)[1][1:]
+    try:
+        meth = eval("validate_%s"%ext)
+    except NameError:
+        raise ValueError, 'Unknown export format: "%s" for file %s' % (ext, filename)
+    meth(filename)
+
 def main ():
     import argparse
     parser = argparse.ArgumentParser()
@@ -60,6 +72,8 @@ def main ():
     parser.add_argument("-f", "--format", default=None,
                         help = "Export format, guess by extension if not given")
     parser.add_argument("-o", "--output", default=None,
+                        help="File to export to")
+    parser.add_argument("-V", "--validate", action='store_true',
                         help="File to export to")
     parser.add_argument("config", nargs='+',
                         help="Configuration file(s)")
@@ -73,6 +87,8 @@ def main ():
 
     geom = generate(args.config, args.world)
     export(geom, args.output, args.format)
+    if args.validate:
+        validate(args.output, args.format)
     return
 
 

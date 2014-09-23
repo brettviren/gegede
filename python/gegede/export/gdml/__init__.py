@@ -183,11 +183,13 @@ def convert(geom):
     '''
     Return an lxml.etree formed from the geometry
     '''
-    # exhausting....
+
     gdml_node = etree.Element("gdml")
 
-    xsi = "schema/gdml.xsd"
-    # fixme: do I need this cruft: xsi:noNamespaceSchemaLocation="schema/gdml.xsd" ?
+    # I have no idea what this means but it reproduces what other GDML
+    # files have and w/out it Geant4 complains.
+    gdml_node.set('{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation',
+                  'http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd')
 
     # <define>
     define_node = etree.Element('define')

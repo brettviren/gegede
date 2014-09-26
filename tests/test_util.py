@@ -3,7 +3,7 @@
 test gegede.export.util
 '''
 from collections import namedtuple
-from gegede.util import wash_units
+from gegede.util import wash_units, list_match
 from gegede import Quantity as Q
 
 
@@ -24,3 +24,19 @@ def test_wash_units():
     assert n2.l2 == 2.0, n2
     assert 'meter' == u2['lunit'], u2
     assert 'aunit' not in u2, u2
+
+
+
+
+
+def test_matching():
+    NO = namedtuple('NamedObj','name')
+    values = [NO(o) for o in "the quick brown foxy fiend".split()]
+    def deref(v): return v.name
+    assert list_match(values, deref=deref) == values
+    assert list_match(values,0, deref=deref) == map(NO, ['the'])
+    assert list_match(values,1, deref=deref) == map(NO, ['quick'])
+    assert list_match(values,"quick", deref=deref) == map(NO, ['quick'])
+    assert list_match(values,'b.*', deref=deref) == map(NO, ['brown'])
+    assert list_match(values,'f.*', deref=deref) == map(NO, ['foxy','fiend'])
+    assert list_match(values, lambda x: 'o' in x, deref=deref) == map(NO,'brown foxy'.split())

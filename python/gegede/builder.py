@@ -3,6 +3,7 @@
 A GGD builder
 '''
 
+from .util import list_match
 
 class Builder(object):
     '''
@@ -28,6 +29,12 @@ class Builder(object):
         self.builders = list()
         self.volumes = list()
         
+    
+    def get_builders(self, entry = None):
+        return list_match(self.builders, entry, deref = lambda x: x.name)
+    def get_volumes(self, entry = None):
+        return list_match(self.volumes, entry, deref = lambda x: x.name)
+
     def add_volume(self, *vols):
         '''Register top-level logical volumes to self.volumes.  
 

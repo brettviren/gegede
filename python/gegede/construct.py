@@ -3,6 +3,7 @@
 from collections import namedtuple, OrderedDict
 import schema as default_schema
 from schema.tools import make_maker
+from .util import list_match
 
 class Geometry(object):
     '''A geometry constructor.
@@ -33,3 +34,6 @@ class Geometry(object):
             setattr(self, part, namedtuple(part.capitalize(), types)(*makers))
 
         self.schema = schema
+
+    def get_shape(self, entry = None, index = 0):
+        return list_match(self.store.shapes.values(), entry, deref = lambda x: x.name)[index]

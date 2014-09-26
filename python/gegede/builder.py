@@ -3,6 +3,8 @@
 A GGD builder
 '''
 
+from collections import OrderedDict
+
 from .util import list_match
 
 class Builder(object):
@@ -11,9 +13,9 @@ class Builder(object):
 
     This class maintains the following data members:
 
-    .builders - a sequence holding any sub-builders
+    .builders - an ordered dictionary of sub-builder objects
 
-    .volumes - a sequence holding top-level logical volumes.
+    .volumes - an ordered dictionary of top-level volume objects
 
     For adding to these, see self.add_* methods named after these members
     '''
@@ -26,19 +28,38 @@ class Builder(object):
         The <name> is used to later locate the builders configuration.
         '''
         self.name = name
-        self.builders = list()
-        self.volumes = list()
+        self.builders = OrderedDict()
+        self.volumes = OrderedDict()
         
     
     def get_builders(self, entry = None):
-        return list_match(self.builders, entry, deref = lambda x: x.name)
+        '''
+        Return sequence of builder objects that match the entry.
+        '''
+        return list_match(self.builders.values(), entry, deref = lambda x: x.name)
+
+    def get_builder(self, entry = None, index = 0):
+        '''
+        Return the one builder that matches the entry.
+        '''
+        return list_match(self.builders.values(), entry, deref = lambda x: x.name)[index]
+
     def get_volumes(self, entry = None):
-        return list_match(self.volumes, entry, deref = lambda x: x.name)
+        '''
+        Return sequence of volume objects that match the entry.
+        '''
+        return list_match(self.volumes.values(), entry, deref = lambda x: x.name)
+
+    def get_volume(self, entry = None, index = 0):
+        '''
+        Return the one volume that matches the entry.
+        '''
+        return list_match(self.volumes.values(), entry, deref = lambda x: x.name)[index]
 
     def add_volume(self, *vols):
         '''Register top-level logical volumes to self.volumes.  
 
-        <vols> is a list of names of logical volume objects.
+        <vols> is a list logical volume objects.
 
         No return value.
 
@@ -46,11 +67,10 @@ class Builder(object):
         '''
 
         for v in vols:
-            if hasattr(v,'name'):
-                v = v.name
-            if v in self.volumes:
+            if self.get_volumes(v.name):
                 continue
-            self.volumes.append(v)
+            self.volumes[v.name] = v
+        return
 
     def add_builder(self, name, klass):
         '''Add a builder of type <klass> and given name <name>.
@@ -60,12 +80,16 @@ class Builder(object):
         klass may be an instance of a Builder class or a string
         holding the fully-qualified name of a class.
         '''
+        if self.get_builders(name):
+            print ('Builder already registered: "%s"' % name)
+            return
+            
         if (isinstance(klass, type(""))):
             mod,name = klass.rsplit('.',1) # this seems dirty
             exec ('import %s' % mod)
             klass = eval(klass)
         builder = klass(name)
-        self.builders.append(builder)
+        self.builders[name] = builder
         return
 
     def configure(self, **kwds):
@@ -106,7 +130,7 @@ class Builder(object):
         Implementation should produce all materials and logical or
         physical volumes needed.  Any sub-builders will have their
         construct() method called prior to this one and so will have
-        their .volumes list populated.
+        their .volumes ordered dictionary populated.
 
         '''
         return
@@ -119,14 +143,14 @@ def configure(builder, cfg):
     recurse through any sub-builders.
     '''
     builder.configure(**cfg.get(builder.name, dict()))
-    for other in builder.builders:
+    for other in builder.builders.values():
         configure(other, cfg)
     return
 
 def construct(builder, geom):
     '''Call the construct method on the builder after recursing any
     sub-builders'''
-    for other in builder.builders:
+    for other in builder.builders.values():
         construct(other, geom)
     builder.construct(geom)
     return

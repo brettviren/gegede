@@ -32,7 +32,7 @@ def list_match(values, entry = None, deref = lambda x: x):
     '''
     If not entry, return values.  
 
-    If entry is int, return index into values.
+    If entry is int, return values at entry (at most single element list)
 
     If entry is a callable, call it on deref(value) and return value if callable returns true.
 

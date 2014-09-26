@@ -22,8 +22,9 @@ def generate(filenames, world_name = None):
     geom = gegede.construct.Geometry()
     gegede.builder.construct(wbuilder, geom)
     assert len(wbuilder.volumes) == 1, 'Top level builder "%s" must only produce one LV, produced %d' % (wbuilder.name, len(wbuilder.volumes))
-    geom.world = wbuilder.volumes[0]
-    print 'Generated world "%s"' % geom.world
+    geom.world = wbuilder.get_volume(0)
+    print 'Generated world "%s"' % geom.world.name
+    # fixme: here would be a good time to do some internal validation
     return geom
 
 def export_gdml(geom, filename):

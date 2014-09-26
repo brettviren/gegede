@@ -152,11 +152,12 @@ def make_shape_node(shape):
     return
 
 def make_volume_node(vol, store):
-
+    #print 'VOL',vol
     node_type = 'volume'
     if vol.material is None and vol.shape is None:
         node = etree.Element('assembly', name=vol.name)
     else:
+        assert vol.material and vol.shape
         node = etree.Element('volume', name=vol.name)
         node.append(etree.Element('materialref', ref=vol.material))
         node.append(etree.Element('solidref', ref=vol.shape))
@@ -235,6 +236,7 @@ def convert(geom):
     structure_node = etree.Element('structure')
     gdml_node.append(structure_node)
     for vol in ascending(geom.store.structure, geom.world):
+        assert vol
         node = make_volume_node(vol, geom.store.structure)
         if node is not None:
             structure_node.append(node)
@@ -243,7 +245,7 @@ def convert(geom):
     setup_node = etree.Element('setup', name="Default", version="0")
     gdml_node.append(setup_node)
 
-    world_node = etree.Element('world', ref=geom.world)
+    world_node = etree.Element('world', ref=geom.world.name)
     setup_node.append(world_node)
 
     return gdml_node

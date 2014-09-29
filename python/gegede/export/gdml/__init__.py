@@ -204,7 +204,7 @@ def convert(geom):
             if obj.name == 'center':
                 center = obj
         if typename == 'rotation':
-            node = etree.Element('rotation', **nt_qunit2xmldict(obj, 'deg'))
+            node = etree.Element('rotation', **nt_qunit2xmldict(obj, 'degree'))
             if obj.name == 'identity':
                 identity = obj
         if node is not None:

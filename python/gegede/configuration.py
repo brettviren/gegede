@@ -3,6 +3,7 @@
 gegede configuration
 '''
 import os
+import re
 from collections import OrderedDict
 
 def parse(filenames):
@@ -35,6 +36,43 @@ def cfg2pod(cfg):
             secdat[k] = v
         pod[secname] = secdat
     return pod
+
+interp_reobj = re.compile(r'{([\w:]+)}')
+def interpolate_value(value, secname, sections):
+    def getter(match):
+        m = match.group(1)
+        try:
+            name, key = m.split(':')
+        except ValueError:
+            key = m
+            name = secname
+        return sections[name][key]
+    ret = re.subn(interp_reobj, getter, value)
+    return ret[0]
+
+def interpolate(sections):
+    '''Perform string interpolation values <sections>.
+
+    The <sections> data structure is a dictionary keyed by SECTION name.
+
+    Each section value is a dictionary keyed by KEY with string values.
+
+    Interpolation is performed on literals matching {KEY} or {SECTION:KEY}.
+    '''
+    while True:
+        changed = False
+        for secname, secdict in sections.items():
+            for key, val in secdict.items():
+                newval = interpolate_value(val, secname, sections)
+                if newval == val:
+                    continue
+                changed = True
+                sections[secname][key] = newval
+        if changed:
+            continue
+        break
+        
+
 
 def make_class(fqclass):
     mod, cls = fqclass.rsplit('.',1)
@@ -69,6 +107,9 @@ def configure(filenames):
     assert cfg.sections()
     pod = cfg2pod(cfg)
     assert pod
+
+    interpolate(pod)
+
     dat = evaluate(pod)
     assert dat
     return dat

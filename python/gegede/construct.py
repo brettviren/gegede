@@ -36,4 +36,7 @@ class Geometry(object):
         self.schema = schema
 
     def get_shape(self, entry = None, index = 0):
+        if hasattr(entry, 'shape'): # allow to pass entry as a Volume object
+            entry = entry.shape
+
         return list_match(self.store.shapes.values(), entry, deref = lambda x: x.name)[index]

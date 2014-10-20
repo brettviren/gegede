@@ -26,5 +26,11 @@ def convert(geom):
         dat[section] = things
     return dat
 
-def dumps(geom):
-    return pprint.pformat(convert(geom), indent=4) + '\n'
+def dumps(obj):
+    return pprint.pformat(obj, indent=4) + '\n'
+
+def output(obj, filename):
+    fp = open(filename, 'w')
+    fp.write('#!/usr/bin/env python\n')
+    fp.write(dumps(obj))
+    fp.close()

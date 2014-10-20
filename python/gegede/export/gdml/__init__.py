@@ -262,8 +262,23 @@ def validate(text):
         raise ValueError, 'Invalid GDML'
     return True
 
-def dumps(geom):
-    xml = etree.tostring(convert(geom), pretty_print = True, xml_declaration = True)
-    xml = xml.replace("'",'"')
+def validate_object(obj):
+    return validate(dumps(obj))
+
+#def validate_output(obj, filename):
+#    return False
+
+def dumps(obj):
+    '''
+    Return a string representation of the object returned by convert.
+    '''
+    xml = etree.tostring(obj, pretty_print = True, xml_declaration = True)
+    xml = xml.replace("'",'"')  # work around ROOT GDML import bug....
     # don't validate here
     return xml
+
+def output(obj, filename):
+    '''
+    Save to file
+    '''
+    open(filename,'w').write(dumps(obj))

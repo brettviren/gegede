@@ -143,10 +143,12 @@ def make_structure(bucket, obj):
     
 
 class Bucket(object):
-    def __init__(self, name):
+    def __init__(self, world):
+        if not isinstance(world, type("")):
+            world = world.name
         from collections import defaultdict
         self._dat = defaultdict(dict)
-        self.tgeo = ROOT.TGeoManager(name, 'GeGeDe %s' % name)
+        self.tgeo = ROOT.TGeoManager(world, 'GeGeDe %s' % world)
 
     def store(self, category):
         return self._dat[category]

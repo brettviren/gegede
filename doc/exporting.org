@@ -1,31 +1,69 @@
 Exporting =gegede= objects.
 
-* Calling exporters
+A GeGeDe exporter is a Python module following the interface described here.  The conversion process is broken up into a number of steps, some optional, in order to give the user (or client code) some finer grained control.
 
-After producing a =gegede.construct.Geometry= object one can export it to a number of supported formats.  
+* Required Exporter Module Methods
+
+A GeGeDe exporter module must supply a method =convert(geom)= which is called like:
 
 #+BEGIN_SRC python
-  from gegede.export import gdml
-  from gegede.construct import Geometry
-  geom = Geomtry()
-  # ... fill geom ...
-  xml = gdml.dumps(geom)
-  open('geom.gdml','w').write(xml)
+  from MyConverterModule import convert
+  geom = ...
+  obj = convert(geom)
 #+END_SRC
 
-Each exporter is in a module under =gegede.export= and must implement the following API:
+The =geom= object is an instance of =gegede.construct.Geometry=.  The =convert()= method should return an object holding any transient information related to the conversion.  This object will be treated as opaque by GeGeDe. 
 
-- =EXPORTER.dumps(geom)= :: return a serializable object (string) representing the =geom= in the EXPORTER's format.
 
-It may implement this additional API:
+* Optional Exporter Module Methods
 
-- =EXPORTER.convert(geom)= :: return a different object representation of =geom= in a form related to the exporter.
+** Validating exported object
 
-* Writing exporters
+The module may provide an optional method =validate_object= to validate the transient object =obj= returned as part of its conversion process.  It is called like:
 
-Exporters must supply the =dumps()= function taking an instance of =gegede.construct.Geometry= and returning a serialized object (eg a string) suitable to passing to =file.write()=.
+#+BEGIN_SRC python
+  from MyConverterModule import validate_object
+  validate_object(obj)
+#+END_SRC
 
-** Considerations
+The method should raise =ValueError= if the object =obj= is not valid.
+
+** Producing an output file
+
+The main job of an exporter module is to produce a file from the information held in the =geom= object.  This method is optional.  If the module implements such functionality it should provide a =output()= method which would be called like:
+
+#+BEGIN_SRC python
+  from MyConverterModule import output
+  filename = ...
+  output(obj, filename)
+#+END_SRC
+
+** Validating the output file
+
+It is often useful to be able to write an invalid file in order to test the nature of its validity in other tools.  It is also useful to encode tests for known failure modes.  This requires an explicit "hook" to be called after writing the output file and one which the user may want control over its inclusion or exclusion.  For that is =validate_file()=
+
+#+BEGIN_SRC python
+  from MyConverterModule import validate_file
+  validate_file(obj, filename)
+#+END_SRC
+
+The same transient object =obj= is passed in as it may be useful in comparing the written representation.
+
+** String representation
+
+An exporter may provide the optional =dumps()= method to return a string representation of the =obj= object returned by its =convert()= method.
+
+#+BEGIN_SRC python
+  obj = myexporter.convert(geom)
+  text = myexporter.dumps(obj)
+  print text
+#+END_SRC
+
+* API
+
+An instance of the class =gegede.export.Exporter= can be created with the name of an exporter (relative to =gegede.export= or a fully qualified module name).  It then provides a simple API expressing the above conventions.
+
+* Some considerations
 
 The =gegede.construct.Geometry= data object's =store= member contains a per-section collection of all objects created under that section.  Most exporter's work by walking through this store and converting each object into whatever the target form is.  Object values that are held as =collections.namedtuple= or =pint.Quantity= will likely need special consideration when serializing.  For a simple example see the module =gegede.export.pod=.
 

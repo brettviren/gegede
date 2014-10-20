@@ -1,0 +1,118 @@
+Others in this space.
+
+* CAD
+
+Computer Assisted Drawing (CAD) is all about modeling geometry, so it is natural that I get the question "why not just use CAD?".  this section interprets this question and tries to answer it.
+
+** Why not to use CAD
+
+Using CAD for modeling geometry for the purpose of tracking simulation and reconstruction is not suitable for many reasons.  (But see [[Why use CAD]]).
+
+*** CAD software is exclusionary
+
+CAD software tends to be very expensive (excluding instances distributed under a Free Software license) and tends to be rather difficult to learn to use.  It is not uncommon for licenses to  cost $100-1000/seat and training to have similar price tags.  This means that only a minor few of the collaboration can, in practice, contribute to developing, validating, tuning the geometry.  It is typical that only a small number of individuals do geometry work so the intersection of these two sets can be expected to be even smaller.
+
+*** CAD is too detailed
+
+CAD modeling of detector geometry is often done by engineers.  The same thing that makes these models useful for them makes them unsuitable for simulation and reconstruction.  I estimate the level of detail in typical engineering CAD modules is a factor of 100 to high.  The additional detail provides essentially no benefit and instead bloats memory footprints and slows down any traversals of the geometry, such as needed while tracking.  One might consider starting with an engineering model and using CAD software to "dumb down" the details to a reasonable level.  I suspect this would be a lot of work and initial benchmarks will with the full model will take significant resources to run.  Furthermore, while CAD has some open formats (which break the required model, see next) they tend to prefer proprietary ones or to not preserve all information.  This leads to a further restriction of the pool of individuals that may productively contribute to a model.
+
+*** CAD uses the "wrong" model
+
+The prevailing model used by the likes of ROOT and Geant4 is Constructive Solid Geometry (CSG).  While many CAD software applications support CSG, it tends not to be the primary model.  Instead models that describe a geometry with surfaces either via boundaries or tessellations are often used.  Even a hybrid that mixes these models is possible.  Moving between these different descriptions, such as would be needed in writing a converter to CSG, is challenging.
+
+*** CAD versioning is hard
+
+Any GUI app saving an opaque, often binary, file is not well suited to performing careful version control.  I've discussed how this is done with CAD models by expert engineers and it is, in my word, a "nightmare".  It is a very manual effort and fraught with chances to loose information especially if different CAD applications are in use on the same model.  There are lowest common denominator formats that lose types of information that can at least exchange the bulk of the information, but loss is loss.  The engineers make it work by being careful but software types like me are far too lazy to do likewise.
+
+**  Why use CAD
+
+With the above in mind, there are two avenues to use CAD which I think have some potential.  
+
+*** CAD as read-only
+
+CAD software applications have beautiful and useful interfaces.  That's their main reason for existence.  Converting simulation/reconstruction geometry models into formats that can be loaded into CAD applications would provide for very useful visualization and validation tools.
+
+*** Simple authoring in CAD
+
+One *might* be able to fruitfully harvest CAD to author sim/reco geometry models in a way that avoids the problems above if the following were used as guidance:
+
+ - restrict the geometry model to CSG elements only
+ - use Free Software CAD software (eg [[http://www.freecadweb.org/][FreeCAD]])
+ - use open and CSG-based exchange format (eg, [[http://oivdoc90.vsg3d.com/content/open-inventor-mentor-2nd-edition-volume-i][OpenInventor]])
+ - develop a simple description starting from a green-field (as apposed to "dumbing down" detailed engineering models)
+
+I note that this approach still does not avoid the "CAD is hard" and the versioning issues.
+
+*** FreeCAD
+
+A particular comment on FreeCAD.  This application has built-in support for reading OpenInventor files and preserves the OpenInventor description model into its internal data structure.  It would be a good default CAD application to target for both the [[CAD as read-only]] and [[Simple authoring in CAD]] models.  
+
+FreeCAD allows for graphical creation of shapes with an emphasis on Boolean joins.  While this is supported by CSG it tends to lead to an inefficient geometry.  Besides the built-in shapes, FreeCAD support something called "scripted" or "FeaturePython" objects.  It would be interesting to look into the possibility of developing a set of such shapes that mirror those supported by the likes of ROOT and Geant4 and then developing a detector model that is restricted to including these shapes.  This might (or not) allow for such things as saving a FreeCAD model to a format friendly to converting to GDML if, maybe not directly to GDML itself.  Investigation is need to see if this approach is a dead end or not.
+
+* Unified Solids
+
+** Links
+
+ - http://www.marekgayer.com/en/projects/unified-solids/
+
+** Reading
+
+This project is related but orthogonal to GeGeDe.
+
+The goal of this project is to replace (reimplement) the code already in ROOT and Geant4 that is used for performing calculations related to tracking through shapes in order to improve performance.
+
+** Related
+
+ - [[http://ph-news.web.cern.ch/content/aida-project-sft-group-develops-new-generation-geometry-toolkit][Detector Description Toolkit]].  Is this real or still conceptual?
+
+* SLIC/LCDD
+
+** Links
+
+Google for links to some talks.  All "official" looking link results go to dead pages or empty placeholders. Like:
+
+ - http://www.lcsim.org/software/ (dead)
+ - http://www.lcsim.org/sites/lcsim/lcsim-detector-framework/index.html (empty)
+ - https://confluence.slac.stanford.edu/display/ilc/LCDD (empty)
+
+Here is a paper on LCDD:
+
+ - http://www.slac.stanford.edu/cgi-wrap/getdoc/slac-pub-11418.pdf
+
+** Reading
+
+#+BEGIN_SRC dot
+digraph SLIC {
+  CompactDescriptionXml->GeomConverter->LCDD
+}
+#+END_SRC
+
+ - =GeomConverter= :: a Java program.
+
+ - LCDD :: is an extension to GDML.  LCDD files "should" be readable as GDML files (according to [[http://www.slac.stanford.edu/cgi-wrap/getdoc/slac-pub-11418.pdf][this]].  However, GDML files are often not readable as GDML files so I'm a bit skeptical of how well this works in practice with existing parsers.  But, still this may be a good extension approach.
+
+From [[http://calor.pg.infn.it/calor2006/access_contribId=111&sessionId=37&resId=1&materialId=slides&confId=522.pdf][here]] gives an illustration of what's what with LCDD XML:
+#+BEGIN_SRC xml
+  <lcdd>                          <!--LCDD Root Element-->
+    <header/>                     <!--Information about the Detector-->
+    <iddict/>                     <!--Identifier Specifications-->
+    <sensitive_detectors/>        <!--Detector Readouts-->
+    <limits/>                     <!--Physics Limits-->
+    <regions/>                    <!--Regions (sets of volumes)-->
+    <display/>                    <!--Visualization Attributes-->
+    <gdml>                        <!--GDML Root Element-->
+      <define/>                   <!--Constants, Positions, Rotations-->
+      <materials/>                <!--Material Definitions-->
+      <solids/>                   <!--Solid Definitions-->
+      <structure/>                <!--Volume Hierarchy-->
+    </gdml>
+    <fields/>                     <!--Magnetic Field-->
+  </lcdd> 
+#+END_SRC
+
+Questions:
+
+ 1) Is the "Compact Geometry Description" (CDG) XML schema LC-dependent
+ 2) What is used to author CDG?  Emacs?
+ 3) is the =GeomConverter= process LC-dependent
+ 4) what mechanism is used to translate LCDD into Gean4?  Is a custom XML parser used?  Is Geant4's parser modified or derived from?

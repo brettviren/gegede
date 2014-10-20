@@ -6,7 +6,7 @@ The General Geometry Description (GGD) is a software system to generate a descri
 
 ** Dependencies
 
-The core of GeGeDe relies on [[https://github.com/hgrecco/pint][Pint]] to enforce the consistent use of units.  The =gegede= command line interface relies on [[http://click.pocoo.org/][Click]].
+The core of GeGeDe relies on [[https://github.com/hgrecco/pint][Pint]] to enforce the consistent use of units.  
 
 Additional functionality, particularly with regards to export, is provided by other modules:
 

@@ -12,9 +12,10 @@ setup(name = 'gegede',
       packages = ['gegede', 'gegede.schema', 'gegede.export'],
       # These are just what were developed against.  Older versions may be okay.
       install_requires=[
-          "pint >= 0.5.1",
-          "lxml >= 3.3.5"
+          "pint >= 0.5.1",      # for units
+          "lxml >= 3.3.5",      # for GDML export
       ],
+      # implicitly depends on ROOT
       entry_points = {
           'console_scripts': [
               'gegede-cli = gegede.main:main',

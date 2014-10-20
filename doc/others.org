@@ -110,9 +110,13 @@ From [[http://calor.pg.infn.it/calor2006/access_contribId=111&sessionId=37&resId
   </lcdd> 
 #+END_SRC
 
-Questions:
+Questions (sent to Norman Graf):
 
- 1) Is the "Compact Geometry Description" (CDG) XML schema LC-dependent
- 2) What is used to author CDG?  Emacs?
- 3) is the =GeomConverter= process LC-dependent
- 4) what mechanism is used to translate LCDD into Gean4?  Is a custom XML parser used?  Is Geant4's parser modified or derived from?
+ - Q :: Is the "Compact Geometry Description" (CDG) XML schema LC-dependent. 
+ - A :: Independent and used in at least one non-LC experiment
+
+ - Q :: What is used to author CDG?  Emacs?
+ - A :: Hand-edited and no need yet seen to pragmatically generate, although one could do so.
+
+ - Q :: what mechanism is used to translate LCDD into Gean4?  Is a custom XML parser used?  Is Geant4's parser modified or derived from?
+ - A :: Only parsed once (I didn't get a full understanding of this answer, maybe in part due to my XML naivete, more discussion needed)

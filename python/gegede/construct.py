@@ -12,8 +12,8 @@ class Geometry(object):
     maintains a store of these elements for later retrieval by name.
     '''
 
-    # Set to the name of the world volume
-    world = None
+    # Name of world volume, set via .set_world()
+    _world = None
 
     def __init__(self, schema = None):
         '''Create a geometry constructor.
@@ -34,6 +34,16 @@ class Geometry(object):
             setattr(self, part, namedtuple(part.capitalize(), types)(*makers))
 
         self.schema = schema
+
+    @property
+    def world(self):
+        return self._world
+
+    def set_world(self, world):
+        if hasattr(world, 'name'):
+            self._world = world.name
+        else:
+            self._world = world
 
     def get_shape(self, entry = None, index = 0):
         if hasattr(entry, 'shape'): # allow to pass entry as a Volume object

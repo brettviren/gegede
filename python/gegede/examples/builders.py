@@ -25,17 +25,20 @@ class SimpleBuilder(gegede.builder.Builder):
         # now hook up the sub-builder's LV if it exists
         if not self.builders:
             return
-        subb = self.builders[0]
+        subb = self.get_builder()
         if not subb.volumes:
             return
 
-        sublv = subb.volumes[0]
+        sublv = subb.get_volume()
         p = geom.structure.Placement("%s_in_%s" % (sublv, lv.name), volume=sublv)
         # fixme: need to do something with this placement!
         return
 
 
 def nested_boxes():
+    '''
+    Make some nested boxes by explicitly creating some builders
+    '''
     blist = list()
     last_b = None
     sizes = ['1m', '100cm', '10cm', '1cm', '1mm']
@@ -46,11 +49,11 @@ def nested_boxes():
         cfg[sb.name] = dict(dx=size,dy=size,dz=size)
         blist.append(sb)
         if last_b:
-            sb.builders.append(last_b)
+            sb.builders[last_b.name] = last_b
         last_b = sb
 
     gegede.builder.configure(blist[0], cfg)
     geom = gegede.construct.Geometry()
     gegede.builder.construct(blist[0], geom)
-    geom.world = blist[0].volumes[0]
+    geom.set_world(blist[0].get_volume())
     return geom

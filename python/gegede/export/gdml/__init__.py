@@ -245,7 +245,7 @@ def convert(geom):
     setup_node = etree.Element('setup', name="Default", version="0")
     gdml_node.append(setup_node)
 
-    world_node = etree.Element('world', ref=geom.world.name)
+    world_node = etree.Element('world', ref=geom.world)
     setup_node.append(world_node)
 
     return gdml_node

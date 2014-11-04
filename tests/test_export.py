@@ -16,13 +16,15 @@ def test_pod():
 
 def test_ggdjson():
     g = airwaterboxes()
-    s = gegede.export.ggdjson.dumps(g)
+    o = gegede.export.ggdjson.convert(g)
+    s = gegede.export.ggdjson.dumps(o)
     assert s                    # lame test
 
 
 def test_gdml():
     g = airwaterboxes()
-    s = gegede.export.gdml.dumps(g)
+    o = gegede.export.gdml.convert(g)
+    s = gegede.export.gdml.dumps(o)
     assert s                    # lame test
     try:
         gegede.export.gdml.validate(s)

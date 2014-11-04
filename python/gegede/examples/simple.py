@@ -22,6 +22,6 @@ def airwaterboxes():
     lv1inlv2 = g.structure.Placement("lv1_in_lv2", volume=lv1, pos=pos, rot=rot)
     lv2 = g.structure.Volume('the_world', material = air, shape=box2,
                              placements = [lv1inlv2], params= (("foo",42), ("bar","baz")))
-    g.world = lv2.name
+    g.set_world(lv2)
     return g
 

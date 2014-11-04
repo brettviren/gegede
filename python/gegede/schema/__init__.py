@@ -5,7 +5,7 @@ The schema is a dictionary with an item for each major category in the
 schema.  The item's value is in a form which is category dependent.  
 
 In general, leaf elements are described by a 2-tuple holding a data
-member name and a pro typical value.  This value must be either an
+member name and a prototypical value.  This value must be either an
 object or a string that can be interpreted into an object in a
 category-dependent manner.  
 

@@ -31,7 +31,8 @@ def test_make_some_stuff():
     print lv1inlv2
     lv2 = g.structure.Volume('lv2', material = air, shape=box2,
                              placements = [lv1inlv2])
-    assert lv2.params is None
+    assert lv2.params is not None, 'got %s' % str(lv2.params) # want empty list
+    assert not lv2.params, 'got %s' % str(lv2.params)
     lv2 = g.structure.Volume('the world', material = air, shape=box2,
                              placements = [lv1inlv2], params= (("foo",42), ("bar","baz")))
     assert lv2.params

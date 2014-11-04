@@ -1,0 +1,32 @@
+#+TITLE: Test for Overlaps Using ROOT
+
+* Getting started
+
+You can use ROOT to validate that your geometry contains no overlapping volumes.  Start by generating a GDML file and loading it into ROOT:
+
+#+BEGIN_EXAMPLE
+  root [0] geo = TGeoManager::Import("35ton.gdml"); geo->GetMasterVolume()->Draw("ogl")
+
+  root [1] gGeoManager->CheckOverlaps()
+  Info in <TGeoNodeMatrix::CheckOverlaps>: Checking overlaps for volworld and daughters within 0.1
+  Check overlaps:      [==========]   44 [100.00 %]   TIME 00:00:00             
+  Info in <TGeoNodeMatrix::CheckOverlaps>: Number of illegal overlaps/extrusions : 7
+
+  root [2] gGeoManager->PrintOverlaps()
+  === Overlaps for Default ===
+   = Overlap ov00000: volLongDrift extruded by: volLongDrift/volTPC_ML_29 ovlp=5.515
+   = Overlap ov00001: volLongDrift extruded by: volLongDrift/volTPC_SL_30 ovlp=5.515
+   = Overlap ov00002: volShortDrift extruded by: volShortDrift/volTPC_MS_4 ovlp=5.515
+   = Overlap ov00003: volShortDrift extruded by: volShortDrift/volTPC_SS_5 ovlp=5.515
+   = Overlap ov00004: volDetEnclosure extruded by: volDetEnclosure/volThirtyFiveTon_36 ovlp=2.855
+   = Overlap ov00005: volLongDrift extruded by: volLongDrift/volLongCage_26 ovlp=0.27
+   = Overlap ov00006: volShortDrift extruded by: volShortDrift/volShortCage_1 ovlp=0.225
+
+  root [3] loo = gGeoManager->GetListOfOverlaps()
+  (class TObjArray*)0x1a49a10
+
+  root [4] loo->At(0)->Draw()
+   = Overlap ov00000: volLongDrift extruded by: volLongDrift/volTPC_ML_29 ovlp=5.515
+#+END_EXAMPLE
+
+That last =Draw()= command will show a graphical representation of two volumes and their overlap with the overlapped region highlighted.

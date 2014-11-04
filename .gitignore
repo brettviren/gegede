@@ -8,3 +8,7 @@ dist
 gegede.egg-info
 *.html
 test_gdml.gdml
+*.iv
+.cut.py
+*.pdf
+*.tex

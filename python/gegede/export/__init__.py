@@ -14,6 +14,7 @@ class Exporter(object):
         if isinstance(mod, type("")):
             if not '.' in mod:
                 mod = 'gegede.export.' + mod
+            print 'Importing: "%s"' % mod
             exec('import %s' % mod)
             mod = eval(mod)
         self.mod = mod

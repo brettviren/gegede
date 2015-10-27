@@ -9,7 +9,8 @@ setup(name = 'gegede',
       license = 'GPLv2',
       url = 'http://github.com/brettviren/gegede',
       package_dir = {'':'python'},
-      packages = ['gegede', 'gegede.schema', 'gegede.export'],
+      packages = ['gegede', 'gegede.schema', 'gegede.export',
+                  'gegede.export.gdml', 'gegede.examples'],
       # These are just what were developed against.  Older versions may be okay.
       install_requires=[
           "pint >= 0.5.1",      # for units

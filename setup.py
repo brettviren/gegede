@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name = 'gegede',
-      version = '0.0',
+      version = '0.1',
       description = 'General Geometry Description',
       author = 'Brett Viren',
       author_email = 'brett.viren@gmail.com',

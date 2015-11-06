@@ -36,8 +36,10 @@ def list_match(values, entry = None, deref = lambda x: x):
 
     If entry is a callable, call it on deref(value) and return value if callable returns true.
 
-    O.w. assume str and interpret as regexp and return values matching deref(value)
+    O.w. assume str and first try exact match otherwise interpret as regexp and return values matching deref(value).
     '''
+    #print "list_match(%s,%s)" % (', '.join(['%s:%s' % (type(v),v.name) for v in values]), entry)
+
     if entry is None:
         return values
 
@@ -51,9 +53,17 @@ def list_match(values, entry = None, deref = lambda x: x):
                 ret.append(v)
         return ret
 
-    # assume string
-    rx = re.compile(entry, re.I)
+    # assume string, first as exact match
     ret = list()
+    for v in values:
+        if entry == deref(v):
+            ret.append(v)
+    if ret:
+        return ret
+    
+
+    # then as regex
+    rx = re.compile(entry, re.I)
     for v in values:
         if rx.search(deref(v)) is None:
             continue

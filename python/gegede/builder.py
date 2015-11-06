@@ -42,7 +42,9 @@ class Builder(object):
         '''
         Return the one builder that matches the entry.
         '''
-        return list_match(self.builders.values(), entry, deref = lambda x: x.name)[index]
+        b = list_match(self.builders.values(), entry, deref = lambda x: x.name)[index]
+        #print 'get_builder("%s") -> %s:%s' % (entry, b, b.name)
+        return b
 
     def get_volumes(self, entry = None):
         '''

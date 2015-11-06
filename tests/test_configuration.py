@@ -2,6 +2,7 @@
 
 import os
 import gegede.configuration as ggdconf
+from gegede import Quantity as Q
 
 def test_read():
     fname = os.path.splitext(__file__)[0]+'.cfg'
@@ -16,6 +17,21 @@ def test_configure():
     cfg = ggdconf.configure(fname)
     worldname, worldcfg = cfg.items()[0]
     assert 2 == len(worldcfg['subbuilders'])
+    assert worldcfg['width'] == Q(10,'meter')
+    want_height = Q(100,'meter')
+    assert worldcfg['height'] == want_height
+    assert worldcfg['depth'] == Q(123,'meter')
+
+    assert type(worldcfg['integer']) == int
+    assert type(worldcfg['floating']) == float
+    assert type(worldcfg['string']) == str
+    assert type(worldcfg['sequence']) == list
+
+    sb1name, sb1cfg = cfg.items()[1]
+    print sb1name,sb1cfg
+    # this fails because interpolation is global and before evaluation
+    #assert sb1cfg['height'] == want_height
+    
 
 from gegede.configuration import interpolate_value, interpolate
 def test_interpolate_value():

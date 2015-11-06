@@ -25,6 +25,7 @@ def test_ascending():
 
     seen = set()
     for vol in ascending(g.store.structure, top):
+        print vol
         if vol.name in seen:
             raise ValueError, "Seen again: %s" % vol.name
             seen.add(vol.name)

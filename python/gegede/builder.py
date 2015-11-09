@@ -69,7 +69,9 @@ class Builder(object):
         '''
 
         for v in vols:
-            if self.get_volumes(v.name):
+            if v.name in self.volumes:
+                print 'Volume already exists: "%s" out of %d volumes' % (v.name, len(self.volumes))
+                print '\n'.join(self.volumes)
                 continue
             self.volumes[v.name] = v
         return

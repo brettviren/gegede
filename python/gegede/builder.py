@@ -146,7 +146,13 @@ def configure(builder, cfg):
     '''Configure a builder with its item in the <cfg> dictionary and
     recurse through any sub-builders.
     '''
+
+    if hasattr(builder, '_configured'): 
+        return                  # only configure once
     builder.configure(**cfg.get(builder.name, dict()))
+    builder._configured = True;
+
+    # recurs on child builders
     for other in builder.builders.values():
         configure(other, cfg)
     return
@@ -156,7 +162,11 @@ def construct(builder, geom):
     sub-builders'''
     for other in builder.builders.values():
         construct(other, geom)
+
+    if hasattr(builder, '_constructed'):
+        return
     builder.construct(geom)
+    builder._constructed = True
     return
 
 

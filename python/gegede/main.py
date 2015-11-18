@@ -70,10 +70,10 @@ def main ():
                         help="Validate exported, in-memory objects")
     parser.add_argument("-F", "--validate-file", action='store_true',
                         help="Validate exported, on-file objects")
-    parser.add_argument("-d", "--volume-dot-file", default=None,
-                        help="Produce a GraphViz dot file showing volume hierarchy")
-    parser.add_argument("-D", "--builder-dot-file", default=None,
-                        help="Produce a GraphViz dot file showing builder hierarchy")
+    parser.add_argument("-d", "--dot-file", default=None,
+                        help="Produce a GraphViz dot file")
+    parser.add_argument("-D", "--dot-hierarchy", default="volume",
+                        help="Follow the 'volume' or 'builder' hierarchy if making a dot file")
     parser.add_argument("config", nargs='+',
                         help="Configuration file(s)")
     args = parser.parse_args()
@@ -87,18 +87,19 @@ def main ():
 
     cfg = parse_config(args.config)
 
-    if args.builder_dot_file:
+    if args.dot_file and 'builder' in args.dot_hierarchy.lower():
         import gegede.dot
-        gegede.dot.builder_hierarchy(cfg, args.world, args.builder_dot_file)
+        gegede.dot.builder_hierarchy(cfg, args.world, args.dot_file)
 
     wbuilder = make_builder(cfg, args.world)
     configure_builder(cfg, wbuilder)
     geom = generate_geometry(wbuilder)
 
-    if args.volume_dot_file:
+    if args.dot_file and 'volume' in args.dot_hierarchy.lower():
         import gegede.dot
-        gegede.dot.volume_hierarchy(geom, None, args.volume_dot_file)
-
+        gegede.dot.volume_hierarchy(geom, None, args.dot_file)
+        #gegede.dot.placement_hierarchy(geom, None, args.dot_file)
+        
     if args.validate:
         import gegede.validation
         gegede.validation.validate(geom)

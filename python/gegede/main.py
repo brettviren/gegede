@@ -70,8 +70,10 @@ def main ():
                         help="Validate exported, in-memory objects")
     parser.add_argument("-F", "--validate-file", action='store_true',
                         help="Validate exported, on-file objects")
+    parser.add_argument("-d", "--volume-dot-file", default=None,
+                        help="Produce a GraphViz dot file showing volume hierarchy")
     parser.add_argument("-D", "--builder-dot-file", default=None,
-                        help="Produce a GraphViz dot file showing builder relationships")
+                        help="Produce a GraphViz dot file showing builder hierarchy")
     parser.add_argument("config", nargs='+',
                         help="Configuration file(s)")
     args = parser.parse_args()
@@ -92,6 +94,10 @@ def main ():
     wbuilder = make_builder(cfg, args.world)
     configure_builder(cfg, wbuilder)
     geom = generate_geometry(wbuilder)
+
+    if args.volume_dot_file:
+        import gegede.dot
+        gegede.dot.volume_hierarchy(geom, None, args.volume_dot_file)
 
     if args.validate:
         import gegede.validation

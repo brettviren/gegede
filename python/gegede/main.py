@@ -18,20 +18,34 @@ The main runs in these stages:
 import os
 
 
-def generate(filenames, world_name = None):
+def parse_config(filenames):
     '''
-    Return a geometry object generated from the given configuration file(s).
+    Return configuration object
     '''
     import gegede.configuration
-    import gegede.interp
-    import gegede.builder
-    import gegede.construct
-
     assert filenames
     cfg = gegede.configuration.configure(filenames)
     assert cfg
-    wbuilder = gegede.interp.make_builder(cfg, world_name)
-    gegede.builder.configure(wbuilder, cfg)
+    return cfg
+
+def make_builder(cfg, name):
+    '''
+    Make and return the builder and all subbuilders.
+    '''
+    import gegede.interp
+    return gegede.interp.make_builder(cfg, name)
+
+def configure_builder(cfg, builder):
+    import gegede.builder
+    return gegede.builder.configure(builder, cfg)
+    
+
+def generate_geometry(wbuilder):
+    '''
+    Return a geometry object generated from the given configuration file(s).
+    '''
+    import gegede.construct
+
     geom = gegede.construct.Geometry()
     gegede.builder.construct(wbuilder, geom)
     assert len(wbuilder.volumes) == 1, 'Top level builder "%s" must only produce one LV, produced %d' % (wbuilder.name, len(wbuilder.volumes))
@@ -56,6 +70,8 @@ def main ():
                         help="Validate exported, in-memory objects")
     parser.add_argument("-F", "--validate-file", action='store_true',
                         help="Validate exported, on-file objects")
+    parser.add_argument("-D", "--builder-dot-file", default=None,
+                        help="Produce a GraphViz dot file showing builder relationships")
     parser.add_argument("config", nargs='+',
                         help="Configuration file(s)")
     args = parser.parse_args()
@@ -67,7 +83,16 @@ def main ():
     if args.output == '-':
         args.output = "/dev/stdout"
 
-    geom = generate(args.config, args.world)
+    cfg = parse_config(args.config)
+
+    if args.builder_dot_file:
+        import gegede.dot
+        gegede.dot.builder_hierarchy(cfg, args.world, args.builder_dot_file)
+
+    wbuilder = make_builder(cfg, args.world)
+    configure_builder(cfg, wbuilder)
+    geom = generate_geometry(wbuilder)
+
     if args.validate:
         import gegede.validation
         gegede.validation.validate(geom)

@@ -33,6 +33,11 @@ Schema = dict(
         Sphere = (("rmin", "0m"), ("rmax","1m"),
                     ("sphi","0deg"), ("dphi", "360deg"),
                     ("stheta","0deg"), ("dtheta", "180deg")),
+        Cone = (("rmin1","0m"), ("rmax1","1m"),
+                    ("rmin2","0m"), ("rmax2","2m"), ("dz","2m"),
+                    ("sphi","0deg"), ("dphi","360deg")),
+        Trapezoid = (("dx1","2m"),("dx2","1m"),
+                        ("dy1","2.5m"),("dy2","1.5m"),("dz","3m")),
         Boolean = (("type",str), ("first", Named), ("second", Named), 
                    ("pos", Named), ("rot", Named))
 

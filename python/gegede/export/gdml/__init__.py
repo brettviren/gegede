@@ -138,6 +138,19 @@ def make_shape_node(shape):
                    starttheta=ang(shape.stheta), deltatheta=ang(shape.dtheta))
         return etree.Element('sphere', **dat)
 
+    if typename == 'Cone':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    rmin1=rsize(shape.rmin1), rmax1=rsize(shape.rmax1),
+                    rmin2=rsize(shape.rmin2), rmax2=rsize(shape.rmax2), z=dsize(shape.dz),
+                    startphi=ang(shape.sphi), deltaphi=ang(shape.dphi))
+        return etree.Element('cone', **dat)
+
+    if typename == 'Trapezoid':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    x1=dsize(shape.dx1), x2=dsize(shape.dx2),
+                    y1=dsize(shape.dy1), y2=dsize(shape.dy2), z=dsize(shape.dz))
+        return etree.Element('trd', **dat)
+
     if typename == 'Boolean':
         ele = etree.Element(shape.type, name=shape.name)
         # the rest are sub nodes.  why?  because, don't ask questions!

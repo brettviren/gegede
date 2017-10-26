@@ -4,7 +4,7 @@ A (trivial) JSON representation of a gegede geometry
 '''
 
 import json
-import pod
+from . import pod
 
 def convert(geom):
     return pod.convert(geom)

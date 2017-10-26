@@ -22,7 +22,7 @@ http://root.cern.ch/root/html534/guides/users-guide/Geometry.html#shapes
 
 '''
 
-from types import Named, NameList, NamedTypedList
+from .types import Named, NameList, NamedTypedList
 
 Schema = dict(
 

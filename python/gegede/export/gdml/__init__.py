@@ -272,7 +272,7 @@ def validate(text):
     okay = xsd.validate(xml)
     if not okay:
         print (xsd.error_log)
-        raise (ValueError, 'Invalid GDML')
+        raise ValueError('Invalid GDML')
     return True
 
 def validate_object(obj):

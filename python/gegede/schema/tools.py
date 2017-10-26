@@ -3,7 +3,7 @@
 Some functions to help process the schema
 '''
 from collections import OrderedDict, namedtuple
-from types import isquantity, toquantity
+from .types import isquantity, toquantity
 
 def make_converter(proto):
     '''Return a function that will convert its argument using <proto> as a
@@ -19,9 +19,9 @@ def make_converter(proto):
         def tostr(other):
             other = str(other)
             if other == "":
-                raise (ValueError, 'Empty string is an illegal value for str')
+                raise ValueError('Empty string is an illegal value for str')
             if other is None:
-                raise (ValueError, 'None is an illegal value for str')
+                raise ValueError('None is an illegal value for str')
             return other
         return tostr
 
@@ -83,9 +83,9 @@ def validate_input(proto, *args, **kwargs):
 
     for k,v in kwargs.items():
         if k not in converters.keys():
-            raise ValueError, 'Object "%s" not in prototype' % (k,)
+            raise ValueError('Object "%s" not in prototype' % (k,))
         if k in already:
-            raise ValueError, 'Keyword argument already supplied as positional: %s' % k
+            raise ValueError('Keyword argument already supplied as positional: %s' % k)
         members[k] = converters[k](v)
         #print ('KWDS:',k,v,members[k])
 
@@ -105,8 +105,8 @@ def make_maker(collector, ntname, *proto):
             objname = "%s%06d" % (ntname, len(collector))
 
         if objname in collector:
-            raise ValueError, 'Instance "%s" of type %s already in %s' % \
-                (objname, ntname, collector)
+            raise ValueError('Instance "%s" of type %s already in %s' % \
+                (objname, ntname, collector))
 
         members = validate_input(proto, *args, **kwargs)
 

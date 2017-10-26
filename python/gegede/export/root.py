@@ -33,7 +33,7 @@ def get_element(tgeo, name):
         for count in range(nele):
             known = et.GetElement(count)
             print ('\t%4d: "%s" "%s"' % (count, known.GetName(), known.GetTitle()))
-        raise (KeyError, 'No such element: "%s"' % name)
+        raise KeyError('No such element: "%s"' % name)
     return ele
     
 
@@ -76,7 +76,7 @@ def make_material(bucket, mat):
             new.AddElement(comp, compfrac)
 
     if not new:
-        raise ValueError, 'Unknown type: "%s"' % typename
+        raise ValueError('Unknown type: "%s"' % typename)
 
     bucket.add(new, 'MATERIAL')
     return new
@@ -133,10 +133,6 @@ def make_structure(bucket, obj):
         med = make_medium(bucket, obj.material) 
         assert med, 'No medium for material "%s' % obj.material
         vol = bucket.make(ROOT.TGeoVolume, obj.name, shape, med)
-        
-                          
-
-
     return
 
 

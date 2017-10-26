@@ -93,7 +93,7 @@ def shape2shape(name, geom):
         print ('WARNING: Boolean shapes are not supported, simply using the first shape for %s' % obj.name)
         return shape2shape(obj.first, geom)
 
-    raise (ValueError, 'Unsupported shape for scenegraph: "%s"' % type(obj).__name__)
+    raise ValueError('Unsupported shape for scenegraph: "%s"' % type(obj).__name__)
 
 def convert(geom):
     '''

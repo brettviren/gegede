@@ -11,7 +11,7 @@ def test_units():
 
     try:
         g.shapes.Box("units1",1,'2cm','3cm') # should fail
-    except ValueError:
+    except (ValueError):
         pass
     else:
         raise (RuntimeError, "Failed to catch unit mismatch")

@@ -79,7 +79,7 @@ def main ():
     args = parser.parse_args()
 
     if not args.format and '.' not in args.output:
-        raise (parser.error("Can not guess format.  Need --format or --output with file extension"))
+        raise parser.error("Can not guess format.  Need --format or --output with file extension")
     if not args.format:
         args.format = os.path.splitext(args.output)[1][1:]
     if args.output == '-':

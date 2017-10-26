@@ -117,7 +117,7 @@ class Builder(object):
         if hasattr(self, 'defaults'):
             if not set(kwds).issubset(self.defaults): # no unknown keywords
                 msg = 'Unknown parameter in: "%s"' % (', '.join(sorted(kwds.keys())), )
-                raise (ValueError,msg)
+                raise ValueError(msg)
             self.__dict__.update(**self.defaults)    # stash them as data members
             self.__dict__.update(**kwds)             # and update any from user
 

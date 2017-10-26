@@ -34,5 +34,5 @@ class SiteBuilder(gegede.builders.Builder):
         elif self.site == '35t':
             shape = geom.structure.Box('35t site box', dx='5m', dy='5m', dz='5m')
         else:
-            raise (ValueError, 'Unknown site: "%s"' % self.site)
+            raise ValueError('Unknown site: "%s"' % self.site)
         lv = geom.structure.Volume(self.site + '_volume', material=self.material, shape = self.shape)

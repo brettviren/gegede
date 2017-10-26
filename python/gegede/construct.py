@@ -1,9 +1,9 @@
 
 
 from collections import namedtuple, OrderedDict
-import schema as default_schema
-from schema.tools import make_maker
-from .util import list_match
+import gegede.schema as default_schema
+from gegede.schema.tools import make_maker
+from gegede.util import list_match
 
 class Geometry(object):
     '''A geometry constructor.

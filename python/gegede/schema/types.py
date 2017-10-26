@@ -29,7 +29,7 @@ def toquantity(proto):
         other = Quantity(other)
         if qobj.dimensionality == other.dimensionality:
             return other
-        raise (ValueError, 'Unit mismatch: %s incompatible with prototype %s' % (other, qobj))
+        raise ValueError('Unit mismatch: %s incompatible with prototype %s' % (other, qobj))
     return converter
 
 def Named(thing):
@@ -50,7 +50,7 @@ def NamedTypedList(typ, minentries = 1):
         #print ('named_typed_list_converter(%s, "%s")' % (typ, str(proto)))
         ret = list()
         if len(proto) < minentries:
-            raise ValueError, "At least %d entries required" % minentries
+            raise ValueError("At least %d entries required" % minentries)
         for n,v in proto:
             v = typ(v)
             n = Named(n)
@@ -69,7 +69,7 @@ def NameList(typ, minentries = 1):
         #print ('name_list_converter(%s, "%s")' % (typ, str(proto)))
         ret = list()
         if len(proto) < minentries:
-            raise ValueError, "At least %d entries required" % minentries
+            raise ValueError("At least %d entries required" % minentries)
         for n in proto:
             n = Named(n)
             ret.append(n)

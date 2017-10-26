@@ -29,10 +29,9 @@ def test_gdml():
     try:
         gegede.export.gdml.validate(s)
     except ValueError:
-        print 'Validation failed!'
+        print ('Validation failed!')
         for lineno,line in enumerate(s.split('\n')):
-            print "[%3d] %s" %(lineno+1, line)
-
+            print ("[%3d] %s" %(lineno+1, line))
         raise
 
 

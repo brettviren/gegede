@@ -20,7 +20,7 @@ def parse(filenames):
         filenames = [filenames]
     for fname in filenames:
         if not os.path.exists(fname):
-            raise ValueError, 'No such file: %s' % fname
+            raise (ValueError, 'No such file: %s' % fname)
         cfg.read(fname)
     return cfg
 

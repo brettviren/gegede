@@ -28,7 +28,7 @@ def test_configure():
     assert type(worldcfg['sequence']) == list
 
     sb1name, sb1cfg = cfg.items()[1]
-    print sb1name,sb1cfg
+    print (sb1name,sb1cfg)
     # this fails because interpolation is global and before evaluation
     #assert sb1cfg['height'] == want_height
     

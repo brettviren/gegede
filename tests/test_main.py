@@ -10,5 +10,5 @@ def test_main():
     assert g
     assert g.store.shapes
     if not g.store.matter:
-        print "You still haven't implemented this, huh?"
+        print ("You still haven't implemented this, huh?")
     assert g.store.structure

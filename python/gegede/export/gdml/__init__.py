@@ -165,7 +165,7 @@ def make_shape_node(shape):
     return
 
 def make_volume_node(vol, store):
-    #print 'VOL',vol
+    #print ('VOL',vol)
     node_type = 'volume'
     if vol.material is None and vol.shape is None:
         node = etree.Element('assembly', name=vol.name)
@@ -271,8 +271,8 @@ def validate(text):
     xml = etree.parse(StringIO(text))
     okay = xsd.validate(xml)
     if not okay:
-        print xsd.error_log
-        raise ValueError, 'Invalid GDML'
+        print (xsd.error_log)
+        raise (ValueError, 'Invalid GDML')
     return True
 
 def validate_object(obj):

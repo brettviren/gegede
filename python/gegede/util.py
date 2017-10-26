@@ -38,7 +38,7 @@ def list_match(values, entry = None, deref = lambda x: x):
 
     O.w. assume str and first try exact match otherwise interpret as regexp and return values matching deref(value).
     '''
-    #print "list_match(%s,%s)" % (', '.join(['%s:%s' % (type(v),v.name) for v in values]), entry)
+    #print ("list_match(%s,%s)" % (', '.join(['%s:%s' % (type(v),v.name) for v in values]), entry))
 
     if entry is None:
         return values

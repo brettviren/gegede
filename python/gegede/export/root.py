@@ -24,16 +24,16 @@ def Density(obj):
 
 def get_element(tgeo, name):
     et = tgeo.GetElementTable()
-    print et
+    print (et)
     ele = et.FindElement(name)
 
     if not ele:
         nele = et.GetNelements()
-        print 'I know about %d elements:' % nele
+        print ('I know about %d elements:' % nele)
         for count in range(nele):
             known = et.GetElement(count)
-            print '\t%4d: "%s" "%s"' % (count, known.GetName(), known.GetTitle())
-        raise KeyError, 'No such element: "%s"' % name
+            print ('\t%4d: "%s" "%s"' % (count, known.GetName(), known.GetTitle()))
+        raise (KeyError, 'No such element: "%s"' % name)
     return ele
     
 
@@ -168,12 +168,12 @@ class Bucket(object):
     def make(self, TYPE, name, *args):
         obj = self.get(TYPE, name)
         if obj:
-            print 'Object %s %s already made' % (TYPE, name)
+            print ('Object %s %s already made' % (TYPE, name))
             return obj
         obj = TYPE(name, *args)
         ROOT.SetOwnership(obj, 0)
         self.add(obj, TYPE.__name__)
-        print 'Made: %s' % obj
+        print ('Made: %s' % obj)
         return obj
 
     pass

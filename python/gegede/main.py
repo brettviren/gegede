@@ -50,7 +50,7 @@ def generate_geometry(wbuilder):
     gegede.builder.construct(wbuilder, geom)
     assert len(wbuilder.volumes) == 1, 'Top level builder "%s" must only produce one LV, produced %d' % (wbuilder.name, len(wbuilder.volumes))
     geom.set_world(wbuilder.get_volume(0))
-    print 'Generated world "%s"' % geom.world
+    print ('Generated world "%s"' % geom.world)
     # fixme: here would be a good time to do some internal validation
     return geom
 
@@ -79,7 +79,7 @@ def main ():
     args = parser.parse_args()
 
     if not args.format and '.' not in args.output:
-        raise parser.error("Can not guess format.  Need --format or --output with file extension")
+        raise (parser.error("Can not guess format.  Need --format or --output with file extension"))
     if not args.format:
         args.format = os.path.splitext(args.output)[1][1:]
     if args.output == '-':
@@ -105,7 +105,7 @@ def main ():
         gegede.validation.validate(geom)
     from gegede.export import Exporter
     exporter = Exporter(args.format)
-    print 'Converting with module: %s' % exporter.mod
+    print ('Converting with module: %s' % exporter.mod)
 
     obj = exporter.convert(geom)
     if args.validate_object:
@@ -118,3 +118,6 @@ def main ():
     return
 
 
+if '__main__' == __name__:
+    main()
+    

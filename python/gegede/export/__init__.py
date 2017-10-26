@@ -14,7 +14,7 @@ class Exporter(object):
         if isinstance(mod, type("")):
             if not '.' in mod:
                 mod = 'gegede.export.' + mod
-            print 'Importing: "%s"' % mod
+            print ('Importing: "%s"' % mod)
             exec('import %s' % mod)
             mod = eval(mod)
         self.mod = mod
@@ -42,7 +42,7 @@ class Exporter(object):
         if self.out:
             return
         if not hasattr(self.mod, 'output'):
-            print 'Warning: Module has no output() method: %s' % self.mod
+            print ('Warning: Module has no output() method: %s' % self.mod)
             return
         self.out = filename
         self.mod.output(self.obj, filename)

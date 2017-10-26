@@ -15,7 +15,7 @@ def test_converter():
     except ValueError:
         pass
     else:
-        raise RuntimeError, "Failed to catch mismatch with unitless prototype"
+        raise (RuntimeError, "Failed to catch mismatch with unitless prototype")
 
     c = make_converter('1cm')
     try:
@@ -23,7 +23,7 @@ def test_converter():
     except ValueError:
         pass
     else:
-        raise RuntimeError, "Failed to catch mismatch with unitful prototype"
+        raise (RuntimeError, "Failed to catch mismatch with unitful prototype")
 
 def test_validate_input():
     proto = (("intnum",int),("fpnum",float),("dist","0cm"))
@@ -36,7 +36,7 @@ def test_validate_input():
     except ValueError:
         pass
     else:
-        raise RuntimeError, "Did not catch validation failure."
+        raise (RuntimeError, "Did not catch validation failure.")
 
 
 if "__main__" == __name__:

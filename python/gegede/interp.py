@@ -27,7 +27,7 @@ def walk_builder_config_graph(dat, bname, builder_objects):
     try:
         bdat = dat[bname]
     except KeyError,e:
-        print 'No such builder configuration section: "bname"' % bname
+        print ('No such builder configuration section: "bname"' % bname)
         raise
     klass = bdat.pop('class')   # make exactly one instance
     bobj = klass(bname)

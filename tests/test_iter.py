@@ -25,14 +25,14 @@ def test_ascending():
 
     seen = set()
     for vol in ascending(g.store.structure, top):
-        print vol
+        print (vol)
         if vol.name in seen:
-            raise ValueError, "Seen again: %s" % vol.name
+            raise (ValueError, "Seen again: %s" % vol.name)
             seen.add(vol.name)
 
-    #print g.store.structure
+    #print (g.store.structure)
     vols = list(ascending_all(g.store.structure, top))
-    #print '\n'.join([v.name for v in vols])
+    #print ('\n'.join([v.name for v in vols]))
     assert len(vols) == 19, len(vols)
     assert vols[-1].name == 'top'
 

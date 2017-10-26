@@ -32,7 +32,7 @@ def test_shapes():
             continue
         unimplemented.append(like)
     if unimplemented:
-        print 'Warning: shapes still needing implementation: %s' % ', '.join(unimplemented)
+        print ('Warning: shapes still needing implementation: %s' % ', '.join(unimplemented))
 
     
 

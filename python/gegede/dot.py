@@ -52,10 +52,10 @@ def volume_hierarchy(geom, volume_name, filename):
             place = geom.store.structure[pname]
             daughter = place.volume
             edges[vol.name].add(daughter)
-            #print '%s --> %s' % (vol.name,daughter)
+            #print ('%s --> %s' % (vol.name,daughter))
             if vol.name == daughter:
-                print 'WARNING: mother and daughter volumes share same name: "%s"' % vol.name
-                #print '\t%s'%str(vol)
+                print ('WARNING: mother and daughter volumes share same name: "%s"' % vol.name)
+                #print ('\t%s'%str(vol))
             make_edges(daughter)
 
     make_edges(volume_name)

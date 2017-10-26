@@ -13,5 +13,5 @@ def test_named_typed_list():
     '''
 
     s0 = gst.NamedTypedList(str, 0)
-    print s0
-    print s0([])
+    print (s0)
+    print (s0([]))

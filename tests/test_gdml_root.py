@@ -19,7 +19,7 @@ def test_gdml():
     geo = ROOT.TGeoManager()
     geo.Import(filepath)
     if not geo:
-        print "WARNING: ROOT still fails to parse GDML's own test file"
+        print ("WARNING: ROOT still fails to parse GDML's own test file")
 
 
 def test_read_gdml_in_root():
@@ -31,8 +31,8 @@ def test_read_gdml_in_root():
     geo = ROOT.TGeoManager()
     fd, fname = tempfile.mkstemp(suffix='.gdml')
     open(fname, 'w').write(s)
-    print fname
+    print (fname)
     geo.Import(fname)
     if not geo:
-        print "WARNING: ROOT still fails to parse GDML's own test file"
+        print ("WARNING: ROOT still fails to parse GDML's own test file")
 #    assert geo

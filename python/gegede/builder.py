@@ -43,7 +43,7 @@ class Builder(object):
         Return the one builder that matches the entry.
         '''
         b = list_match(self.builders.values(), entry, deref = lambda x: x.name)[index]
-        #print 'get_builder("%s") -> %s:%s' % (entry, b, b.name)
+        #print ('get_builder("%s") -> %s:%s' % (entry, b, b.name))
         return b
 
     def get_volumes(self, entry = None):
@@ -70,8 +70,8 @@ class Builder(object):
 
         for v in vols:
             if v.name in self.volumes:
-                print 'Volume already exists: "%s" out of %d volumes' % (v.name, len(self.volumes))
-                print '\n'.join(self.volumes)
+                print ('Volume already exists: "%s" out of %d volumes' % (v.name, len(self.volumes)))
+                print ('\n'.join(self.volumes))
                 continue
             self.volumes[v.name] = v
         return
@@ -117,7 +117,7 @@ class Builder(object):
         if hasattr(self, 'defaults'):
             if not set(kwds).issubset(self.defaults): # no unknown keywords
                 msg = 'Unknown parameter in: "%s"' % (', '.join(sorted(kwds.keys())), )
-                raise ValueError,msg
+                raise (ValueError,msg)
             self.__dict__.update(**self.defaults)    # stash them as data members
             self.__dict__.update(**kwds)             # and update any from user
 

@@ -20,15 +20,15 @@ def test_make_some_stuff():
 
     pos = g.structure.Position(None, '1cm',z='2cm')
     assert pos.name == 'Position000000',pos.name
-    print pos
+    print (pos)
     rot = g.structure.Rotation('', x='90deg')
     assert rot.name == 'Rotation000001', rot.name
-    print rot
+    print (rot)
 
     lv1 = g.structure.Volume('a box', material=water, shape=box1)
-    print lv1
+    print (lv1)
     lv1inlv2 = g.structure.Placement("lv1_in_lv2", volume=lv1, pos=pos, rot=rot)
-    print lv1inlv2
+    print (lv1inlv2)
     lv2 = g.structure.Volume('lv2', material = air, shape=box2,
                              placements = [lv1inlv2])
     assert lv2.params is not None, 'got %s' % str(lv2.params) # want empty list
@@ -36,7 +36,7 @@ def test_make_some_stuff():
     lv2 = g.structure.Volume('the world', material = air, shape=box2,
                              placements = [lv1inlv2], params= (("foo",42), ("bar","baz")))
     assert lv2.params
-    print lv2
+    print (lv2)
     
 def test_post_place():
     g = construct.Geometry()
@@ -50,7 +50,7 @@ def test_post_place():
     lv0inlv1 = g.structure.Placement('lv0_in_lv1', volume=lv0)
     lv1.placements.append(lv0inlv1.name) # no boom!
 
-    print 'DONE'
-    print g.store.structure
+    print ('DONE')
+    print (g.store.structure)
     
     

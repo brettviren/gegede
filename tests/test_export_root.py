@@ -22,4 +22,4 @@ def test_bucket():
 def test_export_root():
     g = airwaterboxes()
     b = convert(g)
-    print b.tgeo.Print()
+    print (b.tgeo.Print())

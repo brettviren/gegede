@@ -8,7 +8,7 @@ def test_air():
     o = g.matter.Element("Oxygen", "O", 8, "16.0g/mole")
     air = g.matter.Mixture("Air", density = "1.290*mg/cc", 
                            components = (("Nitrogen", 0.7), ("Oxygen",0.3)))
-    print air
+    print (air)
     assert len(air.components) == 2
     assert type(air.components[0]) == tuple
 
@@ -18,7 +18,7 @@ def test_water():
     h = g.matter.Element("Hydrogen","H",1,"1.01g/mole")
     o = g.matter.Element("Oxygen", "O", 8, "16.0g/mole")
     water = g.matter.Molecule("Water", density="1.0kg/l", elements=(("Oxygen",1),("Hydrogen",2)))
-    print water
+    print (water)
     assert len(water.elements) == 2
     assert type(water.elements[0]) == tuple
     

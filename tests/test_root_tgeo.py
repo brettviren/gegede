@@ -20,15 +20,15 @@ def test_get_elements():
     for count in range(et.GetNelements()):
         ele = et.GetElement(count)
         assert ele
-        #print 'ELE: %4d: %s %s %d %f' % (count, ele.GetName(), ele.GetTitle(), ele.Z(), ele.A())
+        #print ('ELE: %4d: %s %s %d %f' % (count, ele.GetName(), ele.GetTitle(), ele.Z(), ele.A()))
 
     for count in range(et.GetNelementsRN()):
         ele = et.GetElementRN(count)
         ndk = ele.GetNdecays()
         niso = ele.GetNisotopes()
         assert ele
-        #print 'RN: %4d: %s %s %d %f [%d %d]' % \
-        #    (count, ele.GetName(), ele.GetTitle(), ele.Z(), ele.A(), ndk, niso)
+        #print ('RN: %4d: %s %s %d %f [%d %d]' % \
+        #    (count, ele.GetName(), ele.GetTitle(), ele.Z(), ele.A(), ndk, niso))
         
 def test_element():
     '''
@@ -59,9 +59,9 @@ def test_failed_isotope():
     et.AddElement('enriched_U', 'enriched_U', 92, 236)
     eu = et.FindElement('enriched_U')
     if not eu:
-        print 'Failed to find "enriched_U" by name'
+        print ('Failed to find "enriched_U" by name')
         eu = et.GetElement(et.GetNelements()-1)
-        print eu
+        print (eeu)
     assert(eu)
     #eu.AddIsotope(u235,0.6)     # this aborts ROOT
     #eu.AddIsotope(u238,0.4)
@@ -99,7 +99,7 @@ def test_isotope():
     eu = ROOT.TGeoElement('enriched_U', 'enriched_U', 2)
     eu.AddIsotope(u235,0.6)
     eu.AddIsotope(u238,0.4)
-    print 'Neff = %f' % eu.Neff()
+    print ('Neff = %f' % eu.Neff())
 
     # now what? how to register this element?
 

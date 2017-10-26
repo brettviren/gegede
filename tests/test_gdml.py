@@ -19,7 +19,7 @@ def test_gdml():
     xml = etree.parse(os.path.join(testdir, 'test.gdml'))
     valid = xsd.validate(xml)
     if not valid:
-        print xsd.error_log
+        print (xsd.error_log)
     assert valid, "Failed to validate GDML's own test.gdml"
 
 def test_gegede_gdml():
@@ -27,7 +27,7 @@ def test_gegede_gdml():
     obj = gegede.export.gdml.convert(geom)
     s = gegede.export.gdml.dumps(obj)
     assert s
-    print s
+    print (s)
     gegede.export.gdml.validate(s)
 
     

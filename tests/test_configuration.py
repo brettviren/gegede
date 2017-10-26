@@ -15,7 +15,8 @@ def test_read():
 def test_configure():
     fname = os.path.splitext(__file__)[0]+'.cfg'
     cfg = ggdconf.configure(fname)
-    worldname, worldcfg = cfg.items()[0]
+    cfg_items = list(cfg.items()) # odict_items does not support indexing
+    worldname, worldcfg = cfg_items[0]
     assert 2 == len(worldcfg['subbuilders'])
     assert worldcfg['width'] == Q(10,'meter')
     want_height = Q(100,'meter')
@@ -27,7 +28,7 @@ def test_configure():
     assert type(worldcfg['string']) == str
     assert type(worldcfg['sequence']) == list
 
-    sb1name, sb1cfg = cfg.items()[1]
+    sb1name, sb1cfg = cfg_items[1]
     print (sb1name,sb1cfg)
     # this fails because interpolation is global and before evaluation
     #assert sb1cfg['height'] == want_height
@@ -44,6 +45,8 @@ def test_interpolate_value():
                             ('xxx{b}yyy', 'xxx{a}{aa:a}yyy', 'bb')]:
         got = interpolate_value(give, sec, dat)
         assert want == got, 'in section %s: "%s" gave "%s" wanted "%s"' % (sec, give, got, want)
+
+# this requires an insane amount of memory in Python3
 def test_interpolate():
     dat = dict(aa = dict(a='{b}', b='aaa'),
                bb = dict(a='{aa:b}', b='{a}{aa:a}'))

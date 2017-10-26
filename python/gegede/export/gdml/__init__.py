@@ -265,10 +265,16 @@ def convert(geom):
 
 
 def validate(text):
-    from StringIO import StringIO
+    try:
+        from StringIO import StringIO
+        sio = StringIO(text)
+    except ImportError:         # python3
+        from io import BytesIO
+        sio = BytesIO(text)
+
     xsd_doc = etree.parse(schema_file)
     xsd = etree.XMLSchema(xsd_doc)
-    xml = etree.parse(StringIO(text))
+    xml = etree.parse(sio)
     okay = xsd.validate(xml)
     if not okay:
         print (xsd.error_log)
@@ -286,7 +292,7 @@ def dumps(obj):
     Return a string representation of the object returned by convert.
     '''
     xml = etree.tostring(obj, pretty_print = True, xml_declaration = True)
-    xml = xml.replace("'",'"')  # work around ROOT GDML import bug....
+    xml = xml.replace(b"'",b'"')  # work around ROOT GDML import bug....
     # don't validate here
     return xml
 

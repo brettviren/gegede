@@ -45,6 +45,7 @@ def generate_geometry(wbuilder):
     Return a geometry object generated from the given configuration file(s).
     '''
     import gegede.construct
+    import gegede.builder
 
     geom = gegede.construct.Geometry()
     gegede.builder.construct(wbuilder, geom)

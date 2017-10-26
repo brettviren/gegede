@@ -27,7 +27,7 @@ def test_gegede_gdml():
     obj = gegede.export.gdml.convert(geom)
     s = gegede.export.gdml.dumps(obj)
     assert s
-    print (s)
+    print (s.decode())
     gegede.export.gdml.validate(s)
 
     

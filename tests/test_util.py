@@ -34,9 +34,9 @@ def test_matching():
     values = [NO(o) for o in "the quick brown foxy fiend".split()]
     def deref(v): return v.name
     assert list_match(values, deref=deref) == values
-    assert list_match(values,0, deref=deref) == map(NO, ['the'])
-    assert list_match(values,1, deref=deref) == map(NO, ['quick'])
-    assert list_match(values,"quick", deref=deref) == map(NO, ['quick'])
-    assert list_match(values,'b.*', deref=deref) == map(NO, ['brown'])
-    assert list_match(values,'f.*', deref=deref) == map(NO, ['foxy','fiend'])
-    assert list_match(values, lambda x: 'o' in x, deref=deref) == map(NO,'brown foxy'.split())
+    assert list_match(values,0, deref=deref) == list(map(NO, ['the']))
+    assert list_match(values,1, deref=deref) == list(map(NO, ['quick']))
+    assert list_match(values,"quick", deref=deref) == list(map(NO, ['quick']))
+    assert list_match(values,'b.*', deref=deref) == list(map(NO, ['brown']))
+    assert list_match(values,'f.*', deref=deref) == list(map(NO, ['foxy','fiend']))
+    assert list_match(values, lambda x: 'o' in x, deref=deref) == list(map(NO,'brown foxy'.split()))

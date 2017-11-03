@@ -1,0 +1,30 @@
+digraph "highlevel" {
+	
+	user[shape=diamond, label="end\nuser"];
+	programmer[shape=diamond, label="experiment\ns/w developer"];
+	
+	GDML[shape=folder];
+	ROOT[shape=folder];
+	AGDD[shape=folder];
+	etc[shape=folder, label="..."];
+	//validation[shape=septagon,label="(validation)"];
+	params[fontcolor=purple];
+	builders[fontcolor=purple];
+	objects[fontcolor=purple];
+	exporters[fontcolor=purple];
+
+
+	{rank=same; params -> builders -> objects -> exporters;}
+
+	user -> params[style=dashed];
+	programmer -> params;
+	programmer -> builders;
+
+
+	//objects -> validation;
+	
+	exporters -> GDML;
+	exporters -> ROOT;
+	exporters -> AGDD;
+	exporters -> etc;
+}

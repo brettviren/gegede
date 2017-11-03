@@ -11,5 +11,14 @@ test_gdml.gdml
 *.iv
 .cut.py
 *.pdf
-*.tex
 venv*
+auto
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb

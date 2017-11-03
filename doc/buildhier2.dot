@@ -4,64 +4,72 @@ digraph "buildhier" {
 
 
 	// builders
-	node[group=builders, shape=box3d,style=filled]
-	worldB[label="World Builder"];
-	siteB[label="Site Builder"];
-	detB[label="Detector Builder"];
-	apaB[label="APA Builder"];
-	{rank=same;worldB;siteB;detB;apaB}
+	subgraph cluster_builders {
+		rankdir=LR;
 		
+		label="Builder Ownership Hierarchy";
+		node[group=builders, shape=box3d,style=filled]
+		worldB[label="World Builder"];
+		siteB[label="Site Builder"];
+		detB[label="Detector Builder"];
+		apaB[label="Part Builder"];
+		{rank=same;worldB;siteB;detB;apaB}
+		worldB->siteB->detB->apaB[label="owns", constraint=false];
+	}
 
 	// logical volumes
 	node[group=lvols, shape=ellipse, style=filled, color=lightgrey];
         worldLV[label="World LV"];
 	siteLV[label="Site LV"];
 	tankLV[label="Cryostat LV"];
-	larLV[label="LAr LV"];
-	apaLV[label="APA LV"];
-	wiresLV[label="Wires LV"];
+	larLV[label="Module LV"];
+	apaLV[label="Part LV"];
+	wiresLV[label="Subpart LV"];
         
 	// placements
 	node[group=pvols, shape=diamond, style=filled, color=lightgrey];
 	sitePV [label="Site PV"];
 	tankPV [label="Cryostat PV"];
-	larPV [label="Lar PV"];
-	apaPV1 [label="APA1 PV"];
-	apaPV2 [label="APA2 PV"];
-	wiresPV [label="Wires PV"];
+	larPV [label="Module PV"];
+	apaPV1 [label="Part1 PV"];
+	apaPV2 [label="Part2 PV"];
+	wiresPV [label="Subpart PV"];
 
 	// any other nodes are invisible
 	node[shape=none, width=0, height=0, label=""];
-	edge[color="red"];
+	edge[color="red",label="constructs"];
 
 	subgraph cluster_worldB {
+		label="World construction";
 		worldLV -> sitePV;
-		edge[color=none];
-		worldB->worldLV;
 	}
 	subgraph cluster_siteB {
+		label="Site construction";
 		siteLV -> tankPV;
-		edge[color=none];
-		siteB->siteLV;
 	}
 	subgraph cluster_detB {
-		tankLV -> larPV -> larLV;
+		label="Detector construction";
+		tankLV -> larPV;
+		larPV -> larLV[color=blue,label="places"];
 		larLV -> apaPV1;
 		larLV -> apaPV2;
-		edge[color=none];
-		detB->tankLV;
 	}
 	subgraph cluster_apaB {
-		apaLV -> wiresPV -> wiresLV;
-		edge[color=none];
-		apaB -> apaLV;
+		label="Part construction";
+		apaLV -> wiresPV;
+		wiresPV -> wiresLV[color=blue,label="places"];
 	}
 
-	edge[color="black"];
-	worldB->siteB->detB->apaB;
+	compound=true;
+	edge[color="black",label="constructs"];
+	worldB->worldLV[lhead=cluster_worldB];
+	siteB->siteLV[lhead=cluster_siteB];
+	detB->tankLV[lhead=cluster_detB];
+	apaB -> apaLV[style=invis];
+	apaB -> apaLV[lhead=cluster_apaB];
+
 	
-	
-	edge[color="blue",weight=0];
+	edge[color="blue",weight=0,label="places"];
 	sitePV->siteLV;
 	tankPV->tankLV;
 	apaPV1->apaLV;

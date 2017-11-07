@@ -45,7 +45,7 @@ def list_match(values, entry = None, deref = lambda x: x):
         return list(values)
 
     if isinstance(entry, int):
-        return [values[entry]]
+        return [list(values)[entry]]
 
     if callable(entry):
         ret = list()

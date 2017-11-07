@@ -81,7 +81,7 @@ def make_material_node(obj):
             node.append(etree.Element('fraction', ref=isoname, n=str(isofrac)))
 
     if typename == 'Amalgam':
-        node = etree.Element('material', name=obj.name, Z=float(obj.z))
+        node = etree.Element('material', name=obj.name, Z=str(float(obj.z)))
         # fixme: units???
         node.append(etree.Element('D', value=D(obj)))
         node.append(etree.Element('atom', value=Atom(obj)))
@@ -300,4 +300,4 @@ def output(obj, filename):
     '''
     Save to file
     '''
-    open(filename,'w').write(dumps(obj))
+    open(filename,'wb').write(dumps(obj))

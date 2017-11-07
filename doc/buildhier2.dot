@@ -21,7 +21,7 @@ digraph "buildhier" {
 	node[group=lvols, shape=ellipse, style=filled, color=lightgrey];
         worldLV[label="World LV"];
 	siteLV[label="Site LV"];
-	tankLV[label="Cryostat LV"];
+	tankLV[label="Detector LV"];
 	larLV[label="Module LV"];
 	apaLV[label="Part LV"];
 	wiresLV[label="Subpart LV"];
@@ -29,7 +29,7 @@ digraph "buildhier" {
 	// placements
 	node[group=pvols, shape=diamond, style=filled, color=lightgrey];
 	sitePV [label="Site PV"];
-	tankPV [label="Cryostat PV"];
+	tankPV [label="Detector PV"];
 	larPV [label="Module PV"];
 	apaPV1 [label="Part1 PV"];
 	apaPV2 [label="Part2 PV"];
@@ -75,4 +75,7 @@ digraph "buildhier" {
 	apaPV1->apaLV;
 	apaPV2->apaLV;
 	
+	edge[color="black",weight=0,label="(exposed)"];
+	tankLV->siteB[style=dashed];
+
 }

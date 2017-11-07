@@ -50,27 +50,27 @@
 
 \begin{frame}
   \frametitle{Non-features}
-  GeGeDe does \textbf{NOT} provide:
+  GeGeDe is focused on authoring.  Non-features include:
   \vspace{5mm}
   \begin{itemize}
-  \item[$\times$] No \textbf{tracking} or other geometric query code.  
+  \item[$\times$] \textbf{No tracking} or other geometry querying algorithms.  
     \begin{itemize}\footnotesize
     \item[$\times$] It is \textbf{not} a replacement for
       \href{https://geant4.web.cern.ch/}{Geant4}, nor ROOT's
       \href{https://root.cern.ch/root/html/GEOM_GEOM_Index.html}{TGeo/GEOM}
     \item[\checkmark] But, it can produce geometry data for them.
     \end{itemize}
-  \item[$\times$] No geometry content \textbf{validation}, eg overlapping volumes.
+  \item[$\times$] \textbf{No geometry content validation}, eg overlapping volumes.
     \begin{itemize}\footnotesize
     \item[\checkmark] But, other apps can check the exported geometry.
     \item[\checkmark] And, it will assure valid output formats.
     \item[?] Trivial hooks exist to add content validation in the future.
     \end{itemize}
-  \item[$\times$] No built-in \textbf{visualization} services.
+  \item[$\times$] \textbf{No built-in visualization} services.
     \begin{itemize}\footnotesize
     \item[\checkmark] But, some of its formats can be visualized by other applications.
     \end{itemize}
-  \item[$\times$] No \textbf{interactive/GUI} model editing. It is not CAD.
+  \item[$\times$] \textbf{No interactive/GUI} for model editing. It is not CAD.
     \begin{itemize}\footnotesize
     \item[\checkmark] But, has some experimental export format support for \href{https://www.freecadweb.org/}{FreeCAD}
     \end{itemize}
@@ -85,21 +85,29 @@
 \begin{frame}
   \frametitle{Design Overview}
 
+  \vspace{-5mm}
   \begin{center}
     \includegraphics[width=0.8\textwidth]{layers.pdf}
   \end{center}
+  \vspace{-5mm}
 
   \begin{description}
   \item[params] High-level, human-centric configuration language.
     \begin{itemize}\scriptsize
-    \item Provided by experiment s/w developers, fiddled with by end users.
+    \item[-] Provided by experiment s/w developers, fiddled with by end users.
     \end{itemize}
   \item[builders] Structured, procedural geometry construction code.
     \begin{itemize}\scriptsize
-    \item Experiment developers code these.
+    \item[-] Experiment developers write this code.
     \end{itemize}
   \item[objects] In-memory representation of full geometry.
+    \begin{itemize}\scriptsize
+    \item[-] Following strict schema defined in GeGeDe.
+    \end{itemize}
   \item[export] Conversion to format suitable for some application.
+    \begin{itemize}\scriptsize
+    \item[-] Batteries included with GeGeDe, or user-provided modules.
+    \end{itemize}
   \end{description}
 \end{frame}
 
@@ -121,19 +129,19 @@ wireangle = Q("35*deg")
 # etc, ...
 \end{verbatim}
 
-  \begin{itemize}
+  \begin{itemize}\footnotesize
   \item Each section binds \textbf{name} and \textbf{parameter set} to a \textbf{builder instance}.
   \item One special builder provides the ``world'' logical volume.
-    \begin{itemize}\footnotesize
+    \begin{itemize}\scriptsize
     \item File can configure multiple world builders.
     \item First one listed ``wins'', or can specify one on the command line.
     \end{itemize}
   \item The \texttt{class} and \texttt{subbuilders} are the only reserved keys.
-    \begin{itemize}\footnotesize
-    \item These are consumed and interpreted by GeGeDe internals.
-    \item Each builder free to expect/interpret any additional keys.
+    \begin{itemize}\scriptsize
+    \item The only two keywords reserved by GeGeDe internals.
+    \item Builders are free to require any additional key/value pairs (\textit{eg}. \texttt{size, wireangle}).
     \end{itemize}
-  \item Use \texttt{Q("...")} for expressing units\footnote{\url{http://pint.readthedocs.org/}} (\texttt{Q} is for ``quantity'').
+  \item Use \texttt{Q("...")} for expressing units\footnote{\url{http://pint.readthedocs.org/}} (\texttt{Q} short for ``quantity'').
   \end{itemize}
 
 \end{frame}
@@ -143,31 +151,31 @@ wireangle = Q("35*deg")
 \begin{frame}[fragile]
   \frametitle{Builders - GeGeDe's main code structure}
   \begin{itemize}
-  \item Builders are \textbf{experiment-provided} code:
+  \item Builders written as \textbf{experiment-provided} code:
     \begin{itemize}\footnotesize
-    \item Their code does not ``live'' in the \texttt{gegede} Git repo!
-    \item Builders are subclasses of
-      \texttt{gegede.builder.Builder} 
-    \item Each builder responsible for constructing some portion of the geometry.
+    \item It does not ``live'' in the \texttt{gegede} Git repo!
+    \item Builders are subclasses of \texttt{gegede.builder.Builder} (or suitably duck-typed)
+    \end{itemize}
+
+  \item Each builder:
+    \begin{itemize}\footnotesize
+    \item Responsible for constructing some portion of the geometry.
+    \item Exposes zero or more logical volume (LV) objects to the \textbf{parent builder}.
+    \item Properly places the LVs of its \textbf{daughter builders} (\textit{subbuilders}) into its own LVs.
     \end{itemize}
     
-  \item Builders typically are written as a \textbf{hierarchy}:
+  \item Builders typically are written as a \textbf{cooperative hierarchy}:
     \begin{itemize}\footnotesize
     \item Builders can delegate to subbuilders.
-    \item Explicit sub-builder creation is allowed but
-      better flexibility by using \texttt{subbuilders} in the configuration.
-    \item Loose coupling between builders but typically some collusion 
-      (``software contract'') is assumed.
+    \item Explicit subbuilder creation is allowed but better
+      flexibility is achieved by listing then with the
+      \texttt{subbuilders} configuration keyword.
+    \item Typically follow a loosely-coupled design but
+      some collusion or ``software contract'' can be useful.
     \item Arbitrary complex builder associations are allowed.  A
         1-parent/$n$-children tree is common.
     \end{itemize}
 
-
-  \item Each builder:
-    \begin{itemize}\footnotesize
-    \item Exposes zero or more logical volume (LV) objects to the parent builder.
-    \item Properly places the LVs of its subbuilders into its own LVs.
-    \end{itemize}
 
 
   \end{itemize}
@@ -178,17 +186,22 @@ wireangle = Q("35*deg")
   \frametitle{Example Builder Hierarchy}
   \vspace{-5mm}
   \begin{center}
-    \includegraphics[width=0.9\textwidth]{buildhier2.pdf}    
+    \includegraphics[width=0.8\textwidth]{buildhier2.pdf}    
   \end{center}
   \vspace{-5mm}
   
-  \begin{itemize}
+  \begin{itemize}\footnotesize
   \item \textbf{Factor} each builder based on \textbf{geometry symmetries}.
-  \item Builders directly construct ``local'' geometry, as they wish, 
-  \item Builder hierarchy employs a software contract:
-    \begin{itemize}\footnotesize
-    \item Child exposes certain, select LV(s).
-    \item Parents know how/where to place them into their own LV(s).
+  \item Builders directly construct ``local'' geometry.
+  \item Hierarchy design best to follow loosely-coupled software contract:
+    \begin{itemize}\scriptsize
+    \item Child builder \textbf{exposes} select LV(s) such that,
+    \item Parent builder knows how/where to \textbf{place} them.
+    \end{itemize}
+  \item Allows for:
+    \begin{itemize}\scriptsize
+    \item Decoupled development and reuse of builders.
+    \item Test ``worlds'' narrowed to a subbuilder's exposed LVs
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -202,26 +215,21 @@ wireangle = Q("35*deg")
 class MyBuilder(gegede.builder.Builder):
 
   def configure(self, dx='1m', dy='2m', dz='3m', **kwds):
-    # Specify any default values as keyword args.
-    # Incorrect units are caught as errors!
-    # Configure self, in some way, typically trivially:
+    # Receive user configuration, providing defaults.
+    # Incompatible units are caught as errors.
+    # Here, configure self, in some way.
     self.size = (dx,dy,dz)
 
   def construct(self, geom):
-    # Construct some volumes with ``geom'' object.
+    # Do local construction using ``geom'' object as only interface.
     box = geom.shapes.Box(self.name+'_shape', *self.size)
-    # Add our ``top-level'' LV to our own .volumes list for our parent.
+    # Add ``top-level'' LV to .volumes list for our parent to use.
     self.add_volume(box)   
-    # Deal with our daughter builders:
+    # Place LVs from our child builders, guaranteed already constructed.
     for sb in self.builders:
       for sv in sb.volumes:
-        # ... place LVs from daughter sub-builders
+        # ... place ``sv'' in ``box'' ...
   \end{lstlisting}
-
-  \begin{description}
-  \item[\texttt{configure()}] used to transmit any configuration parameters, typically as taken from the configuration file section of the same name as the builder.
-  \item[\texttt{construct()}] actual construction using configuration.  Subbuilder's \texttt{.construct()} guaranteed to have been called so the \texttt{.volume} list is filled.
-  \end{description}
 
 \end{frame}
 
@@ -239,15 +247,14 @@ class MyBuilder(gegede.builder.Builder):
 
   These objects:
   \begin{itemize}
-  \item Reference each other to form some graph.
-  \item Are represented as Python \texttt{namedtuple} instances.
-  \item Follow a
-    \href{https://github.com/brettviren/gegede/blob/master/python/gegede/schema/__init__.py}{schema},
-    itself defined as a static Python data structure.
+  \item Reference each other by name to form some graph.
     \begin{itemize}\footnotesize
-    \item Essentially Geant4's Geometry schema
+    \item Name-based references used to parallel GDML's schema.
+    \item May explicitly name objects or GeGeDe will generate a unique name.
     \end{itemize}
-  \item Attributes values have enforced consistency of units.
+  \item Are represented as Python \texttt{namedtuple} instances.
+  \item Objects follow a specific
+    \href{https://github.com/brettviren/gegede/blob/master/python/gegede/schema/__init__.py}{schema}
   \end{itemize}
 \end{frame}
 
@@ -268,13 +275,15 @@ Schema = dict(
 
   \footnotesize
   \begin{itemize}
-  \item Defined as simply a static Python data structure (in \href{https://github.com/brettviren/gegede/blob/master/python/gegede/schema/__init__.py}{\texttt{gegede.schema.Schema}})
-  \item Essentially follows naming and function prototype conventions of Geant4 geometry construction methods.
+  \item Schema written simply as a static Python data structure
+    \begin{itemize}\scriptsize
+    \item[-] (link to \href{https://github.com/brettviren/gegede/blob/master/python/gegede/schema/__init__.py}{\texttt{gegede.schema.Schema}})
+    \end{itemize}
+  \item Follows naming and function prototype conventions of Geant4 geometry construction methods.
     
-  \item Linear dimensions are usually ``half lengths'' (eg, \texttt{dx})
-  \item Attributes defined as (name, type) pair.  The type is either a
-    Python type object or a string that evaluates to a Pint unit
-    quantity and which provides a default value.
+  \item Linear dimensions are usually taken as ``half lengths'' (eg, \texttt{dx})
+  \item Attributes defined as \texttt{(name, type)} pair.  The type is either a
+    Python type object or a string that evaluates to a \texttt{pint.Quantity} unit object and which provides a default value.
     \item Weakly typed references to other objects via \texttt{gegede.types.Named} type.
   \end{itemize}
 \end{frame}
@@ -289,7 +298,7 @@ Schema = dict(
 
   \vspace{5mm}
 
-  Some supported export formats:
+  Some export formats supported by GeGeDe are:
 
   \begin{description}
   \item[GDML] for Geant4.  Uses \texttt{lxml.etree} for assuring valid XML.
@@ -300,16 +309,22 @@ Schema = dict(
 
   \vfill
 
-  Depending on the difficulty of working with the export target
-  itself, new exporters should be easy to develop.
+  New exporters should be easy to develop.
   \begin{itemize}\footnotesize
-  \item The GDML one took about 2 hours development and testing time. 
+  \item Depends on the format, of course.
+  \item Developing and testing the GDML exporter took about 2 hours.
   \item The JSON one took about 2 minutes! 
     \begin{itemize}\tiny
-    \item It's a ``cheat'' as it just uses \texttt{json.dumps()}!
+    \item[:)] It's a ``cheat'' as it just uses \texttt{json.dumps()}!
     \end{itemize}
   \end{itemize}
 
+  \vfill
+
+  GeGeDe supports exporters as independent Python modules.
+  \begin{itemize}\footnotesize
+  \item Contributions back to GeGeDe are welcome!
+  \end{itemize}
 \end{frame}
 
 \section{Usage}
@@ -387,7 +402,7 @@ usage: gegede-cli [-h] [-w WORLD] [-f FORMAT] [-o OUTPUT]
 \begin{frame}
   \frametitle{GeGeDe Status}
   \begin{itemize}
-  \item Main users now doing DUNE Near Detector design studies.
+  \item Main users now are doing DUNE Near Detector design studies.
     \begin{itemize}\footnotesize
     \item They got up to speed using GeGeDe very quickly.
     \item New users are welcome.  You don't have to study neutrinos! :)
@@ -402,14 +417,15 @@ usage: gegede-cli [-h] [-w WORLD] [-f FORMAT] [-o OUTPUT]
       \begin{itemize}\scriptsize
       \item[$\times$] Still need a few more for have 100\% coverage of all Geant4 shapes!
       \end{itemize}
-    \item[\checkmark] Python 3.5+ support just recently added.
+    \item[\checkmark] Python 3.5+ support \textbf{just} added.
       \begin{itemize}\scriptsize
-      \item[$\times$] Have not yet updated this to PyPI!
+      \item[$\sim$] Maybe some 2.7'isms still left uncovered.
       \end{itemize}
     \end{itemize}
   \item I'll continue to support GeGeDe at the level of bug fixes.
     \begin{itemize}\footnotesize
-    \item New features via GitHub Pull Request likely accepted but let's talk first.
+    \item[:)] Major new features will likely be accepted but let's
+      talk first.
     \end{itemize}
   \end{itemize}
 

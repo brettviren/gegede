@@ -7,7 +7,7 @@ from gegede import construct
 
 def test_units():
     g = construct.Geometry()
-    g.shapes.Box("units0",'1cm','2cm','3cm')    
+    g.shapes.Box("units0",'1cm','2cm','3cm')
 
     try:
         g.shapes.Box("units1",1,'2cm','3cm') # should fail
@@ -43,10 +43,10 @@ def test_make_some_shapes():
         pass
     else:
         raise (RuntimeError, 'Failed to catch unitless box dimensions %s' % str(b1))
-        
+
     print ('B1',b1)
     b2 = g.shapes.Box("box2",'1cm',dz='3cm',dy='2cm') # out of order kwargs should work
-    b3 = g.shapes.Box("box3","1cm","2cm","3.0cm")    
+    b3 = g.shapes.Box("box3","1cm","2cm","3.0cm")
     assert b1.dx==b2.dx and b2.dx==b3.dx, str([b1,b2,b3])
     assert b1.dy==b2.dy and b2.dy==b3.dy, str([b1,b2,b3])
     assert b1.dz==b2.dz and b2.dz==b3.dz, str([b1,b2,b3])
@@ -60,6 +60,41 @@ def test_make_some_shapes():
 
     print ('Shape store:\n\t', '\n\t'.join([str(v) for v in g.store.shapes.values()]))
 
+def test_all_shapes():
+    g = construct.Geometry()
+    #Box
+    s = g.shapes.Box('Box')
+    print ('Box:',s)
+    #TwistedBox
+    s = g.shapes.TwistedBox('TwistedBox')
+    print ('TwistedBox:',s)
+    #Tubs
+    s = g.shapes.Tubs('Tubs')
+    print ('Tubs:',s)
+    #Sphere
+    s = g.shapes.Sphere('Sphere')
+    print ('Sphere:',s)
+    #Cone
+    s = g.shapes.Cone('Cone')
+    print ('Cone:',s)
+    #Trapezoid
+    s = g.shapes.Trapezoid('Trapezoid')
+    print ('Trapezoid:',s)
+    #TwistedTrap
+    s = g.shapes.TwistedTrap('TwistedTrap')
+    print ('TwistedTrap:',s)
+    #TwistedTrd
+    s = g.shapes.TwistedTrd('TwistedTrd')
+    print ('TwistedTrd:',s)
+    #Paraboloid
+    s = g.shapes.Paraboloid('Paraboloid')
+    print ('Paraboloid:',s)
+    #Ellipsoid
+    s = g.shapes.Ellipsoid('Ellipsoid')
+    print ('Ellipsoid:',s)
+    #PolyhedraRegular
+    s = g.shapes.PolyhedraRegular('PolyhedraRegular')
+    print ('PolyhedraRegular:',s)
 
 def test_default_args():
     g = construct.Geometry()
@@ -70,3 +105,4 @@ if '__main__' == __name__:
     test_units()
     test_unique_shapes()
     test_make_some_shapes()
+    test_all_shapes()

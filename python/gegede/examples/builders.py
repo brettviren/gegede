@@ -34,7 +34,6 @@ class SimpleBuilder(gegede.builder.Builder):
         # fixme: need to do something with this placement!
         return
 
-
 def nested_boxes():
     '''
     Make some nested boxes by explicitly creating some builders

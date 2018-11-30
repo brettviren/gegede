@@ -124,7 +124,12 @@ def make_shape_node(shape):
         dat = dict(name=shape.name, lunit=lunit,
                    x=dsize(shape.dx), y=dsize(shape.dy), z=dsize(shape.dz))
         return etree.Element('box', **dat)
-                             
+
+    if typename == 'TwistedBox':
+        dat = dict(name=shape.name, lunit=lunit,
+                   x=dsize(shape.dx), y=dsize(shape.dy), z=dsize(shape.dz), PhiTwist=ang(shape.phitws))
+        return etree.Element('twistedbox', **dat)
+
     if typename == 'Tubs':
         dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
                    rmin=rsize(shape.rmin), rmax=rsize(shape.rmax), z=dsize(shape.dz),
@@ -150,6 +155,42 @@ def make_shape_node(shape):
                     x1=dsize(shape.dx1), x2=dsize(shape.dx2),
                     y1=dsize(shape.dy1), y2=dsize(shape.dy2), z=dsize(shape.dz))
         return etree.Element('trd', **dat)
+
+    if typename == 'TwistedTrap':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    x1=dsize(shape.dx1), x2=dsize(shape.dx2), x3=dsize(shape.dx3), x4=dsize(shape.dx4),
+                    y1=dsize(shape.dy1), y2=dsize(shape.dy2), z=dsize(shape.dz),
+                    Theta=ang(shape.dtheta), Phi=ang(shape.dphi), Alph=ang(shape.dalpha), PhiTwist=ang(shape.phitws))
+        return etree.Element('twistedtrap', **dat)
+
+    if typename == 'TwistedTrd':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    x1=dsize(shape.dx1), x2=dsize(shape.dx2),
+                    y1=dsize(shape.dy1), y2=dsize(shape.dy2), z=dsize(shape.dz),
+                    PhiTwist=ang(shape.phitws))
+        return etree.Element('twistedtrd', **dat)
+
+    if typename == 'Paraboloid':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    rlo=dsize(shape.drlo), rhi=dsize(shape.drhi),
+                    dz=dsize(shape.ddz))
+        return etree.Element('paraboloid', **dat)
+
+    if typename == 'Ellipsoid':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    ax=dsize(shape.dax), by=dsize(shape.dby), cz=dsize(shape.dcz),
+                    zcut1=dsize(shape.dzcut1), zcut2=dsize(shape.dzcut2))
+        return etree.Element('ellipsoid', **dat)
+
+    if typename == 'PolyhedraRegular':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    startphi=ang(shape.sphi), deltaphi=ang(shape.dphi), numsides=str(int(shape.numsides)))
+        ele = etree.Element('polyhedra', **dat)
+        zpos = shape.dz / 2
+        zneg = - shape.dz / 2
+        ele.append(etree.Element('zplane', rmin=rsize(shape.rmin), rmax=rsize(shape.rmax), z=dsize(zpos)))
+        ele.append(etree.Element('zplane', rmin=rsize(shape.rmin), rmax=rsize(shape.rmax), z=dsize(zneg)))
+        return ele
 
     if typename == 'Boolean':
         ele = etree.Element(shape.type, name=shape.name)
@@ -242,8 +283,8 @@ def convert(geom):
     for obj in geom.store.shapes.values():
         node = make_shape_node(obj)
         if node is not None:
-            solids_node.append(node)        
-    
+            solids_node.append(node)
+
 
     # <structure>
     structure_node = etree.Element('structure')

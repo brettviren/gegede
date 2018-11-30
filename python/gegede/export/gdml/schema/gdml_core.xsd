@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xs:schema []>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" version="1.0" xmlns:gdml="http://cern.ch/2001/Schemas/GDML" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" version="1.0" xmlns:gdml="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <xs:simpleType name="InlineExpressionType">
     <xs:restriction base="xs:string"></xs:restriction>
@@ -51,12 +51,30 @@
     <xs:attribute name="value" type="ExpressionOrIDREFType" use="required"></xs:attribute>
   </xs:complexType>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <xs:complexType name="VariableType">
+    <xs:annotation>
+      <xs:documentation>An anonymous, local scope, value</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="value" type="ExpressionOrIDREFType" use="required"></xs:attribute>
+  </xs:complexType>
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <xs:complexType name="IdentifiableConstantType">
     <xs:annotation>
       <xs:documentation>Named (referenced), global scope, constant value</xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="ConstantType">
+	<xs:attribute name="name" type="xs:ID" use="required"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <xs:complexType name="IdentifiableVariableType">
+    <xs:annotation>
+      <xs:documentation>Named (referenced), local scope, variable value</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="VariableType">
 	<xs:attribute name="name" type="xs:ID" use="required"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
@@ -97,6 +115,15 @@
     <xs:attribute default="0.0" name="x" type="ExpressionOrIDREFType"></xs:attribute>
     <xs:attribute default="0.0" name="y" type="ExpressionOrIDREFType"></xs:attribute>
     <xs:attribute default="0.0" name="z" type="ExpressionOrIDREFType"></xs:attribute>
+  </xs:complexType>
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <xs:complexType name="MatrixType">
+    <xs:annotation>
+      <xs:documentation>A bi-dimensional matrix of doubles</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:ID"></xs:attribute>
+    <xs:attribute name="coldim" type="xs:nonNegativeInteger"></xs:attribute>
+    <xs:attribute name="values" type="xs:string"></xs:attribute>
   </xs:complexType>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <xs:complexType name="IdentifiableThreeVectorType">
@@ -146,6 +173,14 @@
     <xs:attribute name="ref" type="xs:IDREF" use="required"></xs:attribute>
   </xs:complexType>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <xs:complexType name="FileReferenceType">
+    <xs:annotation>
+      <xs:documentation>Reference to an external file containing sub-volume information</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:anyURI" use="required"></xs:attribute>
+    <xs:attribute name="volname" type="xs:string" use="optional"></xs:attribute>
+  </xs:complexType>
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <xs:complexType name="ReferenceListType">
     <xs:annotation>
       <xs:documentation>List of local references to a set of element of a named type</xs:documentation>
@@ -157,8 +192,12 @@
     <xs:annotation>
       <xs:documentation>Auxiliary information like sensitive detector declaration, etc.</xs:documentation>
     </xs:annotation>
+    <xs:sequence>
+      <xs:element name="auxiliary" maxOccurs="unbounded" minOccurs="0" type="AuxiliaryType"/>
+    </xs:sequence>
     <xs:attribute name="auxtype" type="xs:string" use="required"></xs:attribute>
     <xs:attribute name="auxvalue" type="xs:string" use="required"></xs:attribute>
+    <xs:attribute name="auxunit" type="xs:string" use="optional"></xs:attribute>
   </xs:complexType>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 </xs:schema>

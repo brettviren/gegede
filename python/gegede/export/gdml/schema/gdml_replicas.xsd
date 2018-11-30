@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" version="1.0" xmlns:gdml="http://cern.ch/2001/Schemas/GDML" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" version="1.0" xmlns:gdml="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:include schemaLocation="gdml_define.xsd"/>
+  <xs:include schemaLocation="gdml_extensions.xsd"/>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <xs:complexType abstract="false" name="ReplicationAlgorithmType">
     <xs:annotation>
@@ -64,12 +65,11 @@
   </xs:complexType>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <xs:complexType name="directionType">
-    <xs:complexContent>
-      <xs:restriction base="QuantityVectorType">
-	<xs:attribute default="mm" type="xs:string" name="unit"/>
-	<xs:attribute default="cartesian" type="xs:string" name="type"/>
-      </xs:restriction>
-    </xs:complexContent>
+    <xs:attribute default="0.0" name="x" type="ExpressionOrIDREFType"></xs:attribute>
+    <xs:attribute default="0.0" name="y" type="ExpressionOrIDREFType"></xs:attribute>
+    <xs:attribute default="0.0" name="z" type="ExpressionOrIDREFType"></xs:attribute>
+    <xs:attribute default="0.0" name="phi" type="ExpressionOrIDREFType"></xs:attribute>
+    <xs:attribute default="0.0" name="rho" type="ExpressionOrIDREFType"></xs:attribute>
   </xs:complexType>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <xs:element name="direction" type="directionType"/>

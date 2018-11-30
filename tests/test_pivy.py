@@ -57,7 +57,7 @@ def make_mother_daughter():
     cube_lv.addChild(cube_shape)
 
     return cube_lv
-    
+
 
 def test_save():
     cube_lv = make_mother_daughter()
@@ -89,4 +89,3 @@ def main():
 if '__main__' == __name__:
     #main()
     test_save()
-

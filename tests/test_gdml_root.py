@@ -11,7 +11,7 @@ testdir = os.path.dirname(__file__)
 
 def test_gdml():
     '''
-    Test the test.gdml from GDML's own Python package 
+    Test the test.gdml from GDML's own Python package
     '''
     filepath = os.path.join(testdir, 'test.gdml')
     assert os.path.exists(filepath), 'No such file: %s' % filepath

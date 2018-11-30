@@ -29,7 +29,7 @@ def test_get_elements():
         assert ele
         #print ('RN: %4d: %s %s %d %f [%d %d]' % \
         #    (count, ele.GetName(), ele.GetTitle(), ele.Z(), ele.A(), ndk, niso))
-        
+
 def test_element():
     '''
     Make some elements
@@ -69,7 +69,7 @@ def test_failed_isotope():
 
 def test_kaboom():
     '''
-    Make enriched Uranium 
+    Make enriched Uranium
     '''
     tgeo = ROOT.TGeoManager()
     et = tgeo.GetElementTable()
@@ -79,7 +79,7 @@ def test_kaboom():
     eu.AddIsotope(u235,0.5)
     eu.AddIsotope(u238,0.5)
     assert 2 == eu.GetNisotopes()
-    
+
 
 def test_isotope():
     '''
@@ -102,4 +102,3 @@ def test_isotope():
     print ('Neff = %f' % eu.Neff())
 
     # now what? how to register this element?
-

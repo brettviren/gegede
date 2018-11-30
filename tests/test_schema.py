@@ -18,9 +18,8 @@ def test_shapes():
     # get an idea of what gdml expects
     # grep 'xs:element name=' GDMLSchema/gdml_solids.xsd | sed -e 's/.*name="//' -e 's/".*//'
     # note, actual shape types have capitalized names
-    must = ["Box","Sphere","Tubs"]
-    want = ["ellipsoid","tube","cone","polycone","zplane","para","trd",
-            "trap","torus","orb","polyhedra","zplane","hype","eltube"]
+    must = ["Box","TwistedBox","Sphere","Tubs","Trapezoid","PolyhedraRegular"]
+    want = ["twistedtubs","cutTube","elcone","polycone","genericPolycone","para","trap","torus","orb","polyhedra","genericPolyhedra","xtru","hype","eltube","tet","arb8"]
 
     shapes = schema.Schema['shapes']
 
@@ -34,7 +33,7 @@ def test_shapes():
     if unimplemented:
         print ('Warning: shapes still needing implementation: %s' % ', '.join(unimplemented))
 
-    
+
 
 if '__main__' == __name__:
     test_categories()

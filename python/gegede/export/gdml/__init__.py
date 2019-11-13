@@ -217,7 +217,10 @@ def make_volume_node(vol, store):
         node.append(etree.Element('solidref', ref=vol.shape))
     for placename in vol.placements or []:
         place = store[placename]
-        pvol = etree.Element('physvol')
+        if place.copynumber:
+            pvol = etree.Element('physvol', copynumber=str(place.copynumber))
+        else:
+            pvol = etree.Element('physvol')
         node.append(pvol)
         pvol.append(etree.Element('volumeref', ref=place.volume))
         if place.pos:

@@ -81,6 +81,6 @@ Schema = dict(
         Volume = (("material", Named), ("shape", Named),
                   ("placements", NameList(str,0)),
                   ("params", NamedTypedList(str, 0))),
-        Placement = (("volume", Named), ("pos", Named), ("rot", Named)),("copynumber",int)),
+        Placement = (("volume", Named), ("pos", Named), ("rot", Named),("copynumber",int)),
     ),
 )

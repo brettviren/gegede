@@ -11,7 +11,7 @@ The core of GeGeDe relies on [[https://github.com/hgrecco/pint][Pint]] to enforc
 Additional functionality, particularly with regards to export, is provided by other modules:
 
  - GDML :: requires [[http://lxml.de/][lxml]] for emitting XML for GDML
- - ROOT :: for ROOT-based tests and direct ROOT export, PyROOT is needed
+ - ROOT :: (optional) for ROOT-based tests and direct ROOT export, PyROOT is needed
 
 For running the tests [[https://nose.readthedocs.org][nose]] is useful.
 

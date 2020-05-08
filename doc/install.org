@@ -2,35 +2,38 @@
 
 ** For ROOT export
 
-[[http://root.cern.ch/drupal/content/building-root-cmake][Install ROOT]]
+See the ROOT home page for how to install ROOT:
+https://root.cern.ch/
 
-ROOT is available on Ubuntu but needs =PYTHONPATH= set:
+ROOT 6 is recommended.  Once installed and after entering your Python
+environment (see below) you can test if PyROOT is available:
 
 #+BEGIN_EXAMPLE
-  $ sudo apt-et install libroot-bindings-python5.34
-  $ export PYTHONPATH=/usr/lib/x86_64-linux-gnu/root5.34
-  $ python -c 'import ROOT'  # <-- just a test...
+  $ python --version
+  (make sure it is Python 3.x)
+  $ python -c 'import ROOT'
+  (make sure no errors)
 #+END_EXAMPLE
+
+To use ROOT you may need to add/set its library directory to ~PYTHONPATH~.
 
 ** For GDML export
 
 #+BEGIN_EXAMPLE
-$ sudo apt-get install libxml2 libxslt1-dev
+  $ sudo apt-get install libxml2 libxslt1-dev
 #+END_EXAMPLE
 
 
 * Installation of GeGeDe
 
-GeGeDe is pure Python with a few dependencies.  It may be installed in "the usual way" of Python packages.  
+GeGeDe is pure Python with a few dependencies.  It supports Python 3.  Python 2.x will likely not work.  GeGeDe and dependencies may be installed in "the usual way".
 
 ** Virtualenv
 
-The easiest way to install GeGeDe for yourself is via a "virtual environment".  If you do not have the  =virtualenv= command see [[http://virtualenv.readthedocs.org/en/latest/virtualenv.html#installation][these instructions]].  Here is one recipe to get set up.
+The easiest way to install GeGeDe for yourself is via a "virtual environment".  
 
 #+BEGIN_EXAMPLE
-  $ wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.tar.gz
-  $ tar -xf virtualenv-1.11.tar.gz
-  $ python virtualenv-1.11/virtualenv.py ggdvenv
+  $ python3 -m venv ggdvenv
   $ source ggdvenv/bin/activate
 #+END_EXAMPLE
 
@@ -46,14 +49,13 @@ Get the GeGeDe source and install like:
   $ python setup.py install
 #+END_EXAMPLE
 
-
 * Development
 
 To set up for building and testing GGD "in source":
 
 #+BEGIN_EXAMPLE
-  $ virtualenv venv
-  $ source venv/bin/activate
+  $ python3 -m venv ggdvenvdev
+  $ source ggdvenvdev/bin/activate
   $ python setup.py develop
 #+END_EXAMPLE
 
@@ -69,4 +71,12 @@ The tests are meant to be run via [[https://nose.readthedocs.org][nose]]:
   OK
 #+END_EXAMPLE
 
-All tests should pass in a "develop" install.  Tests run in a normal install may fail.
+Tests should be run from the source directory in a virtual environment prepared with "setup.py develop".  All tests should pass if all dependencies are installed.  If ROOT or other dependencies are not installed, tests which need them will naturally fail.  These should be marked clearly with an error message like:
+
+#+BEGIN_EXAMPLE
+ERROR: Failure: ModuleNotFoundError (No module named 'ROOT')
+#+END_EXAMPLE
+
+Note, you may still use GeGeDe without ROOT installed in the virtual
+environment, eg by making GDML files and using them from another
+environment.

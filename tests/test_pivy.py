@@ -2,13 +2,19 @@
 '''
 Play with pivy
 '''
+import unittest
+skipmsg=""
+try:
+    from pivy import coin
+except ImportError:
+    skipmsg="pivy.coin not available, skipping test"
 
-from pivy import coin
 
 def make_mother_daughter():
     '''
     Make a cube with two cylinders inside.
     '''
+
 
     tube_shape = coin.SoCylinder()
     tube_shape.radius = 0.25
@@ -59,6 +65,7 @@ def make_mother_daughter():
     return cube_lv
 
 
+@unittest.skipIf(skipmsg, skipmsg)
 def test_save():
     cube_lv = make_mother_daughter()
     writer = coin.SoWriteAction()
@@ -71,6 +78,7 @@ def test_save():
 def main():
     from pivy import sogui
     #from pivy import soqt as sogui
+    from pivy import coin
 
     win = sogui.SoGui.init()
     world = coin.SoSeparator()

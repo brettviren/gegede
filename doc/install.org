@@ -2,11 +2,29 @@
 
 ** For ROOT export
 
-See the ROOT home page for how to install ROOT:
-https://root.cern.ch/
+ROOT is not required to use GeGeDe.  It is needed to let GeGeDe
+directly export to ROOT.  Without direct ROOT support one may still
+generate GDML output with GeGeDe and then transport the GDML output to
+a different environment that provides ROOT.
 
-ROOT 6 is recommended.  Once installed and after entering your Python
-environment (see below) you can test if PyROOT is available:
+See the ROOT home page for definitive instructions on how to install
+it: https://root.cern.ch/.  Here is one particular example used on
+Ubuntu 18.04:
+
+#+begin_example
+  # (git clone/download source)
+  $ mkdir root/buildit && cd root/buildit
+  $ cmake -G Ninja .. -Dcxx17=ON \
+    -DCMAKE_INSTALL_PREFIX=$HOME/opt/root \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+    -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so \
+    -DPYTHON_INCLUDE_DIR=/usr/include/python3.6m
+  $ cmake --build . -- -j$(nproc)
+  $ cmake --build . --target install
+#+end_example
+
+Once installed and after entering your Python environment (see below)
+you may quickly test if PyROOT is available:
 
 #+BEGIN_EXAMPLE
   $ python --version
@@ -15,7 +33,13 @@ environment (see below) you can test if PyROOT is available:
   (make sure no errors)
 #+END_EXAMPLE
 
-To use ROOT you may need to add/set its library directory to ~PYTHONPATH~.
+To use ROOT you may need to add/set its library directory to
+~PYTHONPATH~.  Extending the build example above:
+
+#+begin_example
+export PYTHONPATH=$HOME/opt/root/lib
+export LD_LIBRARY_PATH=$HOME/opt/root/lib
+#+end_example
 
 ** For GDML export
 
@@ -23,21 +47,31 @@ To use ROOT you may need to add/set its library directory to ~PYTHONPATH~.
   $ sudo apt-get install libxml2 libxslt1-dev
 #+END_EXAMPLE
 
+** For Pivy/Coin3D/FreeCAD
+
+This is experimental and left as an exercise for the interested.
 
 * Installation of GeGeDe
 
-GeGeDe is pure Python with a few dependencies.  It supports Python 3.  Python 2.x will likely not work.  GeGeDe and dependencies may be installed in "the usual way".
+GeGeDe is pure Python.  It now only supports Python 3.  GeGeDe may be
+installed in "the usual Python way".
 
-** Virtualenv
+** Python3 venv
 
-The easiest way to install GeGeDe for yourself is via a "virtual environment".  
+One of the easiest ways to install GeGeDe (or any Python package) is
+to do so in a virtual environment:
 
 #+BEGIN_EXAMPLE
   $ python3 -m venv ggdvenv
   $ source ggdvenv/bin/activate
 #+END_EXAMPLE
 
-At this point, any Python packages you install go into your virtual environment (called "=ggdvenv=" here).
+At this point, any Python packages you install go into your virtual
+environment directory, called "=ggdvenv/=" here.
+
+If you have ROOT installed, it is likely outside this virtual
+environment and, you may to explicitly tell Python about it.  See
+above.
 
 ** Installing GeGeDe
 
@@ -51,15 +85,29 @@ Get the GeGeDe source and install like:
 
 * Development
 
-To set up for building and testing GGD "in source":
+To set up for building and testing GGD "in source" you may use a
+virtual environment created as above but an even nicer way is to use [[https://direnv.net/][direnv]]:
 
 #+BEGIN_EXAMPLE
-  $ python3 -m venv ggdvenvdev
-  $ source ggdvenvdev/bin/activate
-  $ python setup.py develop
+  $ cd gegede
+  $ echo layout python3 > .envrc
+  $ direnv allow
 #+END_EXAMPLE
 
-The tests are meant to be run via [[https://nose.readthedocs.org][nose]]:
+If ROOT is used then also let direnv know how to include it:
+
+#+begin_example
+  $ cat <<EOF >> .envrc
+  export PYTHONPATH=$HOME/opt/root/lib
+  export LD_LIBRARY_PATH=$HOME/opt/root/lib
+  EOF
+#+end_example
+
+* Testing
+
+GeGeDe comes with a set of unit tests which are meant to be run via
+[[https://nose.readthedocs.org][nose]].  If the test as a whole does not pass then there is a bug worth
+[[https://github.com/brettviren/gegede/issues][reporting]].
 
 #+BEGIN_EXAMPLE
   $ pip install nose
@@ -71,12 +119,18 @@ The tests are meant to be run via [[https://nose.readthedocs.org][nose]]:
   OK
 #+END_EXAMPLE
 
-Tests should be run from the source directory in a virtual environment prepared with "setup.py develop".  All tests should pass if all dependencies are installed.  If ROOT or other dependencies are not installed, tests which need them will naturally fail.  These should be marked clearly with an error message like:
+Tests should be run from the source directory in a virtual environment
+prepared with "setup.py develop".  All tests should pass if all
+dependencies are installed.  If optional dependencies such as PyROOT
+are not available to a test it should be skipped and an "S" will show
+in the output.
 
 #+BEGIN_EXAMPLE
-ERROR: Failure: ModuleNotFoundError (No module named 'ROOT')
+$ nosetests
+...................SS............SS...SSSSSS.......
+----------------------------------------------------------------------
+Ran 51 tests in 0.968s
+
+OK (SKIP=10)
 #+END_EXAMPLE
 
-Note, you may still use GeGeDe without ROOT installed in the virtual
-environment, eg by making GDML files and using them from another
-environment.

@@ -12,6 +12,7 @@ Additional functionality, particularly with regards to export, is provided by ot
 
  - GDML :: requires [[http://lxml.de/][lxml]] for emitting XML for GDML
  - ROOT :: (optional) for ROOT-based tests and direct ROOT export, PyROOT is needed
+ - pivy :: (optional) for experimental FreeCAD support, pivy/coin3d is needed.
 
 For running the tests [[https://nose.readthedocs.org][nose]] is useful.
 

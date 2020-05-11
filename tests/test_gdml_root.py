@@ -6,9 +6,16 @@ import tempfile
 from gegede.examples.builders import nested_boxes
 import gegede.export.gdml
 
-import ROOT
+import unittest
+skipmsg=""
+try:
+    import ROOT
+except ImportError:
+    skipmsg="PyROOT not available, skipping test"
+
 testdir = os.path.dirname(__file__)
 
+@unittest.skipIf(skipmsg, skipmsg)
 def test_gdml():
     '''
     Test the test.gdml from GDML's own Python package
@@ -22,6 +29,7 @@ def test_gdml():
         print ("WARNING: ROOT still fails to parse GDML's own test file")
 
 
+@unittest.skipIf(skipmsg, skipmsg)
 def test_read_gdml_in_root():
 
     geom = nested_boxes()
@@ -35,4 +43,4 @@ def test_read_gdml_in_root():
     geo.Import(fname)
     if not geo:
         print ("WARNING: ROOT still fails to parse GDML's own test file")
-#    assert geo
+    assert geo

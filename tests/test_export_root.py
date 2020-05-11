@@ -3,11 +3,17 @@
 Test the ROOT exporter
 '''
 
-from gegede.export.root import Bucket, make_material, convert
-import ROOT
+import unittest
+skipmsg=""
+try:
+    import ROOT
+    from gegede.export.root import Bucket, make_material, convert
+except ImportError:
+    skipmsg="PyROOT not available, skipping test"
 
 from gegede.examples.simple import airwaterboxes
 
+@unittest.skipIf(skipmsg, skipmsg)
 def test_bucket():
     '''
     Test the gegede.export.root.Bucket class
@@ -19,6 +25,7 @@ def test_bucket():
 
 
 
+@unittest.skipIf(skipmsg, skipmsg)
 def test_export_root():
     g = airwaterboxes()
     b = convert(g)

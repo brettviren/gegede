@@ -15,6 +15,7 @@ setup(name = 'gegede',
       install_requires=[
           "pint >= 0.5.1",      # for units
           "lxml >= 3.3.5",      # for GDML export
+          "nose",               # for unit tests
       ],
       # implicitly depends on ROOT
       entry_points = {

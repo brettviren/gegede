@@ -58,12 +58,7 @@ T.B.D.
 
 * Installation
 
-GGD can be installed in the usual "Python way":
-
-#+BEGIN_EXAMPLE
-  $ python setup.py install
-#+END_EXAMPLE
-
-More info in the [[./doc/install.org][installation]] document.
+GeGeDe is effectively now Python 3 only and can be installed in any of
+the "usual" ways.  See the [[./doc/install.org][installation]] document for details.
 
 

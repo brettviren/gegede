@@ -53,8 +53,10 @@ This is experimental and left as an exercise for the interested.
 
 * Installation of GeGeDe
 
-GeGeDe is pure Python.  It now only supports Python 3.  GeGeDe may be
-installed in "the usual Python way".
+GeGeDe is pure Python.  It effectively supports only Python 3 due to
+its dependencies dropping support for dead Python 2 (RIP).  GeGeDe may
+be installed in "the usual Python ways" and some examples are given
+below.
 
 ** Python3 venv
 
@@ -86,17 +88,30 @@ Get the GeGeDe source and install like:
 * Development
 
 To set up for building and testing GGD "in source" you may use a
-virtual environment created as above but an even nicer way is to use [[https://direnv.net/][direnv]]:
+virtual environment created as above.  An even more convenient way is
+to use [[https://direnv.net/][direnv]] to bind setting up the venv based on ~cd~'ing to the
+development area.
 
 #+BEGIN_EXAMPLE
-  $ cd gegede
+  $ cd /my/dev/area
   $ echo layout python3 > .envrc
   $ direnv allow
 #+END_EXAMPLE
 
-If ROOT is used then also let direnv know how to include it:
+If you will develop on GeGeDe (or other Python packages), after
+activating the virtual environment, they should be installed in
+"editable" or "develop" mode.  For example:
 
 #+begin_example
+  $ cd /path/to/my/gegede
+  $ pip install -e .
+#+end_example
+
+If ROOT (PyROOT) will be used then you must let ~direnv~ know how to
+include it by appending this to its configuration file:
+
+#+begin_example
+  $ cd /my/dev/area
   $ cat <<EOF >> .envrc
   export PYTHONPATH=$HOME/opt/root/lib
   export LD_LIBRARY_PATH=$HOME/opt/root/lib

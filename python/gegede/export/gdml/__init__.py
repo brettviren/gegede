@@ -200,6 +200,11 @@ def make_shape_node(shape):
         ele.append(etree.Element('positionref', ref = shape.pos or 'center'))
         ele.append(etree.Element('rotationref', ref = shape.rot or 'identity'))
         return ele
+    
+    if typename == 'EllipticalTube':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    dx=dsize(0.5*shape.dx), dy=dsize(0.5*shape.dy), dz=dsize(0.5*shape.dz))
+        return etree.Element('eltube', **dat)    
 
     # etc....  Grow this as gegede.schema.Schema.shapes grows....
 

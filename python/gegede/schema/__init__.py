@@ -49,6 +49,7 @@ Schema = dict(
         Ellipsoid = (("dax","1m"),("dby","2m"),("dcz","2m"),
                      ("dzcut1","2m"),("dzcut2","2m")),
         PolyhedraRegular = (("numsides", "8"), ("sphi", "0deg"), ("dphi", "360deg"), ("rmin", "1m"), ("rmax", "2m"), ("dz", "1m")),
+        EllipticalTube = (("dx","1m"),("dy","2m"),("dz","2m")),
         Boolean = (("type",str), ("first", Named), ("second", Named),
                    ("pos", Named), ("rot", Named))
 

@@ -24,21 +24,6 @@
   </xs:complexType>
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 	
-  <xs:element name="eltube" substitutionGroup="Solid">
-    <xs:annotation>
-      <xs:documentation>Ellispoid tube</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="SolidType">
-          <xs:attribute name="dx" type="ExpressionOrIDREFType" use="required"></xs:attribute>
-          <xs:attribute name="dy" type="ExpressionOrIDREFType" use="required"></xs:attribute>
-          <xs:attribute name="dz" type="ExpressionOrIDREFType" use="required"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->	
   
   <xs:complexType name="BooleanSolidType">
     <xs:annotation>

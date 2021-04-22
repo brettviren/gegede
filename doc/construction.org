@@ -41,7 +41,61 @@ Items to note about this example:
 - Unspecified arguments will take values as are provided by the schema, knowing these defaults lets it be said that the three boxes are equivalently defined.
 - All numerical quantities that have dimension *must* have units, while unitless quantities can be expressed as literal numbers or their string representations.  Either way, these values are parsed by [[https://github.com/hgrecco/pint][pint]] and must match the dimension for the value as given by its prototype in the schema.  Otherwise, one is free to specify values in whatever supported unit happens to be convenient.
 
-** Material
+** Materials
+
+Materials are defined using the geometry =matter= attribute.  There are two main classes of matter that can be defined.  In all cases, elements and materials must have unique names.
+
+The first type of matter describes elements, and compositions of isotopes.  These are described by the atomic number (Z), and the atomic mass.  For an element, the atomic mass is the average atomic mass of the element.  A composition is composed of one or more isotopes.  
+
+#+BEGIN_SRC python
+elem_hydrogen= geom.matter.Element("Elem_Hydrogen",z=1,a="1.008 g/mole")
+elem_helium = geom.matter.Element("Elem_Helium",z=2,a="4.003 g/mole")
+elem_oxygen = geom.matter.Element("Elem_Oxygen",z=8,a="15.999 g/mole")
+
+iso_helium3 = geom.matter.Isotope("Iso_Helium3",z=2,ia=3,a="3.016 g/mole")
+iso_helium4 = geom.matter.Isotope("Iso_Helium4",z=2,ia=4,a="4.003 g/mole")
+comp_helium = geom.matter.Composition("Comp_Helium",
+                                      isotopes=(("Iso_Helium3", 0.000002),
+                                                ("Iso_Helium4", 0.999998)))
+#+END_SRC
+
+The second type of matter describes materials that are used in simulations (e.g. "air", "water", "steel").  These materials are composed of elements, and other materials, and are defined using =Molecule=, =Mixture=, and =Amalgam=.
+
+A =Molecule= defines a specific molecule composed of elements or compositions of isotopes.  It is defined by the number of each element that occur in a single molecule, and comprises one or more elements.  For example, gaseous helium will have a single element while liquid water has two.
+
+#+BEGIN_SRC python
+helium = geom.matter.Molecule("Helium_Gas", density="0.1786 g/cc",
+                              elements = (("Elem_Helium",1)))
+water = geom.matter.Molecule("Water_Liquid", density="1.0 kg/l",
+                             elements = (("Elem_Hydrogen", 2)
+                                         ("Elem_Oxygen", 1)))
+#+END_SRC
+
+A =Mixture= defines a combination of elements and other materials.  Mixtures are defined by the mass fraction of each component.  For example, oxygenated water could be defined as
+
+#+BEGIN_SRC python
+aquarium_water = geom.matter.Mixture("Aquarium_Water", density="1.0 kg/l",
+                                     components = (("Elem_Oxygen", 0.01),
+                                                   ("Water_Liquid", 0.99)))
+#+END_SRC
+
+
+An =Amalgam= defines a material with no specific elemental components.  It is defined by it's effective atomic number, and it's effective atomic mass.  For example, an amalgam for water might be
+
+#+BEGIN_SRC python
+amalgam_water = geom.matter.Amalgam("Amal_Water", density = "1.0 kg/l",
+                                    z="7.42", a="18.02 g/mole")
+#+END_SRC
+
+Specific material properties can be defined for materials defined by =Molecule=, =Mixture=, and =Amalgam=.  These properties are used to fill the material property table for a material in GEANT4.  An example of defining the property for water is
+
+#+BEGIN_SRC python
+water = geom.matter.Molecule("Water_Liquid", density="1.0 kg/l",
+                             elements = (("Elem_Hydrogen", 2)
+                                         ("Elem_Oxygen", 1)),
+                             properties = (("ABSLENGTH", (20.0, 30.0)),
+                                           ("DIFFUSION", (1.0,))))
+#+END_SRC
 
 ** Volumes
 

@@ -64,7 +64,7 @@ Schema = dict(
         Composition = (("symbol",str), ("isotopes", NamedTypedList(float))),
 
         # a material with no specific constituents
-        Amalgam = (("z", int),
+        Amalgam = (("z", float),
                    ("a","0.0g/mole"),
                    ("density", "0.0g/cc"), 
                    ("properties",NamedTypedList(list))),

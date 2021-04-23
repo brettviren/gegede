@@ -85,12 +85,20 @@ def make_material_node(obj):
         # fixme: units???
         node.append(etree.Element('D', value=D(obj)))
         node.append(etree.Element('atom', value=Atom(obj)))
+        for propname, propvect in obj.properties:
+            node.append(etree.Element('property',
+                                      name=propname,
+                                      ref=obj.name+'_'+propname+'_VALUE'))
 
     if typename == 'Molecule':
         node = etree.Element('material', name=obj.name, formula=Symbol(obj))
         node.append(etree.Element('D', value=D(obj)))
         for elename, elenum in obj.elements:
             node.append(etree.Element('composite', ref=elename, n=str(elenum)))
+        for propname, propvect in obj.properties:
+            node.append(etree.Element('property',
+                                      name=propname,
+                                      ref=obj.name+'_'+propname+'_VALUE'))
 
 
     if typename == 'Mixture':
@@ -98,6 +106,10 @@ def make_material_node(obj):
         node.append(etree.Element('D', value=D(obj)))
         for compname, compfrac in obj.components:
             node.append(etree.Element('fraction', ref=compname, n=str(compfrac)))
+        for propname, propvect in obj.properties:
+            node.append(etree.Element('property',
+                                      name=propname,
+                                      ref=obj.name+'_'+propname+'_VALUE'))
 
     return node
 
@@ -271,6 +283,19 @@ def convert(geom):
                 identity = obj
         if node is not None:
             define_node.append(node)
+        continue
+    for name, obj in geom.store.matter.items():
+        typename = type(obj).__name__.lower()
+        if typename=='mixture' or typename=='molecule' or typename=='amalgam':
+            for prop, val in obj.properties:
+                vals = str(val[0])
+                for v in val[1:]: vals += ' ' + str(v)
+                define_node.append(etree.Element('matrix',
+                                                 name=name+'_'+prop+'_VALUE',
+                                                 coldim=str(len(val)),
+                                                 values=vals))
+                continue
+            continue
         continue
     if center is None:
         define_node.append(etree.Element('position', name='center'))

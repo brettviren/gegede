@@ -218,6 +218,12 @@ def make_shape_node(shape):
                     dx=dsize(0.5*shape.dx), dy=dsize(0.5*shape.dy), dz=dsize(0.5*shape.dz))
         return etree.Element('eltube', **dat)    
 
+    if typename == 'Torus':
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                    rmin=rsize(shape.rmin), rmax=rsize(shape.rmax), rtor=rsize(shape.rtor),
+                    startphi=ang(shape.startphi), deltaphi=ang(shape.deltaphi))
+        return etree.Element('torus', **dat)
+
     # etc....  Grow this as gegede.schema.Schema.shapes grows....
 
     return

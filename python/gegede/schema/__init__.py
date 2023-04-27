@@ -51,7 +51,8 @@ Schema = dict(
         PolyhedraRegular = (("numsides", "8"), ("sphi", "0deg"), ("dphi", "360deg"), ("rmin", "1m"), ("rmax", "2m"), ("dz", "1m")),
         EllipticalTube = (("dx","1m"),("dy","2m"),("dz","2m")),
         Boolean = (("type",str), ("first", Named), ("second", Named),
-                   ("pos", Named), ("rot", Named))
+                   ("pos", Named), ("rot", Named)),
+	Torus = (("rmin", "0m"), ("rmax", "0.5m"), ("rtor", "1m"), ("startphi", "0deg"), ("deltaphi", "360deg"))
 
         # fixme: fill in the rest!
         ),

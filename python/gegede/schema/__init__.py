@@ -52,7 +52,17 @@ Schema = dict(
         EllipticalTube = (("dx","1m"),("dy","2m"),("dz","2m")),
         Boolean = (("type",str), ("first", Named), ("second", Named),
                    ("pos", Named), ("rot", Named)),
-	Torus = (("rmin", "0m"), ("rmax", "0.5m"), ("rtor", "1m"), ("startphi", "0deg"), ("deltaphi", "360deg"))
+	    Torus = (("rmin", "0m"), ("rmax", "0.5m"), ("rtor", "1m"), ("startphi", "0deg"), ("deltaphi", "360deg")),
+        Arb8= (
+               ("v1x","0m"),("v1y","0m"),
+               ("v2x","0m"),("v2y","1m"),
+               ("v3x","1m"),("v3y","1m"),
+               ("v4x","1m"),("v4y","0m"),
+               ("v5x","0m"),("v5y","0m"),
+               ("v6x","0m"),("v6y","1m"),
+               ("v7x","1m"),("v7y","1m"),
+               ("v8x","1m"),("v8y","0m"),
+                ("dz", "1m")),
 
         # fixme: fill in the rest!
         ),

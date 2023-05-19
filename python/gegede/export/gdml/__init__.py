@@ -181,6 +181,20 @@ def make_shape_node(shape):
                     y1=dsize(shape.dy1), y2=dsize(shape.dy2), z=dsize(shape.dz),
                     PhiTwist=ang(shape.phitws))
         return etree.Element('twistedtrd', **dat)
+    
+    if typename == 'Arb8':
+        # print("arb8ivert",shape.ivert[0][0])
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                   v1x=dsize(shape.v1x),v1y=dsize(shape.v1y),
+                   v2x=dsize(shape.v2x),v2y=dsize(shape.v2y),
+                   v3x=dsize(shape.v3x),v3y=dsize(shape.v3y),
+                   v4x=dsize(shape.v4x),v4y=dsize(shape.v4y),
+                   v5x=dsize(shape.v5x),v5y=dsize(shape.v5y),
+                   v6x=dsize(shape.v6x),v6y=dsize(shape.v6y),
+                   v7x=dsize(shape.v7x),v7y=dsize(shape.v7y),
+                   v8x=dsize(shape.v8x),v8y=dsize(shape.v8y),
+                    dz=dsize(shape.dz))
+        return etree.Element('arb8', **dat)
 
     if typename == 'Paraboloid':
         dat = dict(name=shape.name, lunit=lunit, aunit=aunit,

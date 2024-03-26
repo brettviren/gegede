@@ -120,32 +120,13 @@ include it by appending this to its configuration file:
 
 * Testing
 
-GeGeDe comes with a set of unit tests which are meant to be run via
-[[https://nose.readthedocs.org][nose]].  If the test as a whole does not pass then there is a bug worth
-[[https://github.com/brettviren/gegede/issues][reporting]].
+GeGeDe comes with a set of unit tests which are meant to be run via [[https://docs.pytest.org/][pytest]].  All
+tests should pass, [[https://github.com/brettviren/gegede/issues][report failures as bugs on github]].  Pytest is not a default
+dependency and must be installed by the user.  To exercise the tests, simply run
+this from the source directory and installation environment:
 
 #+BEGIN_EXAMPLE
-  $ pip install nose
-  $ nosetests
-  ....................
-  ----------------------------------------------------------------------
-  Ran 20 tests in 1.657s
-
-  OK
-#+END_EXAMPLE
-
-Tests should be run from the source directory in a virtual environment
-prepared with "setup.py develop".  All tests should pass if all
-dependencies are installed.  If optional dependencies such as PyROOT
-are not available to a test it should be skipped and an "S" will show
-in the output.
-
-#+BEGIN_EXAMPLE
-$ nosetests
-...................SS............SS...SSSSSS.......
-----------------------------------------------------------------------
-Ran 51 tests in 0.968s
-
-OK (SKIP=10)
+  $ pip install pytest
+  $ pytest
 #+END_EXAMPLE
 

@@ -22,3 +22,5 @@ auto
 *.snm
 *.toc
 *.vrb
+.direnv
+.envrc

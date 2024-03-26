@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name = 'gegede',
-      version = '0.6.1',
+      version = '0.8',
       description = 'General Geometry Description',
       author = 'Brett Viren',
       author_email = 'brett.viren@gmail.com',
@@ -15,7 +15,7 @@ setup(name = 'gegede',
       install_requires=[
           "pint >= 0.5.1",      # for units
           "lxml >= 3.3.5",      # for GDML export
-          "nose",               # for unit tests
+          # "pytest",             # for unit tests
       ],
       # implicitly depends on ROOT
       entry_points = {

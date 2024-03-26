@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pytest
 
 import os
 import gegede.configuration as ggdconf

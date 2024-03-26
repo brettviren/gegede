@@ -11,9 +11,12 @@ def parse(filenames):
 
     Return the parser object.'''
 
-    try:                from ConfigParser import SafeConfigParser
-    except ImportError: from configparser import SafeConfigParser
-    cfg = SafeConfigParser()
+    try:
+        from ConfigParser import SafeConfigParser as ConfParse
+    except ImportError:
+        from configparser import ConfigParser as ConfParse
+
+    cfg = ConfParse()
     cfg.optionxform = str       # want case sensitive
     
     if isinstance(filenames, type("")):

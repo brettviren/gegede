@@ -5,6 +5,7 @@ gegede configuration
 import os
 import re
 from collections import OrderedDict
+from .util import make_class
 
 def parse(filenames):
     '''Parse configuration files.
@@ -40,6 +41,7 @@ def cfg2pod(cfg):
         pod[secname] = secdat
     return pod
 
+
 interp_reobj = re.compile(r'{([\w:]+)}')
 def interpolate_value(value, secname, sections):
     def getter(match):
@@ -52,6 +54,7 @@ def interpolate_value(value, secname, sections):
         return sections[name][key]
     ret = re.subn(interp_reobj, getter, value)
     return ret[0]
+
 
 def interpolate(sections):
     '''Perform string interpolation values <sections>.
@@ -74,15 +77,12 @@ def interpolate(sections):
         if changed:
             continue
         break
-        
 
-
-def make_class(fqclass):
-    mod, cls = fqclass.rsplit('.',1)
-    exec('import %s' % mod) # better way?
-    return eval(fqclass)
 
 def make_value(v, **kwds):
+    '''
+    Return value of string.
+    '''
     from . import Quantity
     return eval(v, globals(), dict(Q=Quantity, **kwds))
 

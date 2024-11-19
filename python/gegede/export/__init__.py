@@ -6,17 +6,18 @@ For guidance on writing GeGeDe exporter modules see:
 
 '''
 
+from gegede.util import make_module
+
 class Exporter(object):
     '''
     Wrapper around an exporter module which helps to enforce the conventions.
     '''
     def __init__(self, mod):
-        if isinstance(mod, type("")):
+        if isinstance(mod, str):
             if not '.' in mod:
                 mod = 'gegede.export.' + mod
             print ('Importing: "%s"' % mod)
-            exec('import %s' % mod)
-            mod = eval(mod)
+            mod = make_module(mod)
         self.mod = mod
 
         self.obj = None

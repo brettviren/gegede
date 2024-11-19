@@ -5,7 +5,7 @@ A GGD builder
 
 from collections import OrderedDict
 
-from .util import list_match
+from .util import list_match, make_class
 
 class Builder(object):
     '''
@@ -88,10 +88,8 @@ class Builder(object):
             print ('Builder already registered: "%s"' % name)
             return
             
-        if (isinstance(klass, type(""))):
-            mod,name = klass.rsplit('.',1) # this seems dirty
-            exec ('import %s' % mod)
-            klass = eval(klass)
+        if isinstance(klass, str):
+            klass = make_class(klass)
         builder = klass(name)
         self.builders[name] = builder
         return

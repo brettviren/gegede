@@ -2,6 +2,7 @@
 '''
 '''
 
+from importlib import import_module
 from gegede import Quantity
 
 def wash_units(obj, lunit='cm', aunit='radian'):
@@ -70,4 +71,20 @@ def list_match(values, entry = None, deref = lambda x: x):
             continue
         ret.append(v)
     return list(ret)
+
+
+def make_module(mod):
+    '''
+    Return a module object given pkg.mod string.
+    '''
+    return import_module(mod)
+
+
+def make_class(fqclass):
+    '''
+    Return a class given pkg.mod.Class string.
+    '''
+    mod, cls = fqclass.rsplit('.',1)
+    mod = import_module(mod)
+    return getattr(mod, cls)
 

@@ -61,4 +61,8 @@ T.B.D.
 GeGeDe is effectively now Python 3 only and can be installed in any of
 the "usual" ways.  See the [[./doc/install.org][installation]] document for details.
 
+* GeGeDe Users
 
+- [[https://github.com/DUNE/duneggd][DUNE GGD]] geometries for DUNE (far) detectors.
+- [[https://github.com/DUNE/dunendggd][DUNE ND GGD]] geometries for (some) DUNE near detectors
+- [[https://github.com/brettviren/gegede-example][GeGeDe Examples]]

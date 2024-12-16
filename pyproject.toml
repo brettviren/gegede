@@ -1,0 +1,30 @@
+[project]
+name = "gegede"
+version = "0.8"
+description = "General Geometry Description"
+authors = [
+  {name = "Brett Viren", email = "brett.viren@gmail.com"},
+]
+maintainers = [
+  {name = "Brett Viren", email = "brett.viren@gmail.com"},
+]
+license = {text = "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)"}
+readme = {file = "README.org", content-type = "text/org"}
+keywords = ["geometry", "schema", "generator", "geant4", "gdml"]
+requires-python = ">=3.11"
+dependencies = [
+    "lxml>=5.3.0",
+    "pint>=0.24.4",
+]
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+]
+
+[project.scripts]
+gegede = "gegede.main:main"

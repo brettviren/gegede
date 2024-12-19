@@ -312,7 +312,6 @@ def make_shape_node(shape):
             sx,sy = rsize(x), rsize(y)
             ele.append(etree.Element("twoDimVertex", x=sx, y=sy))
         for ind, zs in enumerate(shape.zsections):
-            print(f'{zs=}')
             se = etree.Element("section", zOrder=str(ind),
                                zPosition=rsize(zs["z"]),
                                xOffset=rsize(zs["offset"][0]), yOffset=rsize(zs["offset"][1]),

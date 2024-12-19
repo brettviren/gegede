@@ -1,4 +1,4 @@
-GGD builders
+#+title: GGD builders
 
 GGD builders organize geometry object construction code into a hierarchy of reusable chunks.  This layer sits below the [[./configuration.org][configuration]] layer and above the [[./construction.org][construction]] layer.  The first section below goes through some high-level builder concepts and presents some design issues that developers should consider.  It is followed with how to write builders.
 

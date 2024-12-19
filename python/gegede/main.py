@@ -16,6 +16,8 @@ The main runs in these stages:
 
 '''
 import os
+import logging
+log = logging.getLogger('gegede')
 
 
 def parse_config(filenames):
@@ -51,7 +53,7 @@ def generate_geometry(wbuilder):
     gegede.builder.construct(wbuilder, geom)
     assert len(wbuilder.volumes) == 1, 'Top level builder "%s" must only produce one LV, produced %d' % (wbuilder.name, len(wbuilder.volumes))
     geom.set_world(wbuilder.get_volume(0))
-    print ('Generated world "%s"' % geom.world)
+    log.debug('Generated world "%s"' % geom.world)
     # fixme: here would be a good time to do some internal validation
     return geom
 
@@ -77,9 +79,16 @@ def main ():
                         help="Follow the 'volume' or 'builder' hierarchy if making a dot file")
     parser.add_argument("config", nargs='+',
                         help="Configuration file(s)")
+    parser.add_argument("-l", "--log-output", default='/dev/stderr',
+                        help="Log file, default is stderr")
+    parser.add_argument("-L", "--log-level", default="info",
+                        help="Log level, default info (use 'debug' for more verbosity)")
     args = parser.parse_args()
 
-    if not args.format and '.' not in args.output:
+    log.setLevel(args.log_level.upper())
+    log.addHandler(logging.FileHandler(args.log_output))
+
+    if not args.format and '.' not in (args.output or ""):
         raise parser.error("Can not guess format.  Need --format or --output with file extension")
     if not args.format:
         args.format = os.path.splitext(args.output)[1][1:]
@@ -106,7 +115,7 @@ def main ():
         gegede.validation.validate(geom)
     from gegede.export import Exporter
     exporter = Exporter(args.format)
-    print ('Converting with module: %s' % exporter.mod)
+    log.debug('Converting with module: %s' % exporter.mod)
 
     obj = exporter.convert(geom)
     if args.validate_object:

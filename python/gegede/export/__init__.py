@@ -7,6 +7,8 @@ For guidance on writing GeGeDe exporter modules see:
 '''
 
 from gegede.util import make_module
+import logging
+log = logging.getLogger('gegede')
 
 class Exporter(object):
     '''
@@ -16,7 +18,7 @@ class Exporter(object):
         if isinstance(mod, str):
             if not '.' in mod:
                 mod = 'gegede.export.' + mod
-            print ('Importing: "%s"' % mod)
+            log.debug('Importing: "%s"' % mod)
             mod = make_module(mod)
         self.mod = mod
 
@@ -43,7 +45,7 @@ class Exporter(object):
         if self.out:
             return
         if not hasattr(self.mod, 'output'):
-            print ('Warning: Module has no output() method: %s' % self.mod)
+            log.warn('Module has no output() method: %s' % self.mod)
             return
         self.out = filename
         self.mod.output(self.obj, filename)

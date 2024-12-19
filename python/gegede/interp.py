@@ -3,6 +3,11 @@
 configuration data into builder objects.
 '''
 
+import logging
+log = logging.getLogger('gegede')
+warn = log.warn
+
+
 def make_builder(dat, name = None):
     '''Return the a builder object of the given name from the
     configuration data <dat> and recursively call on any subbuilders.
@@ -27,7 +32,7 @@ def walk_builder_config_graph(dat, bname, builder_objects):
     try:
         bdat = dat[bname]
     except KeyError:
-        print ('No such builder configuration section: "bname"' % bname)
+        warn ('No such builder configuration section: "bname"' % bname)
         raise
     klass = bdat.pop('class')   # make exactly one instance
     bobj = klass(bname)

@@ -1,4 +1,4 @@
-Configuration system for GGD
+#+title: Configuration system for GGD
 
 * Overview
 

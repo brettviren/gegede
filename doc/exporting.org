@@ -1,4 +1,4 @@
-Exporting =gegede= objects.
+#+title: Exporting =gegede= objects.
 
 A GeGeDe exporter is a Python module following the interface described here.  The conversion process is broken up into a number of steps, some optional, in order to give the user (or client code) some finer grained control.
 

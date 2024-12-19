@@ -14,8 +14,8 @@ def airwaterboxes():
     enriched_uranium = g.matter.Composition("enriched_U", symbol="U", 
                                             isotopes=(("U235",0.8), ("U238",0.2)))
 
-    box1 = g.shapes.Box("box1",'1cm','2cm','3cm')    
-    box2 = g.shapes.Box("box2",'1m','2m','3m')    
+    box1 = g.shapes.Box("box1",'1cm','2cm','3cm')
+    box2 = g.shapes.Box("box2",'1m','2m','3m')
     pos = g.structure.Position(None, '1cm',z='2cm')
     rot = g.structure.Rotation('', x='90deg')
     lv1 = g.structure.Volume('a_box', material=water, shape=box1)

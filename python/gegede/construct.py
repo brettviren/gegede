@@ -50,3 +50,31 @@ class Geometry(object):
             entry = entry.shape
 
         return list_match(self.store.shapes.values(), entry, deref = lambda x: x.name)[index]
+
+
+    def insert(self, placement, parent=None):
+        '''
+        Insert a child placement into a given parent volume or the world volume.
+        
+        Nominally, this method should be avoided.  Once created, a parent Volume
+        should be considered opaque to future modifications (child placement).
+        However, in rare cases it may be necessary to have an existing parent
+        adopt a new child placement.  This can be accomplished by a clever
+        developer that understands the store data structure but it is somewhat
+        error prone.  This method makes sure this expert operation is done
+        correctly.
+        '''
+        # store the placement
+        try:
+            pname = placement.name
+        except AttributeError:
+            raise ValueError(f'must insert placement as object, got: "{placement}"')
+        self.store.structure[pname] = placement
+
+        # adopt by parent
+        if parent is None:
+            parent = self.world
+        if isinstance(parent, str):
+            parent = self.store.structure[parent]
+        parent.placements.append(placement.name)
+        

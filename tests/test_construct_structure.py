@@ -54,3 +54,5 @@ def test_post_place():
     print (g.store.structure)
     
     
+
+    

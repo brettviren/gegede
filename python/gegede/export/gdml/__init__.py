@@ -14,17 +14,28 @@ http://stackoverflow.com/questions/2850823/multiple-xml-namespaces-in-tag-with-l
 
 import os
 
-schema_dir = os.path.join(os.path.dirname(__file__), 'schema')
-schema_file = os.path.join(schema_dir, 'gdml.xsd')
-
 from lxml import etree
 from gegede import Quantity
 from gegede.iter import ascending
 from gegede.export import pod
 
-def qtus(q,unit):
+import logging
+log = logging.getLogger('gegede')
+debug = log.debug
+warn = log.warn
+
+schema_dir = os.path.join(os.path.dirname(__file__), 'schema')
+schema_file = os.path.join(schema_dir, 'gdml.xsd')
+
+def qtus(q, unit):
     'Quantity to unit string'
     return str(q.to(unit).magnitude)
+
+def qtms(q):
+    'Quantity magnitude to string'
+    if isinstance(q, (int, float)):
+        return str(q)
+    return str(q.magnitude)
 
 def nt_qunit2xmldict(nt, unit):
     ret = dict(unit=unit)
@@ -65,20 +76,22 @@ def make_material_node(obj):
     '''
 
     typename = type(obj).__name__
-    node = None
 
     if typename == 'Element':
         node = etree.Element('element', name=obj.name, Z=str(obj.z), formula=Symbol(obj))
         node.append(etree.Element('atom', value=Atom(obj)))
+        return node
 
     if typename == 'Isotope':
         node = etree.Element('isotope', name=obj.name, Z=str(obj.z), N=str(obj.ia))
         node.append(etree.Element('atom', type="A", value=Atom(obj)))
+        return node
 
     if typename == 'Composition':
         node = etree.Element('element', name=obj.name)
         for isoname, isofrac in obj.isotopes:
             node.append(etree.Element('fraction', ref=isoname, n=str(isofrac)))
+        return node
 
     if typename == 'Amalgam':
         node = etree.Element('material', name=obj.name, Z=str(float(obj.z)))
@@ -89,6 +102,7 @@ def make_material_node(obj):
             node.append(etree.Element('property',
                                       name=propname,
                                       ref=obj.name+'_'+propname+'_VALUE'))
+        return node
 
     if typename == 'Molecule':
         node = etree.Element('material', name=obj.name, formula=Symbol(obj))
@@ -99,6 +113,7 @@ def make_material_node(obj):
             node.append(etree.Element('property',
                                       name=propname,
                                       ref=obj.name+'_'+propname+'_VALUE'))
+        return node            
 
 
     if typename == 'Mixture':
@@ -110,8 +125,9 @@ def make_material_node(obj):
             node.append(etree.Element('property',
                                       name=propname,
                                       ref=obj.name+'_'+propname+'_VALUE'))
+        return node
 
-    return node
+    ValueError(f'unknown material type: "{typename}"')
 
 
 def make_shape_node(shape):
@@ -123,13 +139,31 @@ def make_shape_node(shape):
     typename = type(shape).__name__
 
     def unitify(unit, quant, scale=1.0):
+        '''
+        Convert a GGD quantity into a GDML string  
+        '''
+        debug(f'UNITIFY: {unit=} {quant=} {type(quant)} {scale=}')
         quant = quant * scale
         return str(quant.to(unit).magnitude)
+
     def dsize(quant):
+        '''
+        Convert a GGD distance quantity to GDML distance quantity.  This
+        includes multiplying GGD's "half distance" by two to match GDML's "full
+        distance" convention.
+        '''
         return unitify(lunit, quant, 2.0)
+
     def rsize(quant):
+        '''
+        Convert a GGD radial distance to a GDML radial distance.  
+        '''
         return unitify(lunit, quant, 1.0)
+
     def ang(quant):
+        '''
+        Convert a GGD angle to a GDML angle.
+        '''
         return unitify(aunit, quant, 1.0)
 
     if typename == 'Box':
@@ -148,6 +182,18 @@ def make_shape_node(shape):
                    startphi=ang(shape.sphi), deltaphi=ang(shape.dphi))
         return etree.Element('tube', **dat)
 
+    if typename == 'CutTubs':
+        lo = list(map(qtms, shape.normalm))
+        hi = list(map(qtms, shape.normalp))
+        dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
+                   rmin=rsize(shape.rmin), rmax=rsize(shape.rmax), z=dsize(shape.dz),
+                   startphi=ang(shape.sphi), deltaphi=ang(shape.dphi),
+                   lowX=lo[0], lowY=lo[1], lowZ=lo[2],
+                   highX=hi[0], highY=hi[1], highZ=hi[2],
+                   )
+        return etree.Element('cutTube', **dat)
+
+        
     if typename == 'Sphere':
         dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
                    rmin=rsize(shape.rmin), rmax=rsize(shape.rmax),
@@ -183,7 +229,7 @@ def make_shape_node(shape):
         return etree.Element('twistedtrd', **dat)
     
     if typename == 'Arb8':
-        # print("arb8ivert",shape.ivert[0][0])
+        # debug("arb8ivert",shape.ivert[0][0])
         dat = dict(name=shape.name, lunit=lunit, aunit=aunit,
                    v1x=dsize(shape.v1x),v1y=dsize(shape.v1y),
                    v2x=dsize(shape.v2x),v2y=dsize(shape.v2y),
@@ -218,8 +264,15 @@ def make_shape_node(shape):
         ele.append(etree.Element('zplane', rmin=rsize(shape.rmin), rmax=rsize(shape.rmax), z=dsize(zneg)))
         return ele
 
-    if typename == 'Boolean':
-        ele = etree.Element(shape.type, name=shape.name)
+    if typename in ('Boolean','Union','Subtraction','Intersection'):
+        if typename == 'Boolean':
+            stype = shape.type
+        else:
+            stype = typename.lower()
+        if not stype in ("union", "subtraction", "intersection"):
+            raise ValueError(f'unknown boolean type "{stype}" for shape {shape}')
+
+        ele = etree.Element(stype, name=shape.name)
         # the rest are sub nodes.  why?  because, don't ask questions!
         ele.append(etree.Element('first', ref=shape.first))
         ele.append(etree.Element('second', ref=shape.second))
@@ -238,12 +291,43 @@ def make_shape_node(shape):
                     startphi=ang(shape.startphi), deltaphi=ang(shape.deltaphi))
         return etree.Element('torus', **dat)
 
-    # etc....  Grow this as gegede.schema.Schema.shapes grows....
+    if typename == 'ExtrudedOne':
+        ele = etree.Element("xtru", name=shape.name, lunit=lunit, aunit=aunit)
+        for x,y in shape.polygon:
+            sx,sy = rsize(x), rsize(y)
+            ele.append(etree.Element("twoDimVertex", x=sx, y=sy))
+        for ind, (letter, sign) in enumerate([('m',-1.0), ('p', +1.0)]):
+            x,y = getattr(shape, f'offset{letter}')
+            scale = getattr(shape, f'scale{letter}')
+            se = etree.Element("section", zOrder=str(ind),
+                               zPosition=dsize(sign*shape.dz),
+                               xOffset=rsize(x), yOffset=rsize(y),
+                               scalingFactor=qtms(scale))
+            ele.append(se)
+        return ele
 
-    return
+    if typename == 'ExtrudedMany':
+        ele = etree.Element("xtru", name=shape.name, lunit=lunit, aunit=aunit)
+        for x,y in shape.polygon:
+            sx,sy = rsize(x), rsize(y)
+            ele.append(etree.Element("twoDimVertex", x=sx, y=sy))
+        for ind, zs in enumerate(shape.zsections):
+            print(f'{zs=}')
+            se = etree.Element("section", zOrder=str(ind),
+                               zPosition=rsize(zs["z"]),
+                               xOffset=rsize(zs["offset"][0]), yOffset=rsize(zs["offset"][1]),
+                               scalingFactor=qtms(zs["scale"]))
+            ele.append(se)
+        return ele
+
+
+
+    # etc....  Grow this as gegede.schema.Schema.shapes grows....
+    raise ValueError(f'unknown type for shape: {shape}')
+
 
 def make_volume_node(vol, store):
-    #print ('VOL',vol)
+    #debug ('VOL',vol)
     node_type = 'volume'
     if vol.material is None and vol.shape is None:
         node = etree.Element('assembly', name=vol.name)
@@ -371,7 +455,7 @@ def validate(text):
     xml = etree.parse(sio)
     okay = xsd.validate(xml)
     if not okay:
-        print (xsd.error_log)
+        warn (xsd.error_log)
         raise ValueError('Invalid GDML')
     return True
 

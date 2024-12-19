@@ -3,7 +3,16 @@
 Test the gegede.construct module by making some shapes
 '''
 
-from gegede import construct
+from gegede import construct, schema, Quantity
+
+all_shapes = list(schema.Schema["shapes"].keys())
+
+def test_quantity():
+    g = construct.Geometry()
+    box = g.shapes.Box("units0",'1cm','2cm','3cm')
+    print(type(box), box)
+    assert isinstance(box.dx, Quantity)
+
 
 def test_units():
     g = construct.Geometry()
@@ -62,44 +71,18 @@ def test_make_some_shapes():
 
 def test_all_shapes():
     g = construct.Geometry()
-    #Box
-    s = g.shapes.Box('Box')
-    print ('Box:',s)
-    #TwistedBox
-    s = g.shapes.TwistedBox('TwistedBox')
-    print ('TwistedBox:',s)
-    #Tubs
-    s = g.shapes.Tubs('Tubs')
-    print ('Tubs:',s)
-    #Sphere
-    s = g.shapes.Sphere('Sphere')
-    print ('Sphere:',s)
-    #Cone
-    s = g.shapes.Cone('Cone')
-    print ('Cone:',s)
-    #Trapezoid
-    s = g.shapes.Trapezoid('Trapezoid')
-    print ('Trapezoid:',s)
-    #TwistedTrap
-    s = g.shapes.TwistedTrap('TwistedTrap')
-    print ('TwistedTrap:',s)
-    #TwistedTrd
-    s = g.shapes.TwistedTrd('TwistedTrd')
-    print ('TwistedTrd:',s)
-    #Paraboloid
-    s = g.shapes.Paraboloid('Paraboloid')
-    print ('Paraboloid:',s)
-    #Ellipsoid
-    s = g.shapes.Ellipsoid('Ellipsoid')
-    print ('Ellipsoid:',s)
-    #PolyhedraRegular
-    s = g.shapes.PolyhedraRegular('PolyhedraRegular')
-    print ('PolyhedraRegular:',s)
+
+    for shape in all_shapes:
+        S = getattr(g.shapes, shape)
+        s = S(shape)
+        print(f'{shape}: {s}')
+
 
 def test_default_args():
     g = construct.Geometry()
     b1 = g.shapes.Box('box1')
     print ('Box1:',b1)
+
 
 if '__main__' == __name__:
     test_units()

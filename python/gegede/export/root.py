@@ -6,6 +6,8 @@ Export to ROOT TGeo
 import ROOT
 
 from gegede.util import wash_units
+import logging
+log = logging.getLogger('gegede')
 
 def Amass(obj):
     return obj.a.to('g/mole').magnitude
@@ -24,15 +26,12 @@ def Density(obj):
 
 def get_element(tgeo, name):
     et = tgeo.GetElementTable()
-    print (et)
     ele = et.FindElement(name)
 
     if not ele:
         nele = et.GetNelements()
-        print ('I know about %d elements:' % nele)
         for count in range(nele):
             known = et.GetElement(count)
-            print ('\t%4d: "%s" "%s"' % (count, known.GetName(), known.GetTitle()))
         raise KeyError('No such element: "%s"' % name)
     return ele
     
@@ -164,12 +163,12 @@ class Bucket(object):
     def make(self, TYPE, name, *args):
         obj = self.get(TYPE, name)
         if obj:
-            print ('Object %s %s already made' % (TYPE, name))
+            log.warn('Object %s %s already made' % (TYPE, name))
             return obj
         obj = TYPE(name, *args)
         ROOT.SetOwnership(obj, 0)
         self.add(obj, TYPE.__name__)
-        print ('Made: %s' % obj)
+        log.debug('Made: %s' % obj)
         return obj
 
     pass

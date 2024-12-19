@@ -1,4 +1,4 @@
-Constructing geometry objects with =gegede=.
+#+title: Constructing geometry objects with =gegede=.
 
 * The object schema
 

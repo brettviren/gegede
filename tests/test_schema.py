@@ -18,7 +18,7 @@ def test_shapes():
     # get an idea of what gdml expects
     # grep 'xs:element name=' GDMLSchema/gdml_solids.xsd | sed -e 's/.*name="//' -e 's/".*//'
     # note, actual shape types have capitalized names
-    must = ["Box","TwistedBox","Sphere","Tubs","Trapezoid","PolyhedraRegular"]
+    must = schema.Schema["shapes"].keys()
     want = ["twistedtubs","cutTube","elcone","polycone","genericPolycone","para","trap","torus","orb","polyhedra","genericPolyhedra","xtru","hype","eltube","tet","arb8"]
 
     shapes = schema.Schema['shapes']

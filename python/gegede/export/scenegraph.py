@@ -15,6 +15,9 @@ it is an assembly.  A PV is a SoSeparator with a transform and an LV.
 from collections import defaultdict
 from pivy import coin
 
+import logging
+log = logging.getLogger('gegede')
+
 spatial_units = 'mm'
 
 def pos2trans(obj):
@@ -90,7 +93,7 @@ def shape2shape(name, geom):
         return sph
 
     if type(obj).__name__ == 'Boolean':
-        print ('WARNING: Boolean shapes are not supported, simply using the first shape for %s' % obj.name)
+        log.warn('Boolean shapes are not supported, simply using the first shape for %s' % obj.name)
         return shape2shape(obj.first, geom)
 
     raise ValueError('Unsupported shape for scenegraph: "%s"' % type(obj).__name__)

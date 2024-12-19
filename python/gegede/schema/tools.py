@@ -3,36 +3,81 @@
 Some functions to help process the schema
 '''
 from collections import OrderedDict, namedtuple
-from .types import isquantity, toquantity
+from .. import Quantity, UndefinedUnitError
+
+import logging
+log = logging.getLogger('gegede')
+
+def isquantity(thing):
+    '''
+    Check if "thing" looks like a quantity.  
+    '''
+    # Note, we can not simply test with trying to make Quantity(thing) because
+    # apparently we can successfully construct a Quantity on weird things like
+    # functions which then do not go on to behave in any reasonable way.
+
+    if isinstance(thing, (int, float, Quantity)):
+        return True
+    if isinstance(thing, str):
+        try:
+            q = Quantity(thing)
+        except  UndefinedUnitError:
+            return False
+        return True
+    return False
+
+
+def toquantity(proto):
+    '''
+    Return a converter function that converts a value into a Quantity based on proto.
+
+    proto is a prototypical value of type for which a Quantity can be constructed.
+
+    '''
+    qobj = Quantity(proto)      # wash to assure Quantity object
+    def converter(other):
+        other = Quantity(other)
+        if qobj.dimensionality == other.dimensionality:
+            return other
+        raise ValueError(f'Unit mismatch: {other} incompatible with prototype {qobj}')
+    return converter
+
 
 def make_converter(proto):
-    '''Return a function that will convert its argument using <proto> as a
-    prototype.  The <proto> is either a type or an instance of a Quantity
-    or a string that can be parsed as a Quantity.
     '''
+    Return function to coerce a value to be consistent with proto.
+
+    The coercion depends on `proto`
+
+    The `proto` can be one of:
+    - a Python type (`int`, `float`, `str`) giving the coercion target.
+    - a value which results in coercion to `Quantity` of that type.
+    - a callable that converts a value to a `Quantity` (see `gegede.schema.types`)
+    '''
+    log.debug(f'CONVERTER: {proto}')
+
     if proto in (int, float):   # simple numerical type
         def topod(other):
+            # simply coerce other to be type
             return proto(other)
         return topod
 
     if proto == str:            # treat string special to instrument some error checking
         def tostr(other):
-            other = str(other)
-            if other == "":
-                raise ValueError('Empty string is an illegal value for str')
-            if other is None:
-                raise ValueError('None is an illegal value for str')
+            other = str(other)  # coerce
+            if other in ("", "None"):
+                raise ValueError(f'Illegal str value: "{other}"')
             return other
         return tostr
+
+    if hasattr(proto, "__call__"):
+        return proto
 
     if isquantity(proto):
         return toquantity(proto)
 
-    # it better be of some type of self-converting prototype
-    def toobj(other):
-        ret = proto(other)
-        return ret
-    return toobj
+
+    raise ValueError(f'unsupported converter proto of type: {type(proto)}')
 
 def validate_input(proto, *args, **kwargs):
     '''Validate the input <args> and <kwargs> against the prototypes in <proto>.
@@ -51,21 +96,22 @@ def validate_input(proto, *args, **kwargs):
 
     A an ordered list of values are returned.
     '''
-    #print ('VALIDATE INPUT', str(proto))
+    log.debug(f'VALIDATE INPUT {proto}')
 
     members = OrderedDict()
     converters = dict()
-    for name,pval in proto:
+    for name, pval in proto:
         c = make_converter(pval)
         converters[name] = c
 
-        #print ('CONVERTER:',name,c,pval)
+        log.debug(f'VALIDATOR: {name=} {c=} {pval=}')
 
         # set default
         if isquantity(pval):
             members[name] = c(pval)
+            log.debug(f'SET VALUE {name=} {members[name]}')
         elif hasattr(pval, 'default'):
-            #print ('SET DEFAULT:',name,pval.default)
+            log.debug(f'SET DEFAULT {name=} {pval=} {pval.default}')
             members[name] = pval.default()
         else:
             members[name] = None
@@ -78,7 +124,7 @@ def validate_input(proto, *args, **kwargs):
     already = list()
     for k,v in zip(members.keys(), args):
         members[k] = converters[k](v)
-        #print ('ARGS:',k,v,members[k])
+        log.debug(f'ARGS: {k=} {v=} {members[k]}')
         already.append(k)
 
     for k,v in kwargs.items():
@@ -87,7 +133,7 @@ def validate_input(proto, *args, **kwargs):
         if k in already:
             raise ValueError('Keyword argument already supplied as positional: %s' % k)
         members[k] = converters[k](v)
-        #print ('KWDS:',k,v,members[k])
+        log.debug(f'KWDS: {k=} {v=} {members[k]}')
 
     return members.values()
     
@@ -113,7 +159,7 @@ def make_maker(collector, ntname, *proto):
         NTT = namedtuple(ntname, ['name'] + member_names)
         obj = NTT(objname, *members)
         collector[objname] = obj
-        #print ('INSTANTIATED:', obj)
+        log.debug(f'INSTANTIATED {obj}')
         return obj
     instantiator.__name__ = ntname
     instantiator.__doc__ = "%s: %s" % (ntname, ', '.join(member_names))

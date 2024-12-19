@@ -1,0 +1,39 @@
+#+title: GeGeDe Schema
+
+GeGeDe defines a /schema/ that describes its in-memory data objects.  The schema
+is itself a data object.  The description is intentionally made similar to an
+unwritten schema that is in-effect defined by Geant4.  For example, the GeGeDe
+~Box~ schema object describes the structure of box instance objects and this
+structure closely resembles that of Geant4 box shapes.
+
+Users will use schema objects to define geometry instance objects.  This helps
+to assure the geometry is correct by construction.  The schema objects attempt
+to be and comprehensive while at the same time allows brevity by supplying
+defaults when the user omits explicit values.
+
+* Extending the schema
+
+To date, GeGeDe attempts to mimic only a subset of the implicit Geant4 schema.
+As users wish to utilize novel portions of the Geant4 schema the GeGeDe schema
+requires extension.
+
+GeGeDe explicitly *DOES NOT* mimic GDML's schema.  Do not refer to the GDML manual
+when extending GeGeDe schema.  Of course, you will find that resource helpful
+when providing GDML export support to your GeGeDe schema extension.
+
+** Shapes
+
+In particular, the "shape" sub-schema does not exhaustively cover all possible
+Geant4 shapes.  Contributions for missing shapes according to guidelines given
+here are welcome.
+
+- Read the current source for ~gegede.schema.Schema~.
+- Find your new shape in the list in the Geant4 User Guide for Application Developers, perhaps [[https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Detector/Geometry/geomSolids.html][available here]].
+- Define a GeGeDe name for the shape which must follow CamelCase.  You should consider using the Geant4 class name with the "~G4~" removed.
+- Define its schema to match the arguments to the Geant4 constructor.  If Geant4 offers multiple constructors select the most generic one to mimic.
+- Your schema attributes should match the Geant4 constructor argument names.  Keep in mind that GeGeDe follows Geant4 the convention of specifying distance as "half" lengths.
+- Add the shape to the exporters, at least the one for GDML.
+- Add a ~tests/test_shape_<name>.py~ test that includes [[https://gdml.web.cern.ch/GDML/][GDML]] export and validation.  If you find existing shapes that lack such tests, consider adding those as well.
+  
+
+Contact the main developers if you need new types defined in ~gedede.schema.types~.

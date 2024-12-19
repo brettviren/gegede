@@ -7,6 +7,10 @@ from collections import OrderedDict
 
 from .util import list_match, make_class
 
+import logging
+log = logging.getLogger('gegede')
+warn = log.warn
+
 class Builder(object):
     '''
     A Builder base class
@@ -43,7 +47,6 @@ class Builder(object):
         Return the one builder that matches the entry.
         '''
         b = list_match(self.builders.values(), entry, deref = lambda x: x.name)[index]
-        #print ('get_builder("%s") -> %s:%s' % (entry, b, b.name))
         return b
 
     def get_volumes(self, entry = None):
@@ -70,8 +73,7 @@ class Builder(object):
 
         for v in vols:
             if v.name in self.volumes:
-                print ('Volume already exists: "%s" out of %d volumes' % (v.name, len(self.volumes)))
-                print ('\n'.join(self.volumes))
+                warn('Volume already exists: "%s" out of %d volumes' % (v.name, len(self.volumes)))
                 continue
             self.volumes[v.name] = v
         return
@@ -85,7 +87,7 @@ class Builder(object):
         holding the fully-qualified name of a class.
         '''
         if self.get_builders(name):
-            print ('Builder already registered: "%s"' % name)
+            warn('Builder already registered: "%s"' % name)
             return
             
         if isinstance(klass, str):

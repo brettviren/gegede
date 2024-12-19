@@ -1,8 +1,17 @@
+#!/usr/bin/env python
+'''
+GGD support for GraphViz dot.
+'''
+
+import logging
+log = logging.getLogger('gegede')
+warn = log.warn
 
 from collections import defaultdict
 
 def wash(name):
     return name.replace('-','_')
+
 
 def write_edges(edges,filename):
     with open(filename,"w") as fp:
@@ -11,6 +20,7 @@ def write_edges(edges,filename):
             for head in heads:
                 fp.write('\t%s -> %s\n' % (wash(tail),wash(head)))
         fp.write('}\n')
+
 
 def builder_hierarchy(cfg, start_name, filename):
     '''
@@ -31,7 +41,6 @@ def builder_hierarchy(cfg, start_name, filename):
     make_edges(start_name)
     write_edges(edges, filename)
 
-        
 
 def volume_hierarchy(geom, volume_name, filename):
     '''
@@ -52,10 +61,8 @@ def volume_hierarchy(geom, volume_name, filename):
             place = geom.store.structure[pname]
             daughter = place.volume
             edges[vol.name].add(daughter)
-            #print ('%s --> %s' % (vol.name,daughter))
             if vol.name == daughter:
-                print ('WARNING: mother and daughter volumes share same name: "%s"' % vol.name)
-                #print ('\t%s'%str(vol))
+                warn('mother and daughter volumes share same name: "%s"' % vol.name)
             make_edges(daughter)
 
     make_edges(volume_name)

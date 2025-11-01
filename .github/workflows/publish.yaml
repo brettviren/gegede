@@ -43,7 +43,7 @@ jobs:
 
       - name: Publish package to PyPI (Trusted Publisher)
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
+        # with:
           # The package name and the account
           # are inferred from the Trusted Publisher configuration you set up on PyPI.
           # No token is needed, making this secure!

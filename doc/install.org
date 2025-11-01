@@ -1,5 +1,37 @@
 #+title: Detailed installation guidance for GeGeDe
 
+* Quick start
+
+Any "standard" method to install Python packages should work (let me know if
+otherwise).  Installing with =uv= is recommended and assumed here.
+
+First, need not install GeGeDe to use it:
+
+#+begin_example
+uvx gegede
+#+end_example
+
+To make have it in your =~/.local/bin/=:
+
+#+begin_example
+uv tool install gegede
+gegede
+#+end_example
+
+With optional ROOT dependency.
+
+#+begin_example
+uv tool install gegede[root]
+#+end_example
+
+Installing a pre-releases:
+
+#+begin_example
+uv tool install git+https://github.com/brettviren/gegede
+#+end_example
+
+Additional details follow.
+
 * Dependencies
 
 GeGeDe relies on a set of pure-Python dependencies but for maximal usage some optional dependencies must be provided that require compilation.  
@@ -28,6 +60,7 @@ will be used.  Or, it can be installed via the "ROOT" package on PyPI.  See user
 
 This is experimental and left as an exercise for the interested.
 
+
 * Installation of GeGeDe
 
 GeGeDe is pure Python.  It effectively supports only Python 3 due to
@@ -35,36 +68,24 @@ its dependencies dropping support for dead Python 2 (RIP).  GeGeDe may
 be installed in "the usual Python ways" and some examples are given
 below.
 
-** Using uv
+** User installation
 
-Using =uv= is highly recommended.
+See quick start for basic, initial installation.
 
-*** User installation
-
-#+begin_example
-uv tool install git+https://github.com/brettviren/gegede
-#+end_example
-
-To include ROOT
-
-#+begin_example
-uv tool install --with ROOT git+https://github.com/brettviren/gegede
-#+end_example
-
-Later upgrade:
+To upgrade to a new version:
 
 #+begin_example
 uv tool upgrade gegede
 #+end_example
 
-Or, later uninstall
+Or to uninstall
 #+begin_example
 uv tool uninstall gegede
 #+end_example
 
-*** Developer installation
+** Developer installation
 
-This also uses =uv=.  Other ways are possible for the interested developer.
+This also uses =uv=.  Other methods are possible for the interested developer.
 
 #+begin_example
 git clone git@github.com:brettviren/gegede.git  # or use your fork
@@ -95,3 +116,4 @@ Kitchen sink
 uv sync --all-extras
 #+end_example
 
+See [[file:releases.org]] for how releases are made.

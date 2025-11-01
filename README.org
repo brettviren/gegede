@@ -6,14 +6,22 @@ The General Geometry Description (GGD) is a software system to generate a descri
 
 * Install
 
-GeGeDe is effectively now Python 3 only and can be installed in any of
-the "usual" ways.  In short:
+GeGeDe may be installed in any of the "usual" ways and in particular via [[https://docs.astral.sh/uv/][uv]].
+
+Not installing:
 
 #+begin_example
-uv tool install git+https://github.com/brettviren/gegede
+uvx gegede
 #+end_example
 
-See the [[./doc/install.org][installation]] document for details.
+More persistent
+
+#+begin_example
+uv tool install gegede
+gegede
+#+end_example
+
+See the [[./doc/install.org][installation]] document for details and other ways to install.
 
 * How do I use it?
 

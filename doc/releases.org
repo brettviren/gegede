@@ -1,0 +1,20 @@
+#+title: Making gegede releases
+
+This captures my notes on how to make releases
+
+#+begin_example
+uv version <newversion>
+
+uv run pytest
+# fix broken stuff and git commit
+
+uv build
+uvx dist/gegede-<newversion>-py3-none-any.whl -v
+
+git tag -am "Release <newversion>" <newversion>
+git push
+git push --tags
+
+uv publish --token (pass org/python/pypi/gegede|head -1)
+#+end_example
+

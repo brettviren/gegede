@@ -1,51 +1,28 @@
-* Prerequisites
+#+title: Detailed installation guidance for GeGeDe
 
-** For ROOT export
+* Dependencies
 
-ROOT is not required to use GeGeDe.  It is needed to let GeGeDe
-directly export to ROOT.  Without direct ROOT support one may still
-generate GDML output with GeGeDe and then transport the GDML output to
-a different environment that provides ROOT.
+GeGeDe relies on a set of pure-Python dependencies but for maximal usage some optional dependencies must be provided that require compilation.  
 
-See the ROOT home page for definitive instructions on how to install
-it: https://root.cern.ch/.  Here is one particular example used on
-Ubuntu 18.04:
-
-#+begin_example
-  # (git clone/download source)
-  $ mkdir root/buildit && cd root/buildit
-  $ cmake -G Ninja .. -Dcxx17=ON \
-    -DCMAKE_INSTALL_PREFIX=$HOME/opt/root \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
-    -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so \
-    -DPYTHON_INCLUDE_DIR=/usr/include/python3.6m
-  $ cmake --build . -- -j$(nproc)
-  $ cmake --build . --target install
-#+end_example
-
-Once installed and after entering your Python environment (see below)
-you may quickly test if PyROOT is available:
-
-#+BEGIN_EXAMPLE
-  $ python --version
-  (make sure it is Python 3.x)
-  $ python -c 'import ROOT'
-  (make sure no errors)
-#+END_EXAMPLE
-
-To use ROOT you may need to add/set its library directory to
-~PYTHONPATH~.  Extending the build example above:
-
-#+begin_example
-export PYTHONPATH=$HOME/opt/root/lib
-export LD_LIBRARY_PATH=$HOME/opt/root/lib
-#+end_example
+ - GDML :: requires [[http://lxml.de/][lxml]] for emitting XML for GDML
+ - ROOT :: (optional) for ROOT-based tests and direct ROOT export, PyROOT is needed
+ - pivy :: (optional) for experimental FreeCAD support, pivy/coin3d is needed.
 
 ** For GDML export
 
 #+BEGIN_EXAMPLE
   $ sudo apt-get install libxml2 libxslt1-dev
 #+END_EXAMPLE
+
+** For ROOT export
+
+ROOT is not required to use GeGeDe.  It is only needed to let GeGeDe directly
+export to ROOT formats.  Without direct ROOT support one may still generate GDML
+output with GeGeDe and then transport the GDML output to a different environment
+that provides ROOT.
+
+ROOT can be installed and if its PyROOT is available in the user environment it
+will be used.  Or, it can be installed via the "ROOT" package on PyPI.  See user and developer installation sections below.
 
 ** For Pivy/Coin3D/FreeCAD
 
@@ -58,75 +35,63 @@ its dependencies dropping support for dead Python 2 (RIP).  GeGeDe may
 be installed in "the usual Python ways" and some examples are given
 below.
 
-** Python3 venv
+** Using uv
 
-One of the easiest ways to install GeGeDe (or any Python package) is
-to do so in a virtual environment:
+Using =uv= is highly recommended.
 
-#+BEGIN_EXAMPLE
-  $ python3 -m venv ggdvenv
-  $ source ggdvenv/bin/activate
-#+END_EXAMPLE
-
-At this point, any Python packages you install go into your virtual
-environment directory, called "=ggdvenv/=" here.
-
-If you have ROOT installed, it is likely outside this virtual
-environment and, you may to explicitly tell Python about it.  See
-above.
-
-** Installing GeGeDe
-
-Get the GeGeDe source and install like:
-
-#+BEGIN_EXAMPLE
-  $ git clone https://github.com/brettviren/gegede.git
-  $ cd gegede/
-  $ python setup.py install
-#+END_EXAMPLE
-
-* Development
-
-To set up for building and testing GGD "in source" you may use a
-virtual environment created as above.  An even more convenient way is
-to use [[https://direnv.net/][direnv]] to bind setting up the venv based on ~cd~'ing to the
-development area.
-
-#+BEGIN_EXAMPLE
-  $ cd /my/dev/area
-  $ echo layout python3 > .envrc
-  $ direnv allow
-#+END_EXAMPLE
-
-If you will develop on GeGeDe (or other Python packages), after
-activating the virtual environment, they should be installed in
-"editable" or "develop" mode.  For example:
+*** User installation
 
 #+begin_example
-  $ cd /path/to/my/gegede
-  $ pip install -e .
+uv tool install git+https://github.com/brettviren/gegede
+#+end_example
+
+To include ROOT
+
+#+begin_example
+uv tool install --with ROOT git+https://github.com/brettviren/gegede
+#+end_example
+
+Later upgrade:
+
+#+begin_example
+uv tool upgrade gegede
+#+end_example
+
+Or, later uninstall
+#+begin_example
+uv tool uninstall gegede
+#+end_example
+
+*** Developer installation
+
+This also uses =uv=.  Other ways are possible for the interested developer.
+
+#+begin_example
+git clone git@github.com:brettviren/gegede.git  # or use your fork
+cd gegede
+uv sync
+uv run gegede
+#+end_example
+
+For running tests
+
+#+begin_example
+uv sync --extra test
+uv run pytest
 #+end_example
 
 If ROOT (PyROOT) will be used then you must let ~direnv~ know how to
 include it by appending this to its configuration file:
 
 #+begin_example
-  $ cd /my/dev/area
-  $ cat <<EOF >> .envrc
-  export PYTHONPATH=$HOME/opt/root/lib
-  export LD_LIBRARY_PATH=$HOME/opt/root/lib
-  EOF
+uv sync --extra root
+uv run python -c 'import ROOT; print (ROOT.__version__)'
+6.37.01
 #+end_example
 
-* Testing
+Kitchen sink
 
-GeGeDe comes with a set of unit tests which are meant to be run via [[https://docs.pytest.org/][pytest]].  All
-tests should pass, [[https://github.com/brettviren/gegede/issues][report failures as bugs on github]].  Pytest is not a default
-dependency and must be installed by the user.  To exercise the tests, simply run
-this from the source directory and installation environment:
-
-#+BEGIN_EXAMPLE
-  $ pip install pytest
-  $ pytest
-#+END_EXAMPLE
+#+begin_example
+uv sync --all-extras
+#+end_example
 

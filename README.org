@@ -4,17 +4,16 @@
 
 The General Geometry Description (GGD) is a software system to generate a description of a [[http://en.wikipedia.org/wiki/Constructive_solid_geometry][constructive solid geometry]] specifically as used by [[http://geant4.web.cern.ch/geant4/G4UsersDocuments/UsersGuides/ForApplicationDeveloper/html/Detector/geometry.html][Geant4]] or [[http://root.cern.ch/root/html534/guides/users-guide/Geometry.html][ROOT]] applications are as represented in [[http://cern.ch/gdml][GDML]] files.  It is implemented as a pure Python module =gegede=.  
 
-** Dependencies
+* Install
 
-The core of GeGeDe relies on [[https://github.com/hgrecco/pint][Pint]] to enforce the consistent use of units.  
+GeGeDe is effectively now Python 3 only and can be installed in any of
+the "usual" ways.  In short:
 
-Additional functionality, particularly with regards to export, is provided by other modules:
+#+begin_example
+uv tool install git+https://github.com/brettviren/gegede
+#+end_example
 
- - GDML :: requires [[http://lxml.de/][lxml]] for emitting XML for GDML
- - ROOT :: (optional) for ROOT-based tests and direct ROOT export, PyROOT is needed
- - pivy :: (optional) for experimental FreeCAD support, pivy/coin3d is needed.
-
-For running the tests [[https://nose.readthedocs.org][nose]] is useful.
+See the [[./doc/install.org][installation]] document for details.
 
 * How do I use it?
 
@@ -56,10 +55,6 @@ See also the [[https://github.com/brettviren/gegede-example][GeGeDe Example]] pr
 
 T.B.D.
 
-* Installation
-
-GeGeDe is effectively now Python 3 only and can be installed in any of
-the "usual" ways.  See the [[./doc/install.org][installation]] document for details.
 
 * GeGeDe Users
 

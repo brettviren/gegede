@@ -69,6 +69,8 @@ def main ():
                         help="File to export to")
     parser.add_argument("-V", "--validate", action='store_true',
                         help="Validate geometry using built-in GeGeDe")
+    parser.add_argument("-v", "--version", action='store_true',
+                        help="Show version and exit")
     parser.add_argument("-O", "--validate-object", action='store_true',
                         help="Validate exported, in-memory objects")
     parser.add_argument("-F", "--validate-file", action='store_true',
@@ -77,13 +79,23 @@ def main ():
                         help="Produce a GraphViz dot file")
     parser.add_argument("-D", "--dot-hierarchy", default="volume",
                         help="Follow the 'volume' or 'builder' hierarchy if making a dot file")
-    parser.add_argument("config", nargs='+',
-                        help="Configuration file(s)")
     parser.add_argument("-l", "--log-output", default='/dev/stderr',
                         help="Log file, default is stderr")
     parser.add_argument("-L", "--log-level", default="info",
                         help="Log level, default info (use 'debug' for more verbosity)")
+    parser.add_argument("config", nargs='*',
+                        help="Configuration file(s)")
+
     args = parser.parse_args()
+
+    if args.version:
+        import gegede
+        print(gegede.__version__)
+        return
+
+    if not args.config:
+        parser.print_help()
+        return
 
     log.setLevel(args.log_level.upper())
     log.addHandler(logging.FileHandler(args.log_output))

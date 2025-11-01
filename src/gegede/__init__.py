@@ -4,6 +4,9 @@
 
 This is the main module for gegede defining a few basic types.
 '''
+import importlib.metadata
+
+__version__ = importlib.metadata.version("gegede")
 
 import pint
 UndefinedUnitError = pint.UndefinedUnitError

@@ -1,6 +1,6 @@
 [project]
 name = "gegede"
-version = "0.8"
+version = "0.11"
 description = "General Geometry Description"
 authors = [
   {name = "Brett Viren", email = "brett.viren@gmail.com"},
@@ -18,14 +18,14 @@ dependencies = [
     "pint>=0.24.4",
 ]
 
+[project.optional-dependencies]
+root = ["ROOT"]
+test = ["pytest>=8.3.4"]
+
 [build-system]
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
-[dependency-groups]
-dev = [
-    "pytest>=8.3.4",
-]
 
 [project.scripts]
 gegede = "gegede.main:main"

@@ -3,17 +3,18 @@
 Test the ROOT exporter
 '''
 
-import unittest
+import pytest
 skipmsg=""
+noroot=False
 try:
-    import ROOT
-    from gegede.export.root import Bucket, make_material, convert
+    from ROOT import TGeoManager
 except ImportError:
     skipmsg="PyROOT not available, skipping test"
+    noroot=True
 
 from gegede.examples.simple import airwaterboxes
 
-@unittest.skipIf(skipmsg, skipmsg)
+@pytest.mark.skipif(noroot, reason=skipmsg)
 def test_bucket():
     '''
     Test the gegede.export.root.Bucket class
@@ -25,7 +26,7 @@ def test_bucket():
 
 
 
-@unittest.skipIf(skipmsg, skipmsg)
+@pytest.mark.skipif(noroot, reason=skipmsg)
 def test_export_root():
     g = airwaterboxes()
     b = convert(g)

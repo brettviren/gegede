@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-root = ["ROOT"]
+# root = ["ROOT"]
 test = ["pytest>=8.3.4"]
 
 [build-system]

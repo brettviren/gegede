@@ -17,6 +17,10 @@ jobs:
     # If you didn't set an environment on PyPI, remove this line.
     environment: pypi 
     
+    permissions:
+      id-token: write # MANDATORY for PyPI Trusted Publishers
+      contents: read  # Required to checkout the code
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

@@ -18,12 +18,6 @@ uv tool install gegede
 gegede
 #+end_example
 
-With optional ROOT dependency.
-
-#+begin_example
-uv tool install gegede[root]
-#+end_example
-
 Installing a pre-releases:
 
 #+begin_example
@@ -32,41 +26,13 @@ uv tool install git+https://github.com/brettviren/gegede
 
 Additional details follow.
 
-* Dependencies
-
-GeGeDe relies on a set of pure-Python dependencies but for maximal usage some optional dependencies must be provided that require compilation.  
-
- - GDML :: requires [[http://lxml.de/][lxml]] for emitting XML for GDML
- - ROOT :: (optional) for ROOT-based tests and direct ROOT export, PyROOT is needed
- - pivy :: (optional) for experimental FreeCAD support, pivy/coin3d is needed.
-
-** For GDML export
-
-#+BEGIN_EXAMPLE
-  $ sudo apt-get install libxml2 libxslt1-dev
-#+END_EXAMPLE
-
-** For ROOT export
-
-ROOT is not required to use GeGeDe.  It is only needed to let GeGeDe directly
-export to ROOT formats.  Without direct ROOT support one may still generate GDML
-output with GeGeDe and then transport the GDML output to a different environment
-that provides ROOT.
-
-ROOT can be installed and if its PyROOT is available in the user environment it
-will be used.  Or, it can be installed via the "ROOT" package on PyPI.  See user and developer installation sections below.
-
-** For Pivy/Coin3D/FreeCAD
-
-This is experimental and left as an exercise for the interested.
-
-
 * Installation of GeGeDe
 
-GeGeDe is pure Python.  It effectively supports only Python 3 due to
-its dependencies dropping support for dead Python 2 (RIP).  GeGeDe may
-be installed in "the usual Python ways" and some examples are given
-below.
+The core functionality of GeGeDe is requires pure Python or common binary
+packages.  Additional functionality is available in environments that provide additional binaries.  See below for some guidance on how to install them.
+
+GeGeDe itself may be installed in "the usual Python ways" and some examples are
+given below.
 
 ** User installation
 
@@ -101,19 +67,56 @@ uv sync --extra test
 uv run pytest
 #+end_example
 
-If ROOT (PyROOT) will be used then you must let ~direnv~ know how to
-include it by appending this to its configuration file:
-
-#+begin_example
-uv sync --extra root
-uv run python -c 'import ROOT; print (ROOT.__version__)'
-6.37.01
-#+end_example
-
-Kitchen sink
-
-#+begin_example
-uv sync --all-extras
-#+end_example
-
 See [[file:releases.org]] for how releases are made.
+
+
+* Binary dependencies
+
+By default, GeGeDe relies on a set of pure-Python dependencies and has support for  optional dependencies.
+
+ - GDML :: requires [[http://lxml.de/][lxml]] for emitting XML for GDML
+ - ROOT :: (optional) for ROOT-based tests and direct ROOT export, PyROOT is needed
+ - pivy :: (optional) for experimental FreeCAD support, pivy/coin3d is needed.
+
+** For GDML export
+
+#+BEGIN_EXAMPLE
+  $ sudo apt-get install libxml2 libxslt1-dev
+#+END_EXAMPLE
+
+** For ROOT export
+
+Installing GeGeDe with optional ROOT support will allow export directly to ROOT
+formats.  Note, ROOT is not required to export GDML, which later ROOT may
+ingest.
+
+ROOT provides its own PyROOT interface.  As of end of 2025, there seems to be no
+easy way to install GeGeDe in "usual Python ways" so that it can depend on ROOT.  What I do find:
+
+- PyROOT on PyPI is wholly unrelated to ROOT.  When I say "PyROOT" here, I do
+  not mean this package.
+
+- rootpy has last commit 7 years ago and any case requires PyROOT to already be
+  installed.
+
+- ROOT on PyPI does provide ROOT but does not include TGeoManager.
+
+Building ROOT from source or otherwise relying on being available is then the
+last resort.  The details to that are left to the user but some hints.
+
+#+begin_example
+$ PYTHONPATH=$HOME/opt/root/lib LD_LIBRARY_PATH=$HOME/opt/root/lib python -c 'import ROOT; print(ROOT.TGeoManager)'
+<class cppyy.gbl.TGeoManager at 0x18fd1c90>
+#+end_example
+
+Note, PyROOT is, apparently, sensitive to exact matching of the Python version
+used to build it and to run it.
+
+GeGeDe will fail semi-gracefully if ROOT features are requested in an
+environment that lacks ROOT.
+
+** For Pivy/Coin3D/FreeCAD
+
+This is experimental and left as an exercise for the interested.
+
+

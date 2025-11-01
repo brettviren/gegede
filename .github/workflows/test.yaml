@@ -7,32 +7,37 @@ on:
 
 jobs:
   test:
-    name: Run pytest
+    name: Run pytest on Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     
-    # Define a matrix to test across multiple Python versions
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
-        # You can add more versions or specific OS runners here if needed
 
     steps:
       - name: 🔍 Checkout repository
         uses: actions/checkout@v4
 
       - name: 🐍 Set up Python ${{ matrix.python-version }}
+        # This handles installing Python and adding it to the PATH
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           
-      - name: ⚡ Install uv
-        # Install uv using the recommended installation method
-        run: pip install uv
+      - name: ⚡ Install uv and Enable Caching
+        # This action installs uv, adds it to PATH, and manages the uv cache.
+        uses: astral-sh/setup-uv@v1
+        with:
+          # This input tells the action to save/restore the uv package cache
+          enable-cache: true
+          # Crucial: Use your dependency file (pyproject.toml) to invalidate the cache
+          # This makes the cache key change only when your dependencies are updated.
+          cache-dependency-glob: pyproject.toml
         
       - name: 📦 Install dependencies with uv
-        # Use uv sync with the required test extras
+        # uv sync will restore the virtual environment and install dependencies
+        # very quickly, leveraging the restored uv package cache.
         run: uv sync --extra test
         
       - name: 🧪 Run tests with uv run pytest
-        # Use uv run to execute pytest in the isolated environment
         run: uv run pytest

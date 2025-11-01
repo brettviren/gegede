@@ -49,11 +49,6 @@ Each layer contains a tutorial:
 See also the [GeGeDe Example](https://github.com/brettviren/gegede-example) project.
 
 
-# Reference
-
-T.B.D.
-
-
 # GeGeDe Users
 
 -   [DUNE GGD](https://github.com/DUNE/duneggd) geometries for DUNE (far) detectors.

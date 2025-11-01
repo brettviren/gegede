@@ -8,8 +8,8 @@ authors = [
 maintainers = [
   {name = "Brett Viren", email = "brett.viren@gmail.com"},
 ]
-license = {text = "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)"}
-readme = {file = "README.org", content-type = "text/org"}
+license = "AGPL-3.0-or-later"
+readme = "README.md"
 keywords = ["geometry", "schema", "generator", "geant4", "gdml"]
 requires-python = ">=3.11"
 dependencies = [

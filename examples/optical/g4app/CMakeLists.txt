@@ -10,11 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Requires Geant4 built with GDML support (Xerces-C).  Point CMake at the
 # installation with -DGeant4_DIR or the environment variable Geant4_DIR:
 #
-#   cmake -S . -B build -DGeant4_DIR=/path/to/geant4/lib/Geant4-XX.Y
-#
-# Typical Geant4 install layout:
-#   /opt/geant4/lib/Geant4-11.2.0/Geant4Config.cmake
-#   /opt/geant4/lib/Geant4-11.2.0/Geant4ConfigVersion.cmake
+#   cmake -S g4app -B g4app/build -DGeant4_DIR=/path/to/geant4/lib/cmake/Geant4
 #
 # The "gdml" component ensures the build fails loudly if Xerces-C was not
 # enabled when Geant4 was compiled.
@@ -23,16 +19,28 @@ find_package(Geant4 REQUIRED gdml)
 include(${Geant4_USE_FILE})
 
 # ---------------------------------------------------------------------------
-# Executable
+# Sources
 # ---------------------------------------------------------------------------
-add_executable(optical_g4 main.cc)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+file(GLOB sources CONFIGURE_DEPENDS src/*.cc)
+file(GLOB headers CONFIGURE_DEPENDS include/*.hh)
+
+add_executable(optical_g4 main.cc ${sources} ${headers})
 target_link_libraries(optical_g4 PRIVATE ${Geant4_LIBRARIES})
 
 # ---------------------------------------------------------------------------
-# Helpful reminder
+# Stage macros next to the build directory so the default paths in main.cc
+# resolve correctly when running ./optical_g4 from g4app/build/.
+# ---------------------------------------------------------------------------
+file(COPY macros DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# ---------------------------------------------------------------------------
+# Helpful reminders
 # ---------------------------------------------------------------------------
 message(STATUS "")
-message(STATUS "Build:  cmake --build build")
-message(STATUS "Run:    ./build/optical_g4 ../optical_prism.gdml")
+message(STATUS "Build:  cmake --build ${CMAKE_BINARY_DIR}")
+message(STATUS "Run (default):  ${CMAKE_BINARY_DIR}/optical_g4")
+message(STATUS "Run (custom):   ${CMAKE_BINARY_DIR}/optical_g4 macros/run_traj.mac ../../optical_prism.gdml")
 message(STATUS "  (generate optical_prism.gdml first with ../run.sh)")
 message(STATUS "")

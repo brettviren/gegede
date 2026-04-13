@@ -1,0 +1,34 @@
+# run_traj.mac — small run with trajectory storage on.
+#
+# Trajectory points land in trajectories.csv for the Python plotter.
+# Keep the event count small (50) because storing full trajectories is slow.
+#
+# Usage:
+#   ./optical_g4 macros/run_traj.mac optical_prism.gdml
+
+/run/initialize
+
+/run/verbose      0
+/event/verbose    0
+/tracking/verbose 0
+
+# Enable trajectory storage — every step point is saved.
+/tracking/storeTrajectory 1
+
+# GPS: same point source and spectrum as run.mac
+/gps/particle opticalphoton
+
+/gps/pos/type Point
+/gps/pos/centre 0 0 0 cm
+
+/gps/ang/type iso
+
+/gps/ene/type Lin
+/gps/ene/min  1.77 eV
+/gps/ene/max  4.14 eV
+/gps/ene/gradient  0
+/gps/ene/intercept 1
+
+/gps/polarization 1 0 0
+
+/run/beamOn 50

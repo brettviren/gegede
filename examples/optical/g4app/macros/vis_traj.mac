@@ -1,0 +1,32 @@
+# vis_traj.mac — 100 optical photons with full trajectory recording.
+#
+# All photon trajectories are stored regardless of whether the photon is
+# eventually detected.  The output trajectories.csv is intended for the
+# python/plot_traj.py visualization script which colours each track by
+# its wavelength.
+#
+# Usage:
+#   ./optical_g4 macros/vis_traj.mac optical_prism.gdml
+
+/run/initialize
+
+/run/verbose      0
+/event/verbose    0
+/tracking/verbose 0
+
+# Store full trajectories for every track.
+/tracking/storeTrajectory 1
+
+# GPS: same isotropic point source as run.mac, flat optical spectrum
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre 0 0 0 cm
+/gps/ang/type   iso
+/gps/ene/type   Lin
+/gps/ene/min    1.77 eV
+/gps/ene/max    4.14 eV
+/gps/ene/gradient  0
+/gps/ene/intercept 1
+/gps/polarization  1 0 0
+
+/run/beamOn 100

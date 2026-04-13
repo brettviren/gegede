@@ -1,0 +1,20 @@
+#+title: GeGeDe examples
+
+This area holds some example GeGeDe builders and configuration files and in some
+cases full Geant4 applications to test consuming the exported GDML.
+
+See also https://github.com/brettviren/gegede-example
+
+* optical
+
+#+begin_example
+cd gegede/examples
+cmake -S optical/g4app -B optical/g4app/build \ 
+  -DGeant4_DIR=/path/to/geant4/lib/cmake/Geant4
+
+cmake --build optical/g4app/build
+
+cd optical
+uv run gegede -o optical_prism.gdml optical.cfg
+./g4app/build/optical_g4 optical/optical_prism.gdml
+#+end_example

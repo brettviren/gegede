@@ -1,164 +1,82 @@
-// main.cc — Minimal Geant4 application for the optical_prism GDML example.
+// main.cc — Optical photon simulation for the gegede optical_prism example.
 //
-// Reads the GDML file produced by the gegede optical builder, prints the
-// volume tree, lists materials with their optical property tables, and
-// reports the border/skin surfaces that drive Geant4 optical-photon tracking.
+// Reads the GDML geometry produced by optical.py, runs a Geant4 batch
+// simulation driven by a macro file, and writes PMT hits and (optionally)
+// optical-photon trajectories to CSV files.
 //
 // Usage:
-//   ./optical_g4 [path/to/optical_prism.gdml]
+//   ./optical_g4 [macro.mac] [path/to/optical_prism.gdml]
+//
+// Defaults (when run from g4app/build/):
+//   macro : macros/run.mac          (copied here by CMake)
+//   GDML  : ../../optical_prism.gdml
+//
+// Environment overrides:
+//   OPTICAL_MACRO  — path to macro file
+//   OPTICAL_GDML   — path to GDML file
+//   OPTICAL_OUT_DIR — directory for hits.csv / trajectories.csv (default: cwd)
 //
 // Generate the GDML first:
-//   cd ..
-//   ./run.sh          # or: python optical.py
+//   cd examples/optical && ./run.sh
 //
-// To extend this into a full optical simulation, see the comments marked
-// "TODO(optical-sim)" below.
+// Build:
+//   cmake -S g4app -B g4app/build -DGeant4_DIR=/path/to/Geant4
+//   cmake --build g4app/build
+//
+// Run (no trajectories, 1000 photons):
+//   ./g4app/build/optical_g4
+//
+// Run with trajectories (50 photons):
+//   ./g4app/build/optical_g4 macros/run_traj.mac optical_prism.gdml
+
+#include "OpticalDetectorConstruction.hh"
+#include "OpticalActionInitialization.hh"
+#include "OpticalPhysicsList.hh"
+
+#include "G4RunManager.hh"
+#include "G4UImanager.hh"
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
-#include "G4GDMLParser.hh"
-#include "G4VPhysicalVolume.hh"
-#include "G4LogicalVolume.hh"
-#include "G4Material.hh"
-#include "G4MaterialPropertiesTable.hh"
-#include "G4LogicalBorderSurface.hh"
-#include "G4LogicalSkinSurface.hh"
-#include "G4OpticalSurface.hh"
-#include "G4SystemOfUnits.hh"
-
-// ---------------------------------------------------------------------------
-// Recursively print the physical-volume tree.
-// ---------------------------------------------------------------------------
-static void printTree(const G4VPhysicalVolume* pv, int depth = 0)
-{
-    std::string pad(depth * 2, ' ');
-    const G4LogicalVolume* lv = pv->GetLogicalVolume();
-    std::cout << pad << pv->GetName()
-              << "  [" << lv->GetMaterial()->GetName() << "]\n";
-    for (std::size_t i = 0; i < lv->GetNoDaughters(); ++i)
-        printTree(lv->GetDaughter(static_cast<int>(i)), depth + 1);
-}
-
-// ---------------------------------------------------------------------------
-// main
-// ---------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
-    // Default path assumes the executable was built in g4app/build/ and the
-    // GDML was written to examples/optical/.
-    const std::string gdml_path =
-        (argc > 1) ? argv[1] : "../../optical_prism.gdml";
+    // ------------------------------------------------------------------
+    // Resolve macro and GDML paths.
+    // Priority: command-line argument > environment variable > default.
+    // ------------------------------------------------------------------
+    const char* macro_env = std::getenv("OPTICAL_MACRO");
+    const char* gdml_env  = std::getenv("OPTICAL_GDML");
 
-    std::cout << "Reading GDML: " << gdml_path << "\n";
+    std::string macro_path = (argc > 1) ? argv[1]
+                           : (macro_env ? macro_env : "macros/run.mac");
+    std::string gdml_path  = (argc > 2) ? argv[2]
+                           : (gdml_env  ? gdml_env  : "../../optical_prism.gdml");
 
-    // Parse the GDML file.
-    // Pass validate=false so the parser does not attempt to fetch the
-    // GDML XSD from the network; schema validation was already performed
-    // by gegede during export.
-    G4GDMLParser parser;
-    parser.Read(gdml_path, /*validate=*/false);
-
-    G4VPhysicalVolume* world = parser.GetWorldVolume();
-    if (!world) {
-        std::cerr << "ERROR: no world volume found in " << gdml_path << "\n";
-        return 1;
-    }
+    std::cout << "Macro: " << macro_path << "\n";
+    std::cout << "GDML : " << gdml_path  << "\n";
 
     // ------------------------------------------------------------------
-    // Volume tree
+    // Run manager + detector construction
     // ------------------------------------------------------------------
-    std::cout << "\n=== Volume tree ===\n";
-    printTree(world);
+    auto* rm = new G4RunManager;
+    rm->SetUserInitialization(new OpticalDetectorConstruction(gdml_path));
+
+    // Minimal physics list: EM + optical only (avoids slow hadronic init).
+    rm->SetUserInitialization(new OpticalPhysicsList);
+
+    // User actions: generator, run action, event action.
+    rm->SetUserInitialization(new OpticalActionInitialization);
+
+    rm->Initialize();
 
     // ------------------------------------------------------------------
-    // Materials
+    // Execute the macro
     // ------------------------------------------------------------------
-    std::cout << "\n=== Materials ===\n";
-    for (const G4Material* mat : *G4Material::GetMaterialTable()) {
-        std::cout << "  " << mat->GetName()
-                  << "  density=" << mat->GetDensity() / (g / cm3)
-                  << " g/cm3";
-        const G4MaterialPropertiesTable* mpt =
-            mat->GetMaterialPropertiesTable();
-        if (mpt) {
-            // Check for the properties that were set in optical.py.
-            std::cout << "  optical-props:";
-            for (const char* key : {"RINDEX", "ABSLENGTH", "SCINTILLATIONYIELD"})
-                if (mpt->GetProperty(key))
-                    std::cout << " " << key;
-        }
-        std::cout << "\n";
-    }
+    G4UImanager::GetUIpointer()
+        ->ApplyCommand("/control/execute " + macro_path);
 
-    // ------------------------------------------------------------------
-    // Border surfaces (air↔steel boundary)
-    // ------------------------------------------------------------------
-    std::cout << "\n=== Border surfaces ===\n";
-    const auto* borders = G4LogicalBorderSurface::GetSurfaceTable();
-    if (borders && !borders->empty()) {
-        for (const G4LogicalBorderSurface* bs : *borders) {
-            std::cout << "  " << bs->GetName() << "\n";
-            std::cout << "    pv1: " << bs->GetVolume1()->GetName() << "\n";
-            std::cout << "    pv2: " << bs->GetVolume2()->GetName() << "\n";
-            const G4OpticalSurface* os =
-                dynamic_cast<const G4OpticalSurface*>(
-                    bs->GetSurfaceProperty());
-            if (os) {
-                const G4MaterialPropertiesTable* smpt =
-                    os->GetMaterialPropertiesTable();
-                if (smpt) {
-                    std::cout << "    surface-props:";
-                    for (const char* key : {"REFLECTIVITY", "EFFICIENCY",
-                                            "SPECULARLOBECONSTANT"})
-                        if (smpt->GetProperty(key))
-                            std::cout << " " << key;
-                    std::cout << "\n";
-                }
-            }
-        }
-    } else {
-        std::cout << "  (none)\n";
-    }
-
-    // ------------------------------------------------------------------
-    // Skin surfaces (volume-wide coating)
-    // ------------------------------------------------------------------
-    std::cout << "\n=== Skin surfaces ===\n";
-    const auto* skins = G4LogicalSkinSurface::GetSurfaceTable();
-    if (skins && !skins->empty()) {
-        for (const G4LogicalSkinSurface* ss : *skins)
-            std::cout << "  " << ss->GetName()
-                      << "  lv: " << ss->GetLogicalVolume()->GetName()
-                      << "\n";
-    } else {
-        std::cout << "  (none)\n";
-    }
-
-    // ------------------------------------------------------------------
-    // TODO(optical-sim): To run an optical photon simulation, add:
-    //
-    //   1. A G4RunManager (or G4MTRunManager for multi-threading):
-    //        auto* rm = new G4RunManager;
-    //
-    //   2. A detector construction that wraps the GDML world:
-    //        rm->SetUserInitialization(new GDMLDetectorConstruction(world));
-    //
-    //   3. A physics list that includes optical processes, e.g.:
-    //        #include "FTFP_BERT.hh"
-    //        #include "G4OpticalPhysics.hh"
-    //        auto* pl = new FTFP_BERT;
-    //        pl->RegisterPhysics(new G4OpticalPhysics);
-    //        rm->SetUserInitialization(pl);
-    //
-    //   4. An action initialisation providing a primary generator that
-    //      shoots G4OpticalPhoton particles into the prism.
-    //
-    //   5. rm->Initialize();
-    //      rm->BeamOn(N);
-    //
-    // ------------------------------------------------------------------
-
-    std::cout << "\nDone.\n";
+    delete rm;
     return 0;
 }

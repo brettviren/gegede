@@ -1,0 +1,123 @@
+# dsotm.mac — "Dark Side Of The Moon" optical-dispersion demonstration.
+#
+# A narrow parallel beam of seven monochromatic wavelengths (representing
+# white light split into a rainbow) enters the left face of the triangular
+# glass prism.  Wavelength-dependent refraction (dispersion) in the dense
+# flint glass separates the colours, producing a rainbow fan on exit —
+# recreating the classic Pink Floyd album-cover image.
+#
+# Geometry (optical.py, all in cm):
+#   Prism vertices in XY: (-15,0), (15,0), (0,20)   apex at top
+#   Left face: (-15,0)→(0,20)  outward normal ≈ (−0.8, 0.6)
+#   Beam entry point: (−35, 8, 0) — horizontal (+x), hits left face at ≈37°
+#
+# GPS multi-source: 7 equal-intensity point sources, each monochromatic.
+# All photons travel in the +x direction (beam1d, sigma_r=0).
+# /run/beamOn 700 → ~100 photons per wavelength on average.
+#
+# View with:  python plot_traj.py --view dsotm --traj trajectories.csv
+#                                 --gdml optical_prism.gdml --out dsotm.png
+#
+# Usage:
+#   ./optical_g4 macros/dsotm.mac optical_prism.gdml
+
+/run/initialize
+
+/run/verbose      0
+/event/verbose    0
+/tracking/verbose 0
+
+# Store all photon trajectories.
+/tracking/storeTrajectory 1
+
+# ------------------------------------------------------------------
+# GPS multi-source — one per rainbow colour.
+# All sources: point at (−35, 8, 0) cm, direction +x, beam1d (parallel).
+# ------------------------------------------------------------------
+
+# --- RED  (~700 nm, 1.771 eV) ---
+/gps/source/add 1
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre -35 8 0 cm
+/gps/ang/type   beam1d
+/gps/ang/sigma_r 0 deg
+/gps/direction  1 0 0
+/gps/ene/type   Mono
+/gps/ene/mono   1.771 eV
+/gps/polarization 0 1 0
+
+# --- ORANGE  (~620 nm, 2.000 eV) ---
+/gps/source/add 1
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre -35 8 0 cm
+/gps/ang/type   beam1d
+/gps/ang/sigma_r 0 deg
+/gps/direction  1 0 0
+/gps/ene/type   Mono
+/gps/ene/mono   2.000 eV
+/gps/polarization 0 1 0
+
+# --- YELLOW  (~580 nm, 2.138 eV) ---
+/gps/source/add 1
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre -35 8 0 cm
+/gps/ang/type   beam1d
+/gps/ang/sigma_r 0 deg
+/gps/direction  1 0 0
+/gps/ene/type   Mono
+/gps/ene/mono   2.138 eV
+/gps/polarization 0 1 0
+
+# --- GREEN  (~530 nm, 2.340 eV) ---
+/gps/source/add 1
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre -35 8 0 cm
+/gps/ang/type   beam1d
+/gps/ang/sigma_r 0 deg
+/gps/direction  1 0 0
+/gps/ene/type   Mono
+/gps/ene/mono   2.340 eV
+/gps/polarization 0 1 0
+
+# --- CYAN  (~490 nm, 2.530 eV) ---
+/gps/source/add 1
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre -35 8 0 cm
+/gps/ang/type   beam1d
+/gps/ang/sigma_r 0 deg
+/gps/direction  1 0 0
+/gps/ene/type   Mono
+/gps/ene/mono   2.530 eV
+/gps/polarization 0 1 0
+
+# --- BLUE  (~450 nm, 2.755 eV) ---
+/gps/source/add 1
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre -35 8 0 cm
+/gps/ang/type   beam1d
+/gps/ang/sigma_r 0 deg
+/gps/direction  1 0 0
+/gps/ene/type   Mono
+/gps/ene/mono   2.755 eV
+/gps/polarization 0 1 0
+
+# --- VIOLET  (~400 nm, 3.100 eV) ---
+/gps/source/add 1
+/gps/particle opticalphoton
+/gps/pos/type   Point
+/gps/pos/centre -35 8 0 cm
+/gps/ang/type   beam1d
+/gps/ang/sigma_r 0 deg
+/gps/direction  1 0 0
+/gps/ene/type   Mono
+/gps/ene/mono   3.100 eV
+/gps/polarization 0 1 0
+
+# 700 events: ~100 per wavelength
+/run/beamOn 700

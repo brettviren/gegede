@@ -1,0 +1,36 @@
+# run.mac — default optical photon beam: 1000 events, flat spectrum, no traj.
+#
+# Source: isotropic point source at the centre of the air volume.
+# Energy: flat distribution from 1.77 eV (700 nm) to 4.14 eV (300 nm).
+# Trajectories: off (fast mode).
+#
+# Override by passing a different macro as the first argument to optical_g4:
+#   ./optical_g4 my_beam.mac optical_prism.gdml
+
+/run/initialize
+
+# Verbosity (set after initialize so physics list messages are not suppressed)
+/run/verbose      0
+/event/verbose    0
+/tracking/verbose 0
+
+# GPS: optical photon point source at the centre of the air volume
+/gps/particle opticalphoton
+
+/gps/pos/type Point
+/gps/pos/centre 0 0 0 cm
+
+# Isotropic emission direction
+/gps/ang/type iso
+
+# Flat spectrum across the visible / near-UV range
+/gps/ene/type Lin
+/gps/ene/min  1.77 eV
+/gps/ene/max  4.14 eV
+/gps/ene/gradient  0
+/gps/ene/intercept 1
+
+# Polarization: random linear (required for optical photon tracking)
+/gps/polarization 1 0 0
+
+/run/beamOn 1000

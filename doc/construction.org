@@ -87,15 +87,39 @@ amalgam_water = geom.matter.Amalgam("Amal_Water", density = "1.0 kg/l",
                                     z="7.42", a="18.02 g/mole")
 #+END_SRC
 
-Specific material properties can be defined for materials defined by =Molecule=, =Mixture=, and =Amalgam=.  These properties are used to fill the material property table for a material in GEANT4.  An example of defining the property for water is
+Specific material properties can be defined for materials defined by =Molecule=, =Mixture=, and =Amalgam=.  These properties are used to fill the material property table for a material in GEANT4.
+
+Properties are supplied as a list of =(name, rows)= pairs.  The shape of
+=rows= controls the GDML =coldim= attribute of the emitted =<matrix>=
+element:
+
+- A *flat list of scalars* — use for scalar constants (=coldim=1=):
+  #+BEGIN_SRC python
+  properties = [("SCINTILLATIONYIELD", [12000.0])]
+  #+END_SRC
+
+- A *list of equal-length tuples* — use for energy/value pairs and similar
+  tabulated quantities (=coldim= equals the tuple length, typically =2=):
+  #+BEGIN_SRC python
+  properties = [("RINDEX", [(2.034, 1.33), (4.136, 1.34)]),
+                ("ABSLENGTH", [(2.034, 20.0), (4.136, 18.0)])]
+  #+END_SRC
+
+A complete example defining water with an optical absorption length:
 
 #+BEGIN_SRC python
 water = geom.matter.Molecule("Water_Liquid", density="1.0 kg/l",
-                             elements = (("Elem_Hydrogen", 2)
+                             elements = (("Elem_Hydrogen", 2),
                                          ("Elem_Oxygen", 1)),
-                             properties = (("ABSLENGTH", (20.0, 30.0)),
-                                           ("DIFFUSION", (1.0,))))
+                             properties = [
+                                 ("RINDEX",    [(2.034, 1.33), (4.136, 1.34)]),
+                                 ("ABSLENGTH", [(2.034, 20.0), (4.136, 18.0)]),
+                             ])
 #+END_SRC
+
+Note: energy values are dimensionless floats.  The caller is responsible
+for supplying values in the units expected by Geant4 (typically eV for
+photon energies and cm for lengths).
 
 ** Volumes
 
@@ -148,3 +172,81 @@ To create a placement itself one needs a (daughter) volume and to specify a posi
 #+END_SRC
 
 If a position is not specified the default of a null-displacement will be used.  Likewise, no rotation given implies a null rotation.
+
+** Optical Surfaces
+
+Optical surface properties are used by Geant4's optical-photon tracking
+processes.  GeGeDe supports three surface types that live in the =surfaces=
+schema category, accessed via =geom.surfaces=.
+
+*** OpticalSurface
+
+An =OpticalSurface= holds the model parameters and optional spectral
+property tables for a surface.  It maps to Geant4's =G4OpticalSurface=
+and to =<opticalsurface>= in GDML (which appears inside the =<solids>=
+block).
+
+#+BEGIN_SRC python
+  surf = geom.surfaces.OpticalSurface(
+      'air_water_surface',
+      model='unified', finish='polished',
+      type='dielectric_dielectric', value=1.0,
+      properties=[
+          ('RINDEX',       [(2.034, 1.33), (4.136, 1.34)]),
+          ('REFLECTIVITY', [(2.034, 0.98), (4.136, 0.97)]),
+      ])
+#+END_SRC
+
+The =properties= list follows the same =(name, rows)= convention as
+material properties described above: a flat list of scalars gives
+=coldim=1=, and a list of equal-length tuples gives =coldim=len(tuple)=.
+An =OpticalSurface= with no =properties= is valid; GDML defaults for
+=model=, =finish=, =type=, and =value= will be used by Geant4.
+
+*** BorderSurface
+
+A =BorderSurface= applies an =OpticalSurface= to the boundary between two
+specific physical-volume placements.  It maps to Geant4's
+=G4LogicalBorderSurface= and to =<bordersurface>= in GDML (which appears
+inside the =<structure>= block after all volumes).
+
+#+BEGIN_SRC python
+  # 'lv1_in_lv2' is the name of a Placement
+  geom.surfaces.BorderSurface(
+      'air_water_border',
+      surface='air_water_surface',
+      physvol1='lv1_in_lv2',
+      physvol2='lv1_in_lv2')
+#+END_SRC
+
+GDML requires exactly two =<physvolref>= children.  For a single
+placed-volume boundary the same placement name may be supplied for both
+=physvol1= and =physvol2=; for a real two-volume boundary supply both
+placement names.
+
+*** SkinSurface
+
+A =SkinSurface= applies an =OpticalSurface= to the entire outer surface of
+a logical volume.  It maps to Geant4's =G4LogicalSkinSurface= and to
+=<skinsurface>= in GDML.
+
+#+BEGIN_SRC python
+  geom.surfaces.SkinSurface(
+      'scint_skin',
+      surface='air_water_surface',
+      volume='scint_volume')
+#+END_SRC
+
+*** GDML placement of surface elements
+
+For reference, GeGeDe emits the surface elements into the following GDML
+sections:
+
+| GeGeDe type      | GDML element        | GDML section  |
+|------------------+---------------------+---------------|
+| =OpticalSurface= | =<opticalsurface>=  | =<solids>=    |
+| =BorderSurface=  | =<bordersurface>=   | =<structure>= |
+| =SkinSurface=    | =<skinsurface>=     | =<structure>= |
+
+Spectral property =<matrix>= elements for both materials and optical
+surfaces are emitted into =<define>=.

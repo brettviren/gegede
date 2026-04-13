@@ -37,3 +37,79 @@ here are welcome.
   
 
 Contact the main developers if you need new types defined in ~gedede.schema.types~.
+
+** Surfaces
+
+The ~surfaces~ schema category holds optical surface property definitions.
+These correspond to the Geant4 ~G4OpticalSurface~, ~G4LogicalBorderSurface~,
+and ~G4LogicalSkinSurface~ classes.  On the GDML side they map to
+~<opticalsurface>~, ~<bordersurface>~, and ~<skinsurface>~ elements.
+
+*** OpticalSurface
+
+An ~OpticalSurface~ describes the optical model parameters for a surface.
+Its schema attributes mirror the Geant4 constructor arguments:
+
+| Attribute    | Type    | GDML default            | Notes                                  |
+|--------------+---------+-------------------------+----------------------------------------|
+| ~model~      | ~str~   | ~glisur~                | Surface model (glisur, unified, LUT, dichroic) |
+| ~finish~     | ~str~   | ~polished~              | Surface finish (polished, ground, …)   |
+| ~type~       | ~str~   | ~dielectric_dielectric~ | Boundary type (dielectric_dielectric, dielectric_metal, …) |
+| ~value~      | ~float~ | ~1.0~                   | Model-dependent scalar parameter       |
+| ~properties~ | list    | ~[]~                    | Spectral property table (see below)    |
+
+The ~properties~ attribute is a list of ~(name, rows)~ pairs where ~rows~
+determines the matrix ~coldim~ emitted in GDML:
+
+- A *flat list of scalars* produces ~coldim=1~.  Use this for scalar
+  constants such as ~SCINTILLATIONYIELD~.
+- A *list of equal-length tuples* produces ~coldim=len(tuple)~.  The
+  standard case is a list of ~(energy, value)~ 2-tuples (~coldim=2~) used
+  for wavelength-dependent quantities such as ~RINDEX~ or ~REFLECTIVITY~.
+
+#+BEGIN_SRC python
+  geom.surfaces.OpticalSurface(
+      'mysurf',
+      model='unified', finish='polished',
+      type='dielectric_dielectric', value=1.0,
+      properties=[
+          ('SCINTILLATIONYIELD', [12000.0]),           # coldim=1
+          ('RINDEX', [(2.034, 1.33), (4.136, 1.34)]),  # coldim=2
+      ])
+#+END_SRC
+
+Note: attribute values for ~model~, ~finish~, and ~type~ are passed through as
+strings.  GeGeDe does not validate them against the Geant4 enum list.
+
+*** BorderSurface
+
+A ~BorderSurface~ associates an ~OpticalSurface~ with an ordered pair of
+physical-volume placements (Geant4's ~G4LogicalBorderSurface~).
+
+| Attribute   | Type    | Notes                                  |
+|-------------+---------+----------------------------------------|
+| ~surface~   | ~Named~ | Name of an ~OpticalSurface~            |
+| ~physvol1~  | ~Named~ | Name of a ~Placement~ (first physvol)  |
+| ~physvol2~  | ~Named~ | Name of a ~Placement~ (second physvol) |
+
+The GDML ~<bordersurface>~ element requires exactly two ~<physvolref>~
+children.  When describing the surface between a single placement and its
+mother the same placement name may be given for both ~physvol1~ and
+~physvol2~.
+
+*** SkinSurface
+
+A ~SkinSurface~ associates an ~OpticalSurface~ with an entire logical volume
+(Geant4's ~G4LogicalSkinSurface~).
+
+| Attribute | Type    | Notes                       |
+|-----------+---------+-----------------------------|
+| ~surface~ | ~Named~ | Name of an ~OpticalSurface~ |
+| ~volume~  | ~Named~ | Name of a ~Volume~          |
+
+*** Adding new surface types
+
+Follow the same pattern as for shapes.  Add the type to
+~gegede.schema.Schema['surfaces']~, add a node-maker function and an
+insertion point in ~gegede.export.gdml.convert()~, then add a test in
+~tests/test_gdml_optical.py~.

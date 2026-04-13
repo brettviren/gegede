@@ -5,6 +5,15 @@
 from importlib import import_module
 from gegede import Quantity
 
+# Photon energy from wavelength: E = hc/λ
+# hc = 1239.84193 eV·nm; result in MeV (Geant4 GDML internal units)
+_hc = Quantity(1239.84193, "eV * nm")
+                                          
+def wl(nm):
+      """Return photon energy in MeV for a vacuum wavelength in nm."""
+      return (_hc / Quantity(nm, "nm")).to("MeV").magnitude
+                       
+
 def wash_units(obj, lunit='cm', aunit='radian'):
     '''Return a tuple (newobj,used) where <newobj> is <obj> with any
     Quantities placed into explicit units given by lunit for length

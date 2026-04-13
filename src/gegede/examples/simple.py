@@ -23,5 +23,29 @@ def airwaterboxes():
     lv2 = g.structure.Volume('the_world', material = air, shape=box2,
                              placements = [lv1inlv2], params= (("foo",42), ("bar","baz")))
     g.set_world(lv2)
+
+    # Optical surface at the water-box boundary.
+    # properties is a list of (name, rows) where rows is either a flat list
+    # (coldim=1 scalar constant) or a list of equal-length tuples (coldim=2
+    # for energy/value pairs, etc.).  Energy values here are in eV expressed
+    # as plain floats; callers must supply values in the unit Geant4 expects.
+    g.surfaces.OpticalSurface(
+        'air_water_surface',
+        model='unified', finish='polished',
+        type='dielectric_dielectric', value=1.0,
+        properties=[
+            ('RINDEX',       [(2.034, 1.33), (4.136, 1.34)]),
+            ('REFLECTIVITY', [(2.034, 0.98), (4.136, 0.97)]),
+        ])
+
+    # Border surface between the water placement and its mother air volume.
+    # The XSD requires exactly two physvolref children.  For a single placed
+    # volume the same placement name is given twice (directional: lv1 -> lv2).
+    g.surfaces.BorderSurface(
+        'air_water_border',
+        surface='air_water_surface',
+        physvol1='lv1_in_lv2',
+        physvol2='lv1_in_lv2')
+
     return g
 

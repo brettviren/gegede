@@ -132,4 +132,43 @@ Schema = dict(
                   ("params", NamedTypedList(str, 0))),
         Placement = (("volume", Named), ("pos", Named), ("rot", Named),("copynumber",int)),
     ),
+
+    surfaces = dict(
+        # An optical surface property set (Geant4 G4OpticalSurface).
+        # model: glisur | unified | LUT | dichroic
+        # finish: polished | ground | polishedfrontpainted | ...
+        # type: dielectric_dielectric | dielectric_metal | ...
+        # value: model-dependent scalar (default 1.0 in GDML)
+        # properties: list of (name, rows) where rows is a flat list (coldim=1)
+        #   or a list of equal-length tuples (coldim=len(tuple)).
+        #   Examples:
+        #     ('SCINTILLATIONYIELD', [12000])          -> coldim=1
+        #     ('RINDEX', [(2.0*eV, 1.5), (3.5*eV, 1.55)]) -> coldim=2
+        OpticalSurface = (
+            ("model",  str),
+            ("finish", str),
+            ("type",   str),
+            ("value",  float),
+            ("properties", NamedTypedList(list, 0)),
+        ),
+
+        # A border surface between two physical-volume placements.
+        # surfaceproperty: name of an OpticalSurface
+        # physvol1, physvol2: names of Placement objects (physvolref)
+        # The XSD requires exactly two physvolref children; for a single
+        # placement-in-mother the same placement name may be used twice.
+        BorderSurface = (
+            ("surface",  Named),
+            ("physvol1", Named),
+            ("physvol2", Named),
+        ),
+
+        # A skin surface applied to an entire logical volume.
+        # surfaceproperty: name of an OpticalSurface
+        # volume: name of a Volume (volumeref)
+        SkinSurface = (
+            ("surface", Named),
+            ("volume",  Named),
+        ),
+    ),
 )

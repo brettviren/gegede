@@ -70,6 +70,33 @@ def Symbol(obj):
 
 
 
+def _matrix_from_property(val):
+    '''
+    Convert a property value to (coldim, values_string) for a GDML <matrix>.
+
+    Accepts:
+    - a scalar (int/float/Quantity)               -> coldim=1
+    - a flat list/tuple of scalars                -> coldim=1
+    - a list/tuple of equal-length sequences      -> coldim=len(row)
+
+    The values string is space-separated magnitudes (units stripped).
+    Callers are responsible for supplying values in the units expected by
+    Geant4 / GDML (same pre-existing convention as material properties).
+    '''
+    if isinstance(val, (int, float)) or isinstance(val, Quantity):
+        return 1, qtms(val)
+    if len(val) == 0:
+        return 1, ''
+    first = val[0]
+    if isinstance(first, (list, tuple)):
+        coldim = len(first)
+        flat = [qtms(x) for row in val for x in row]
+    else:
+        coldim = 1
+        flat = [qtms(x) for x in val]
+    return coldim, ' '.join(flat)
+
+
 def make_material_node(obj):
     '''
     Return an lxml.etree.Element made from the matter object.
@@ -357,6 +384,48 @@ def make_volume_node(vol, store):
     return node
 
 
+def make_opticalsurface_node(obj):
+    '''
+    Return an lxml.etree.Element for an OpticalSurface object.
+    The element goes inside <solids> (SurfaceProperty substitution group).
+    '''
+    attrs = dict(name=obj.name)
+    if obj.model:  attrs['model']  = obj.model
+    if obj.finish: attrs['finish'] = obj.finish
+    if obj.type:   attrs['type']   = obj.type
+    if obj.value is not None:
+        attrs['value'] = qtms(obj.value)
+    node = etree.Element('opticalsurface', **attrs)
+    for propname, _ in obj.properties:
+        node.append(etree.Element('property',
+                                  name=propname,
+                                  ref=f'{obj.name}_{propname}_VALUE'))
+    return node
+
+
+def make_bordersurface_node(obj):
+    '''
+    Return an lxml.etree.Element for a BorderSurface object.
+    The element goes inside <structure> after all volumes.
+    '''
+    node = etree.Element('bordersurface',
+                         name=obj.name, surfaceproperty=obj.surface)
+    node.append(etree.Element('physvolref', ref=obj.physvol1))
+    node.append(etree.Element('physvolref', ref=obj.physvol2))
+    return node
+
+
+def make_skinsurface_node(obj):
+    '''
+    Return an lxml.etree.Element for a SkinSurface object.
+    The element goes inside <structure> after all volumes.
+    '''
+    node = etree.Element('skinsurface',
+                         name=obj.name, surfaceproperty=obj.surface)
+    node.append(etree.Element('volumeref', ref=obj.volume))
+    return node
+
+
 def convert(geom):
     '''
     Return an lxml.etree formed from the geometry
@@ -391,15 +460,23 @@ def convert(geom):
         typename = type(obj).__name__.lower()
         if typename=='mixture' or typename=='molecule' or typename=='amalgam':
             for prop, val in obj.properties:
-                vals = str(val[0])
-                for v in val[1:]: vals += ' ' + str(v)
+                coldim, vals = _matrix_from_property(val)
                 define_node.append(etree.Element('matrix',
                                                  name=name+'_'+prop+'_VALUE',
-                                                 coldim=str(len(val)),
+                                                 coldim=str(coldim),
                                                  values=vals))
-                continue
             continue
         continue
+    if hasattr(geom.store, 'surfaces'):
+        for name, obj in geom.store.surfaces.items():
+            if type(obj).__name__ != 'OpticalSurface':
+                continue
+            for prop, val in obj.properties:
+                coldim, vals = _matrix_from_property(val)
+                define_node.append(etree.Element('matrix',
+                                                 name=name+'_'+prop+'_VALUE',
+                                                 coldim=str(coldim),
+                                                 values=vals))
     if center is None:
         define_node.append(etree.Element('position', name='center'))
     if identity is None:
@@ -420,7 +497,11 @@ def convert(geom):
         node = make_shape_node(obj)
         if node is not None:
             solids_node.append(node)
-
+    # <opticalsurface> elements live inside <solids> (SurfaceProperty substitution group)
+    if hasattr(geom.store, 'surfaces'):
+        for obj in geom.store.surfaces.values():
+            if type(obj).__name__ == 'OpticalSurface':
+                solids_node.append(make_opticalsurface_node(obj))
 
     # <structure>
     structure_node = etree.Element('structure')
@@ -430,6 +511,14 @@ def convert(geom):
         node = make_volume_node(vol, geom.store.structure)
         if node is not None:
             structure_node.append(node)
+    # <bordersurface> and <skinsurface> must follow all <volume>/<assembly> elements
+    if hasattr(geom.store, 'surfaces'):
+        for obj in geom.store.surfaces.values():
+            typename = type(obj).__name__
+            if typename == 'BorderSurface':
+                structure_node.append(make_bordersurface_node(obj))
+            elif typename == 'SkinSurface':
+                structure_node.append(make_skinsurface_node(obj))
 
     # <setup>
     setup_node = etree.Element('setup', name="Default", version="0")

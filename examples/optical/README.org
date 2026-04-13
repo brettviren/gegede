@@ -1,0 +1,121 @@
+#+TITLE: Optical Prism — GeGeDe + Geant4 Example
+
+This example builds a simple optical detector geometry using GeGeDe and
+exports it to GDML.  A minimal Geant4 C++ application in =g4app/= can then
+read the GDML and report the geometry and optical surfaces it contains.
+
+* Geometry
+
+#+BEGIN_EXAMPLE
+  world_vol  (1 m cube, StainlessSteel)
+    └─ air_vol  (90 cm cube, Air, centred)
+         └─ prism_vol  (triangular glass prism, Glass, centred)
+#+END_EXAMPLE
+
+The triangular prism has a 30 cm base, 20 cm height and 20 cm depth.
+It is shaped with ~ExtrudedOne~ using three polygon vertices.
+
+* Optical properties
+
+| Material / Surface    | Property     | Values                              |
+|-----------------------+--------------+-------------------------------------|
+| Air                   | RINDEX       | 1.00 (flat across visible range)    |
+| Glass (SiO₂)          | RINDEX       | 1.60 (flat approximation)           |
+| StainlessSteel walls  | REFLECTIVITY | 0.90 @ 2.034 eV, 0.85 @ 4.136 eV  |
+
+The steel–air boundary is described by an ~OpticalSurface~ (model
+=unified=, finish =polished=, type =dielectric_metal=) and a
+~BorderSurface~ that references the =air_in_steel= placement.
+
+** Note on energy/value property rows
+
+Material and surface optical properties use the =(energy_eV, value)= pair
+convention.  In the Python source the rows are expressed as plain-float
+2-tuples (energy in eV, dimensionless value).  Geant4 interprets the
+matrix =coldim="2"= entries as energy/value pairs using the G4 internal
+unit for energy.  Because GDML matrices carry no units, callers must
+supply values already in the unit Geant4 expects (typically eV for photon
+energies and cm⁻¹ for attenuation lengths).
+
+A *flat list* of scalars may also be used for single-value (scalar)
+properties; this produces =coldim="1"=.
+
+* Files
+
+| File           | Description                                 |
+|----------------+---------------------------------------------|
+| =optical.py=   | GeGeDe builder class and standalone script  |
+| =optical.cfg=  | GeGeDe configuration (used by the CLI)      |
+| =run.sh=       | Shell script that calls the gegede CLI      |
+| =g4app/=       | Minimal Geant4 C++ reader application       |
+
+* Generating the GDML
+
+Run from this directory.  The script sets =PYTHONPATH= so that =optical.py=
+is importable.
+
+#+BEGIN_SRC sh
+./run.sh
+#+END_SRC
+
+Alternatively, use the Python entry point directly:
+
+#+BEGIN_SRC sh
+PYTHONPATH=. python optical.py optical_prism.gdml
+#+END_SRC
+
+Or drive it yourself via the gegede CLI:
+
+#+BEGIN_SRC sh
+PYTHONPATH=. gegede -o optical_prism.gdml optical.cfg
+#+END_SRC
+
+All three produce the same =optical_prism.gdml= output.
+
+* Building and running the Geant4 application
+
+Geant4 must be built with GDML support (=GEANT4_USE_GDML=ON=, which
+requires Xerces-C).  The application is not built as part of the gegede
+build system; it is a standalone CMake project.
+
+#+BEGIN_SRC sh
+# Generate the GDML first
+./run.sh
+
+# Configure and build
+cmake -S g4app -B g4app/build \
+      -DGeant4_DIR=/path/to/geant4/lib/Geant4-XX.Y
+cmake --build g4app/build
+
+# Run
+./g4app/build/optical_g4 optical_prism.gdml
+#+END_SRC
+
+Expected output (abbreviated):
+
+#+BEGIN_EXAMPLE
+Reading GDML: optical_prism.gdml
+
+=== Volume tree ===
+air_in_steel  [StainlessSteel]
+  prism_in_air  [Air]
+    prism_vol  [Glass]
+
+=== Materials ===
+  StainlessSteel  density=8 g/cm3
+  Air  density=0.00129 g/cm3  optical-props: RINDEX
+  Glass  density=2.2 g/cm3  optical-props: RINDEX
+
+=== Border surfaces ===
+  air_steel_border
+    pv1: air_in_steel
+    pv2: air_in_steel
+    surface-props: REFLECTIVITY
+
+=== Skin surfaces ===
+  (none)
+#+END_EXAMPLE
+
+See the =TODO(optical-sim)= comment in =g4app/main.cc= for the steps
+needed to extend this into a full optical-photon simulation with a
+=G4RunManager=, physics list, and primary generator.

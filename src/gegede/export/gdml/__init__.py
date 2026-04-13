@@ -122,36 +122,37 @@ def make_material_node(obj):
 
     if typename == 'Amalgam':
         node = etree.Element('material', name=obj.name, Z=str(float(obj.z)))
-        # fixme: units???
-        node.append(etree.Element('D', value=D(obj)))
-        node.append(etree.Element('atom', value=Atom(obj)))
+        # The GDML MaterialMixtureType extends MaterialType, so the inherited
+        # MaterialPropertiesGroup content (<property> elements) must appear
+        # BEFORE the extension sequence (<D>, <atom>, <composite>, <fraction>).
         for propname, propvect in obj.properties:
             node.append(etree.Element('property',
                                       name=propname,
                                       ref=obj.name+'_'+propname+'_VALUE'))
+        node.append(etree.Element('D', value=D(obj)))
+        node.append(etree.Element('atom', value=Atom(obj)))
         return node
 
     if typename == 'Molecule':
         node = etree.Element('material', name=obj.name, formula=Symbol(obj))
+        for propname, propvect in obj.properties:
+            node.append(etree.Element('property',
+                                      name=propname,
+                                      ref=obj.name+'_'+propname+'_VALUE'))
         node.append(etree.Element('D', value=D(obj)))
         for elename, elenum in obj.elements:
             node.append(etree.Element('composite', ref=elename, n=str(elenum)))
-        for propname, propvect in obj.properties:
-            node.append(etree.Element('property',
-                                      name=propname,
-                                      ref=obj.name+'_'+propname+'_VALUE'))
-        return node            
-
+        return node
 
     if typename == 'Mixture':
         node = etree.Element('material', name=obj.name, formula=Symbol(obj))
-        node.append(etree.Element('D', value=D(obj)))
-        for compname, compfrac in obj.components:
-            node.append(etree.Element('fraction', ref=compname, n=str(compfrac)))
         for propname, propvect in obj.properties:
             node.append(etree.Element('property',
                                       name=propname,
                                       ref=obj.name+'_'+propname+'_VALUE'))
+        node.append(etree.Element('D', value=D(obj)))
+        for compname, compfrac in obj.components:
+            node.append(etree.Element('fraction', ref=compname, n=str(compfrac)))
         return node
 
     ValueError(f'unknown material type: "{typename}"')
@@ -364,10 +365,14 @@ def make_volume_node(vol, store):
         node.append(etree.Element('solidref', ref=vol.shape))
     for placename in vol.placements or []:
         place = store[placename]
+        # Give each physvol the placement's name so that <bordersurface>
+        # <physvolref> lookups work in the Geant4 GDML reader.
+        # The name attribute is xs:ID so it must be unique; placement names
+        # are required to be unique in the gegede store.
+        pvol_attrs = dict(name=placename)
         if place.copynumber:
-            pvol = etree.Element('physvol', copynumber=str(place.copynumber))
-        else:
-            pvol = etree.Element('physvol')
+            pvol_attrs['copynumber'] = str(place.copynumber)
+        pvol = etree.Element('physvol', **pvol_attrs)
         node.append(pvol)
         pvol.append(etree.Element('volumeref', ref=place.volume))
         if place.pos:

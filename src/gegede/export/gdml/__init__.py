@@ -17,7 +17,6 @@ import os
 from lxml import etree
 from gegede import Quantity
 from gegede.iter import ascending
-from gegede.export import pod
 
 import logging
 log = logging.getLogger('gegede')
@@ -367,9 +366,11 @@ def make_volume_node(vol, store):
         place = store[placename]
         # Give each physvol the placement's name so that <bordersurface>
         # <physvolref> lookups work in the Geant4 GDML reader.
-        # The name attribute is xs:ID so it must be unique; placement names
-        # are required to be unique in the gegede store.
-        pvol_attrs = dict(name=placename)
+        # name is xs:ID (optional) — omit it rather than emit name="" when
+        # the placement name is empty, since xs:ID cannot be an empty string.
+        pvol_attrs = {}
+        if placename:
+            pvol_attrs['name'] = placename
         if place.copynumber:
             pvol_attrs['copynumber'] = str(place.copynumber)
         pvol = etree.Element('physvol', **pvol_attrs)
